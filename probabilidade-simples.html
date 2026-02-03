@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Probabilidade - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA ROXO DA SORTE (Mistério/Jogos) */
+            --theme-color: #E9D8FD; 
+            --theme-active: #805AD5; 
+            --theme-dark: #553C9A;
+            --theme-accent: #F6E05E; /* Amarelo Ouro para destaque */
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .logo-header { width: 100%; max-width: 600px; display: flex; justify-content: center; padding: 20px 0 10px 0; }
+        .logo-img { max-height: 80px; width: auto; display: block; }
+        .container { width: 100%; max-width: 600px; padding: 20px; }
+
+        .top-nav { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-close { text-decoration: none; color: var(--text-color); font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
+
+        .toggle-container { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 50px; padding: 4px; display: flex; margin-bottom: 25px; box-shadow: 3px 3px 0px var(--border-color); }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 40px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; color: #888; cursor: pointer; transition: all 0.3s ease; }
+        .toggle-btn.active { background-color: var(--theme-active); color: var(--theme-text-active); box-shadow: 0px 2px 5px rgba(0,0,0,0.1); }
+
+        .section-view { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .card-content { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: 4px 4px 0px var(--border-color); margin-bottom: 20px; }
+        
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: center; gap: 15px; justify-content: space-between; flex-wrap: wrap; }
+        .visual-svg { color: var(--theme-active); flex-shrink: 0; }
+        .question-visual { display: flex; justify-content: center; margin: 15px 0; padding: 15px; background-color: #FAF5FF; border-radius: 12px; border: 1px dashed var(--theme-active); }
+
+        .example-box { background-color: #FAF5FF; border-left: 5px solid #805AD5; padding: 15px; margin: 15px 0; border-radius: 8px; }
+        .example-tag { font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: #553C9A; margin-bottom: 5px; display: block; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 5px; margin-bottom: 20px; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 40px; height: 40px; border: 2px solid #ccc; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; color: #888; background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { border-color: var(--border-color); background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); transform: scale(1.05); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 16px; background-color: var(--white); border: 2px solid #ccc; border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; position: relative; }
+        .opt-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #ccc; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; flex-shrink: 0; }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; }
+
+        .feedback-box { display: block; margin-top: 20px; background-color: #EDF2F7; border: 2px solid #2D3748; border-radius: 12px; padding: 20px; animation: slideUp 0.3s ease-out; }
+        .feedback-title { font-weight: 800; text-transform: uppercase; font-size: 0.85rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+
+        #viewResult { text-align: center; display: none; animation: fadeIn 0.5s; }
+        .result-card { background: white; border: 2px solid black; border-radius: 20px; padding: 30px; box-shadow: 6px 6px 0px black; margin-bottom: 30px; }
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+        .btn-retry { width: 100%; padding: 15px; background-color: var(--theme-active); color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s; }
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 2px solid var(--border-color); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100; }
+        .nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 700; border: 2px solid var(--border-color); cursor: pointer; }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="6ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Probabilidade</h1>
+            <p style="color: #555; margin-bottom: 20px;">Probabilidade é a matemática que estuda a <strong>chance</strong> de algo acontecer.</p>
+            
+            <div class="card-content">
+                <h3>🎲 A Fórmula Mágica</h3>
+                <div class="example-box" style="text-align:center;">
+                    <p style="font-weight:700; color:#553C9A;">P = (O que eu quero) / (Tudo o que pode acontecer)</p>
+                </div>
+                
+                <div class="visual-row" style="margin-top:20px;">
+                    <div style="text-align:center; flex:1;">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 60 60" fill="none">
+                            <circle cx="30" cy="30" r="28" fill="#F6E05E" stroke="#D69E2E" stroke-width="2"/>
+                            <text x="30" y="38" font-size="20" font-weight="bold" fill="#D69E2E" text-anchor="middle">1</text>
+                        </svg>
+                        <p style="font-size:0.8rem; margin-top:5px;"><strong>Moeda</strong></p>
+                        <p style="font-size:0.7rem;">Total: 2 (Cara/Coroa)</p>
+                    </div>
+
+                    <div style="text-align:center; flex:1;">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 60 60" fill="none">
+                            <rect x="10" y="10" width="40" height="40" rx="5" fill="white" stroke="#2D3748" stroke-width="2"/>
+                            <circle cx="20" cy="20" r="3" fill="#2D3748"/>
+                            <circle cx="40" cy="20" r="3" fill="#2D3748"/>
+                            <circle cx="20" cy="30" r="3" fill="#2D3748"/>
+                            <circle cx="40" cy="30" r="3" fill="#2D3748"/>
+                            <circle cx="20" cy="40" r="3" fill="#2D3748"/>
+                            <circle cx="40" cy="40" r="3" fill="#2D3748"/>
+                        </svg>
+                        <p style="font-size:0.8rem; margin-top:5px;"><strong>Dado</strong></p>
+                        <p style="font-size:0.7rem;">Total: 6 faces</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>🔮 Tipos de Eventos</h3>
+                <ul style="margin-left:20px; font-size:0.9rem; line-height:1.8;">
+                    <li><strong>Impossível (0%):</strong> Tirar 7 num dado comum.</li>
+                    <li><strong>Certo (100%):</strong> Tirar um número menor que 7 num dado.</li>
+                    <li><strong>Provável:</strong> Tem boa chance de acontecer.</li>
+                    <li><strong>Improvável:</strong> Tem pouca chance (mas pode acontecer).</li>
+                </ul>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Calcule as chances e teste sua sorte.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Simulado Finalizado!</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Incrível! Sua intuição matemática é ótima.</p>
+            </div>
+            <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Simulado</button>
+            <button onclick="setMode('explanation')" style="margin-top:15px; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                ⬅ Voltar para o Assunto
+            </button>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (PROBABILIDADE) ---
+        const questions = [
+            // NÍVEL 1: CONCEITOS (POSSÍVEL, IMPOSSÍVEL, CERTO)
+            {
+                id: 1,
+                text: "Se eu jogar um dado comum (1 a 6), qual a chance de sair o número <strong>7</strong>?",
+                visual: `
+                    <svg width="60" height="60" viewBox="0 0 60 60" style="margin:0 auto; display:block;">
+                        <rect x="10" y="10" width="40" height="40" rx="5" fill="white" stroke="#2D3748" stroke-width="2"/>
+                        <text x="30" y="38" font-size="24" text-anchor="middle" font-weight="bold" fill="#C53030">?</text>
+                    </svg>
+                `,
+                options: ["Evento Certo (100%)", "Evento Impossível (0%)", "Evento Provável", "Evento Improvável", "50% de chance"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Um dado comum só vai até o 6. É <strong>impossível</strong> sair 7.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Não existe face 7. Chance zero.</div>`
+            },
+            {
+                id: 2,
+                text: "Ao lançar uma moeda, qual a chance de sair <strong>Cara</strong>?",
+                visual: `
+                    <svg width="80" height="50" viewBox="0 0 80 50" style="margin:0 auto; display:block;">
+                        <circle cx="25" cy="25" r="20" fill="#F6E05E" stroke="#D69E2E" stroke-width="2"/>
+                        <text x="25" y="32" font-size="12" font-weight="bold" text-anchor="middle" fill="#D69E2E">C</text>
+                        <text x="60" y="30" font-size="12" fill="#2D3748">ou</text>
+                        <circle cx="95" cy="25" r="20" fill="#E9D8FD" stroke="#805AD5" stroke-width="2" style="opacity:0.5"/> </svg>
+                `,
+                options: ["1 em 6", "1 em 2 (Metade)", "1 em 10", "Certeza absoluta", "Impossível"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A moeda só tem 2 lados. Cara é 1 deles. Logo, 1 chance em 2 (ou 50%).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 1 em 6 é para dado.</div>`
+            },
+            {
+                id: 3,
+                text: "Em uma urna só tem bolas <strong>Verdes</strong>. Se eu pegar uma bola sem olhar, ela será verde?",
+                options: ["Evento Certo", "Evento Impossível", "Talvez", "Muito difícil", "Depende da sorte"],
+                correct: 0,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Se SÓ tem bolas verdes, é <strong>certo</strong> (100% garantido) que você pegará uma verde.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Não tem como errar se só existe uma opção.</div>`
+            },
+            // NÍVEL 2: DADOS E MOEDAS (FRAÇÕES SIMPLES)
+            {
+                id: 4,
+                text: "No lançamento de um dado, qual a probabilidade de sair o número <strong>4</strong>?",
+                visual: `
+                    <svg width="60" height="60" viewBox="0 0 60 60" style="margin:0 auto; display:block;">
+                        <rect x="10" y="10" width="40" height="40" rx="5" fill="white" stroke="#2D3748" stroke-width="2"/>
+                        <circle cx="20" cy="20" r="3" fill="#2D3748"/>
+                        <circle cx="40" cy="20" r="3" fill="#2D3748"/>
+                        <circle cx="20" cy="40" r="3" fill="#2D3748"/>
+                        <circle cx="40" cy="40" r="3" fill="#2D3748"/>
+                    </svg>
+                `,
+                options: ["1/2", "1/6", "4/6", "6/1", "1/4"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> O dado tem 6 faces. O número 4 é apenas UMA dessas faces. Então, 1 chance em 6 (1/6).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 4/6 seria se você quisesse 4 números diferentes.</div>`
+            },
+            {
+                id: 5,
+                text: "Qual a chance de sair um número <strong>PAR</strong> (2, 4, 6) ao jogar um dado?",
+                options: ["1/6", "2/6", "3/6 (ou 1/2)", "4/6", "5/6"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Os pares são 2, 4 e 6. São 3 números favoráveis num total de 6. 3/6 é a mesma coisa que metade (1/2).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 1/6 seria escolher só um número.</div>`
+            },
+            {
+                id: 6,
+                text: "Se eu jogar uma moeda 10 vezes, é <strong>garantido</strong> que vai sair Cara 5 vezes?",
+                options: ["Sim, sempre é a metade exata", "Não, a probabilidade é uma chance, não uma certeza", "Sim, a matemática não falha", "Só se a moeda for nova", "Depende do vento"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Probabilidade é a CHANCE. Pode sair 6 caras e 4 coroas, ou até 10 caras (raro). A longo prazo se aproxima da metade, mas em poucos jogos varia.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Não é uma garantia exata para poucas tentativas.</div>`
+            },
+            // NÍVEL 3: ROLETA E CORES
+            {
+                id: 7,
+                text: "Observe a roleta. Qual cor tem <strong>maior</strong> probabilidade de sair?",
+                visual: `
+                    <svg width="100" height="100" viewBox="0 0 100 100" style="margin:0 auto; display:block;">
+                        <path d="M50 50 L50 0 A 50 50 0 0 1 100 50 Z" fill="#805AD5"/> <path d="M50 50 L100 50 A 50 50 0 0 1 50 100 Z" fill="#805AD5"/> <path d="M50 50 L50 100 A 50 50 0 0 1 0 50 Z" fill="#805AD5"/> <path d="M50 50 L0 50 A 50 50 0 0 1 50 0 Z" fill="#F6E05E"/> <circle cx="50" cy="50" r="5" fill="white"/>
+                    </svg>
+                `,
+                options: ["Amarelo", "Roxo", "As chances são iguais", "Verde", "Branco"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> O Roxo ocupa 3 partes da roleta (3/4). O Amarelo só ocupa 1 parte (1/4). É mais provável sair Roxo.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Amarelo tem área menor.</div>`
+            },
+            {
+                id: 8,
+                text: "Na roleta acima, qual a fração que representa a chance de cair no <strong>Amarelo</strong>?",
+                options: ["1/2", "1/3", "1/4", "3/4", "1/10"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A roleta está dividida em 4 partes iguais. O Amarelo é 1 dessas partes. Logo, 1/4.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 3/4 é a chance do Roxo.</div>`
+            },
+            {
+                id: 9,
+                text: "Tenho 10 bolas numeradas de 1 a 10. Qual a chance de tirar a bola <strong>número 8</strong>?",
+                options: ["1/10", "1/8", "8/10", "1/2", "10/1"],
+                correct: 0,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Só existe UMA bola número 8. O total são 10 bolas. Chance: 1 em 10 (1/10).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 1/8 seria se tivessem 8 bolas no total.</div>`
+            },
+            // NÍVEL 4: COMPARAÇÃO DE CHANCES
+            {
+                id: 10,
+                text: "Em qual sorteio é <strong>mais difícil</strong> ganhar?",
+                options: ["Sorteio A: 1 prêmio para 10 pessoas", "Sorteio B: 1 prêmio para 100 pessoas", "Sorteio C: 1 prêmio para 2 pessoas", "Sorteio D: 1 prêmio para 5 pessoas", "São todos iguais"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Quanto mais gente participando, MENOR é a sua chance. 1 em 100 é muito mais difícil que 1 em 10.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 1 em 2 é a melhor chance (50%).</div>`
+            },
+            {
+                id: 11,
+                text: "Qual a probabilidade de tirar um número <strong>menor que 3</strong> no dado (1 ou 2)?",
+                visual: `
+                    <svg width="60" height="60" viewBox="0 0 60 60" style="margin:0 auto; display:block;">
+                        <rect x="10" y="10" width="40" height="40" rx="5" fill="white" stroke="#2D3748" stroke-width="2"/>
+                        <circle cx="20" cy="20" r="3" fill="#2D3748"/>
+                        <circle cx="40" cy="40" r="3" fill="#2D3748"/>
+                    </svg>
+                `,
+                options: ["1/6", "2/6 (ou 1/3)", "3/6", "4/6", "5/6"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Números menores que 3 são o 1 e o 2. São 2 números favoráveis. Total 6. 2/6.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 3/6 seria menores ou iguais a 3.</div>`
+            },
+            {
+                id: 12,
+                text: "Uma caixa tem 3 bolas azuis e 2 vermelhas. Qual a probabilidade de pegar uma <strong>Vermelha</strong>?",
+                visual: `
+                    <svg width="100" height="50" viewBox="0 0 100 50" style="margin:0 auto; display:block;">
+                        <circle cx="15" cy="25" r="10" fill="#3182CE"/> <circle cx="40" cy="25" r="10" fill="#3182CE"/> <circle cx="65" cy="25" r="10" fill="#3182CE"/> <circle cx="25" cy="40" r="10" fill="#E53E3E"/> <circle cx="50" cy="40" r="10" fill="#E53E3E"/> </svg>
+                `,
+                options: ["2/5", "3/5", "2/3", "1/2", "5/2"],
+                correct: 0,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Total de bolas = 3 + 2 = 5. Vermelhas = 2. Chance: 2 em 5 (2/5).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 3/5 é a chance das azuis.</div>`
+            },
+            // NÍVEL 5: PORCENTAGEM E LÓGICA
+            {
+                id: 13,
+                text: "Se a chance de chover hoje é <strong>80%</strong>, a chance de NÃO chover é:",
+                options: ["20%", "50%", "80%", "100%", "0%"],
+                correct: 0,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> O total sempre é 100%. Se 80% é Sim, o resto (100 - 80) é Não. 20%.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> A soma deve dar 100%.</div>`
+            },
+            {
+                id: 14,
+                text: "Qual fração representa 50% de chance?",
+                options: ["1/4", "1/2", "1/3", "1/5", "1/10"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> 50% é a metade de 100%. A fração que representa metade é <strong>1/2</strong>.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 1/4 é 25%.</div>`
+            },
+            {
+                id: 15,
+                text: "Se eu sortear uma letra da palavra <strong>AMORA</strong>, qual a chance de sair a letra <strong>A</strong>?",
+                options: ["1/5", "2/5", "3/5", "1/2", "5/2"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A palavra A-M-O-R-A tem 5 letras no total. A letra A aparece 2 vezes. Chance: 2 em 5 (2/5).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 1/5 seria para M, O ou R.</div>`
+            }
+        ];
+
+        // --- ESTADO DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        // --- NAVEGAÇÃO ENTRE ABAS ---
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // --- RENDERIZAÇÃO DO QUIZ ---
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.95rem; line-height: 1.5;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            // Verifica se tem imagem visual na questão
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; // Já respondeu
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#276749"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        function finishQuiz() {
+            score = 0;
+            userAnswers.forEach((ans, idx) => {
+                if (ans === questions[idx].correct) score++;
+            });
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            if (percent === 100) { stars = "⭐⭐⭐⭐⭐"; msg = "Perfeito! Você é um mestre!"; }
+            else if (percent >= 80) { stars = "⭐⭐⭐⭐"; msg = "Muito bom! Quase gabaritou."; }
+            else if (percent >= 60) { stars = "⭐⭐⭐"; msg = "Bom trabalho. Continue praticando."; }
+            else if (percent >= 40) { stars = "⭐⭐"; msg = "Você pode melhorar. Revise a explicação."; }
+            else { stars = "⭐"; msg = "Não desista! Leia a explicação e tente de novo."; }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+
+            if (percent >= 60) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

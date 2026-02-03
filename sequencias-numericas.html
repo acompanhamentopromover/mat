@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sequências Numéricas - 9º Ano</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #1E293B; 
+            --border-color: #000000;
+            
+            /* CORES: CIANO E ROXO NEON (Padrões/Lógica) */
+            --theme-light: #CFFAFE; 
+            --theme-medium: #22D3EE;
+            --theme-dark: #0891B2; 
+            --theme-contrast: #7C3AED; /* Roxo para contraste */
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        /* --- HEADER --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+        .logo-img { max-height: 80px; width: auto; display: block; }
+
+        .container { width: 100%; max-width: 600px; padding: 20px; }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .toggle-btn.active {
+            background-color: var(--theme-contrast); 
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO EXPLICATIVO --- */
+        .section-view { display: none; animation: fadeIn 0.3s ease-in-out; }
+        
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* --- CAIXAS DE EXEMPLO --- */
+        .example-box {
+            background-color: #ECFEFF;
+            border-left: 5px solid var(--theme-dark);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .step-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--theme-dark);
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .math-block {
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: #333;
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #CFFAFE;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .visual-row { display: flex; align-items: center; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+
+        /* --- QUIZ --- */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: var(--theme-light);
+            border-radius: 12px;
+            border: 1px dashed var(--theme-dark);
+        }
+
+        .question-map {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-contrast);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK --- */
+        .feedback-box {
+            display: block; margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+        .feedback-title { font-weight: 800; text-transform: uppercase; font-size: 0.85rem; margin-bottom: 10px; }
+
+        /* --- RESULTADO --- */
+        #viewResult { text-align: center; display: none; animation: fadeIn 0.5s; }
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-contrast); line-height: 1; margin: 10px 0; }
+        .btn-retry {
+            width: 100%; padding: 15px; background-color: var(--theme-contrast); color: white;
+            border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700;
+            cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;
+        }
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- FOOTER --- */
+        .quiz-footer {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background-color: var(--white); border-top: 2px solid var(--border-color);
+            padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100;
+        }
+        .nav-btn {
+            padding: 12px 24px; border-radius: 8px; font-weight: 700; border: 2px solid var(--border-color); cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-contrast); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        <nav class="top-nav">
+            <a href="9ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">9º ANO</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Sequências Numéricas</h1>
+            <p style="color: #555; margin-bottom: 20px;">Uma sequência é uma lista ordenada de números (ou figuras) que segue um <strong>padrão lógico</strong>.</p>
+            
+            <div class="card-content">
+                <h3>1. Padrões Visuais</h3>
+                <p class="explanation-text">Muitas vezes, a regra não é um número, mas uma forma que cresce.</p>
+                <div class="visual-row">
+                    <svg width="250" height="60" viewBox="0 0 250 60">
+                        <rect x="20" y="20" width="20" height="20" fill="#22D3EE"/>
+                        <text x="30" y="55" font-size="10" text-anchor="middle">1</text>
+                        <rect x="60" y="20" width="20" height="20" fill="#22D3EE"/>
+                        <rect x="80" y="20" width="20" height="20" fill="#22D3EE"/>
+                        <text x="80" y="55" font-size="10" text-anchor="middle">2</text>
+                        <rect x="120" y="20" width="20" height="20" fill="#22D3EE"/>
+                        <rect x="140" y="20" width="20" height="20" fill="#22D3EE"/>
+                        <rect x="160" y="20" width="20" height="20" fill="#22D3EE"/>
+                        <text x="150" y="55" font-size="10" text-anchor="middle">3</text>
+                        <path d="M 190 30 L 220 30" stroke="#7C3AED" stroke-width="2" marker-end="url(#arrow)"/>
+                        <text x="230" y="35" font-size="14" fill="#7C3AED">?</text>
+                    </svg>
+                </div>
+                <p class="explanation-text">Neste exemplo, a cada passo, aumentamos 1 quadrado. A regra é <strong>+1</strong>.</p>
+            </div>
+
+            <div class="card-content">
+                <h3>2. Progressão Aritmética (PA)</h3>
+                <p class="explanation-text">É uma escada onde os degraus têm a mesma altura. Você sempre <strong>SOMA</strong> o mesmo valor.</p>
+                <div class="example-box">
+                    <strong>Exemplo: 2, 5, 8, 11...</strong>
+                    <div class="math-block">+3, +3, +3...</div>
+                    <p style="font-size:0.9rem;">A "razão" (r) é 3. Para achar o próximo, basta somar 3.</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>3. Progressão Geométrica (PG)</h3>
+                <p class="explanation-text">É um crescimento explosivo. Você sempre <strong>MULTIPLICA</strong> pelo mesmo valor.</p>
+                <div class="example-box">
+                    <strong>Exemplo: 3, 6, 12, 24...</strong>
+                    <div class="math-block">×2, ×2, ×2...</div>
+                    <p style="font-size:0.9rem;">A "razão" (q) é 2. Para achar o próximo, basta multiplicar por 2.</p>
+                </div>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Descubra o padrão e complete.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Resultado</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente!</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (SEQUÊNCIAS) ---
+        const questions = [
+            // NÍVEL 1: PADRÕES VISUAIS E LÓGICA SIMPLES
+            {
+                id: 1,
+                text: "Observe o padrão de bolinhas. Quantas bolinhas terá a próxima figura?",
+                visual: `
+                    <svg width="200" height="50" viewBox="0 0 200 50">
+                        <circle cx="20" cy="25" r="5" fill="#7C3AED"/> <circle cx="60" cy="25" r="5" fill="#7C3AED"/> <circle cx="60" cy="15" r="5" fill="#7C3AED"/>
+                        <circle cx="60" cy="35" r="5" fill="#7C3AED"/>
+                        
+                        <circle cx="110" cy="25" r="5" fill="#7C3AED"/> <circle cx="110" cy="15" r="5" fill="#7C3AED"/>
+                        <circle cx="110" cy="35" r="5" fill="#7C3AED"/>
+                        <circle cx="110" cy="5" r="5" fill="#7C3AED"/>
+                        <circle cx="110" cy="45" r="5" fill="#7C3AED"/>
+                        
+                        <text x="160" y="30" font-size="20" fill="#333">?</text>
+                    </svg>
+                `,
+                options: ["6", "7", "8", "9"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 6 é par.<br>
+                    <strong>(B) Correta:</strong> A sequência é 1, 3, 5... (números ímpares). O próximo número ímpar é 7.<br>
+                    <strong>(C) Incorreta:</strong> 8 é par.<br>
+                    <strong>(D) Incorreta:</strong> Pulou o 7.`
+            },
+            {
+                id: 2,
+                text: "Qual é o próximo número da sequência: <strong>2, 4, 8, 16...</strong>?",
+                options: ["20", "24", "32", "18"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Somou 4.<br>
+                    <strong>(B) Incorreta:</strong> Somou 8.<br>
+                    <strong>(C) Correta:</strong> A regra é multiplicar por 2 (dobrar). 16 · 2 = 32.<br>
+                    <strong>(D) Incorreta:</strong> Somou 2.`
+            },
+            {
+                id: 3,
+                text: "Descubra o padrão: <strong>100, 95, 90, 85...</strong> O próximo é:",
+                options: ["84", "80", "75", "70"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Subtraiu 1.<br>
+                    <strong>(B) Correta:</strong> A regra é subtrair 5 a cada passo. 85 - 5 = 80.<br>
+                    <strong>(C) Incorreta:</strong> Subtraiu 10.<br>
+                    <strong>(D) Incorreta:</strong> Pulou um termo.`
+            },
+            // NÍVEL 2: QUADRADOS E FORMAS
+            {
+                id: 4,
+                text: "Estes são os 'Números Quadrados'. Qual o próximo? <strong>1, 4, 9, 16...</strong>",
+                visual: `
+                    <svg width="150" height="50" viewBox="0 0 150 50">
+                        <rect x="10" y="20" width="10" height="10" fill="#22D3EE"/> <rect x="40" y="15" width="20" height="20" fill="#22D3EE"/> <rect x="80" y="10" width="30" height="30" fill="#22D3EE"/> <text x="130" y="30" font-size="16" fill="#333">?</text>
+                    </svg>
+                `,
+                options: ["20", "24", "25", "30"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Não é quadrado perfeito.<br>
+                    <strong>(B) Incorreta:</strong> Não é quadrado perfeito.<br>
+                    <strong>(C) Correta:</strong> A sequência é 1², 2², 3², 4². O próximo é 5² = 25.<br>
+                    <strong>(D) Incorreta:</strong> Erro.`
+            },
+            {
+                id: 5,
+                text: "Sequência de Fibonacci: <strong>1, 1, 2, 3, 5...</strong> Qual o próximo? (Dica: some os dois anteriores)",
+                options: ["6", "7", "8", "9"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 3+3?<br>
+                    <strong>(B) Incorreta:</strong> 2+5.<br>
+                    <strong>(C) Correta:</strong> Cada número é a soma dos dois anteriores: 3 + 5 = 8.<br>
+                    <strong>(D) Incorreta:</strong> Erro.`
+            },
+            {
+                id: 6,
+                text: "Qual é a regra da sequência: <strong>1, -1, 1, -1, 1...</strong>?",
+                options: ["Subtrair 2", "Multiplicar por -1", "Dividir por 2", "Somar 0"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 1-2 = -1, mas -1-2 = -3.<br>
+                    <strong>(B) Correta:</strong> Multiplicar por -1 inverte o sinal a cada passo.<br>
+                    <strong>(C) Incorreta:</strong> Diminuiria o valor.<br>
+                    <strong>(D) Incorreta:</strong> Ficaria constante.`
+            },
+            // NÍVEL 3: TERMO GERAL E PA
+            {
+                id: 7,
+                text: "Se a fórmula do termo geral é <strong>an = 2n</strong>, qual é o 5º termo (n=5)?",
+                options: ["5", "7", "10", "25"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> n=5.<br>
+                    <strong>(B) Incorreta:</strong> 5+2.<br>
+                    <strong>(C) Correta:</strong> Substituindo n por 5: 2 · 5 = 10.<br>
+                    <strong>(D) Incorreta:</strong> 5².`
+            },
+            {
+                id: 8,
+                text: "Qual é o valor de x na PA: <strong>5, x, 15</strong>?",
+                visual: `
+                    <svg width="150" height="40" viewBox="0 0 150 40">
+                        <text x="75" y="25" text-anchor="middle" font-size="14" fill="#333">5 -> +r -> x -> +r -> 15</text>
+                    </svg>
+                `,
+                options: ["8", "10", "12", "7"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 5+3=8, 8+3=11 (não 15).<br>
+                    <strong>(B) Correta:</strong> Em uma PA, o termo do meio é a média dos vizinhos. (5+15)/2 = 10.<br>
+                    <strong>(C) Incorreta:</strong> 5+7=12, 12+7=19.<br>
+                    <strong>(D) Incorreta:</strong> Muito baixo.`
+            },
+            {
+                id: 9,
+                text: "Qual é a definição de uma <strong>Progressão Aritmética (PA)</strong>?",
+                options: ["Uma sequência onde se multiplica sempre o mesmo valor", "Uma sequência onde se soma sempre o mesmo valor", "Uma sequência aleatória", "Uma sequência de quadrados"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Isso é PG.<br>
+                    <strong>(B) Correta:</strong> A característica da PA é somar uma constante (razão) a cada termo.<br>
+                    <strong>(C) Incorreta:</strong> PA tem regra fixa.<br>
+                    <strong>(D) Incorreta:</strong> Específico demais.`
+            },
+            // NÍVEL 4: PG E CRESCIMENTO
+            {
+                id: 10,
+                text: "Qual destas é uma <strong>Progressão Geométrica (PG)</strong>?",
+                options: ["2, 4, 6, 8...", "5, 10, 15, 20...", "3, 9, 27, 81...", "1, 2, 3, 4..."],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> PA de razão 2.<br>
+                    <strong>(B) Incorreta:</strong> PA de razão 5.<br>
+                    <strong>(C) Correta:</strong> Multiplica-se sempre por 3. Isso é uma PG.<br>
+                    <strong>(D) Incorreta:</strong> PA de razão 1.`
+            },
+            {
+                id: 11,
+                text: "Qual é a razão da PG: <strong>4, 12, 36...</strong>?",
+                visual: `
+                    <svg width="150" height="40" viewBox="0 0 150 40">
+                        <text x="75" y="25" text-anchor="middle" font-size="14" fill="#333">4 · ? = 12</text>
+                    </svg>
+                `,
+                options: ["2", "3", "4", "8"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 4·2 = 8.<br>
+                    <strong>(B) Correta:</strong> Para ir de 4 para 12, multiplicamos por 3. (12 ÷ 4 = 3).<br>
+                    <strong>(C) Incorreta:</strong> 4·4 = 16.<br>
+                    <strong>(D) Incorreta:</strong> Diferença é 8, não razão.`
+            },
+            {
+                id: 12,
+                text: "Na sequência das metades: <strong>100, 50, 25...</strong> qual o próximo?",
+                options: ["10", "12,5", "15", "0"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Divisão errada.<br>
+                    <strong>(B) Correta:</strong> A regra é dividir por 2. 25 ÷ 2 = 12,5.<br>
+                    <strong>(C) Incorreta:</strong> Subtraiu 10.<br>
+                    <strong>(D) Incorreta:</strong> Não zera tão rápido.`
+            },
+            // NÍVEL 5: DESAFIOS E APLICAÇÕES
+            {
+                id: 13,
+                text: "Se o 1º termo de uma PA é 5 e a razão é 2, qual é o 10º termo?",
+                options: ["23", "25", "20", "15"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> a10 = a1 + 9r = 5 + 9(2) = 5 + 18 = 23.<br>
+                    <strong>(B) Incorreta:</strong> Somou 10 vezes a razão (seria o 11º).<br>
+                    <strong>(C) Incorreta:</strong> 10·2 = 20 (esqueceu o a1).<br>
+                    <strong>(D) Incorreta:</strong> Erro.`
+            },
+            {
+                id: 14,
+                text: "Observe as setas: ⬆️, ➡️, ⬇️, ⬅️ ... Qual a próxima?",
+                options: ["➡️", "⬇️", "⬆️", "⬅️"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Seria a 2ª do ciclo.<br>
+                    <strong>(B) Incorreta:</strong> Seria a 3ª do ciclo.<br>
+                    <strong>(C) Correta:</strong> O padrão é um ciclo de 4 passos girando sentido horário. Após a esquerda, volta para Cima.<br>
+                    <strong>(D) Incorreta:</strong> Acabou de acontecer.`
+            },
+            {
+                id: 15,
+                text: "Uma bactéria se divide em 2 a cada hora. Começando com 1, quantas teremos em 4 horas?",
+                options: ["8", "16", "4", "32"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 3 horas.<br>
+                    <strong>(B) Correta:</strong> Hora 0: 1. Hora 1: 2. Hora 2: 4. Hora 3: 8. Hora 4: 16. (PG de razão 2).<br>
+                    <strong>(C) Incorreta:</strong> Soma simples.<br>
+                    <strong>(D) Incorreta:</strong> 5 horas.`
+            }
+        ];
+
+        // --- LÓGICA DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.90rem; line-height: 1.6;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; 
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#7C3AED"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        function finishQuiz() {
+            score = 0;
+            let feedbackHTML = '<div style="text-align: left; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">';
+
+            userAnswers.forEach((ans, idx) => {
+                const q = questions[idx];
+                const isCorrect = (ans === q.correct);
+                if (isCorrect) score++;
+                
+                if (isCorrect) {
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: #F0FFF4; border-radius: 8px; border-left: 4px solid #48BB78;">
+                            <p style="font-size: 0.9rem;"><strong>Questão ${idx+1}:</strong> ✅ Acertou!</p>
+                        </div>`;
+                } else {
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 15px; background: #FFF5F5; border-radius: 8px; border-left: 4px solid #F56565;">
+                            <p style="font-weight: 700; color: #C53030;">Questão ${idx+1}: ${q.text}</p>
+                            <div style="font-size: 0.85rem; margin-top: 10px; color: #4A5568;">
+                                ${q.explanation}
+                            </div>
+                        </div>`;
+                }
+            });
+            feedbackHTML += '</div>';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            let actionButtonsHTML = "";
+
+            if (percent >= 80) {
+                stars = "⭐⭐⭐⭐⭐"; 
+                msg = "Parabéns! Você dominou o conteúdo.";
+                actionButtonsHTML = `
+                    <button onclick="window.location.href='9ano-matematica.html'" style="width: 100%; padding: 15px; background-color: #48BB78; color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;">
+                        Concluir Atividade
+                    </button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Voltar para o Assunto
+                    </button>
+                `;
+            } else {
+                stars = "💪 Estude mais"; 
+                msg = `Você fez ${percent}%. Precisa de 80% para passar.`;
+                actionButtonsHTML = `
+                    <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Exercícios</button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Revisar Explicação
+                    </button>
+                `;
+            }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+            
+            document.getElementById('review-container').innerHTML = feedbackHTML;
+            document.getElementById('action-buttons').innerHTML = actionButtonsHTML;
+
+            if (percent >= 80) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            document.getElementById('review-container').innerHTML = ""; 
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

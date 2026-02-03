@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juros Simples e Compostos - 9º Ano</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #064E3B; /* Verde Escuro */
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA ESMERALDA (Dinheiro/Crescimento) */
+            --theme-color: #D1FAE5; 
+            --theme-active: #059669; 
+            --theme-text-active: #FFFFFF;
+            
+            /* DESTAQUE DOURADO */
+            --gold: #D97706;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR (ERRO) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- LOGO --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--theme-active);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO --- */
+        .section-view {
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: center; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+        .visual-svg { color: var(--theme-active); }
+        
+        /* Estilo para SVGs dentro das questões */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #D1FAE5;
+            border-radius: 12px;
+            border: 1px dashed var(--theme-active);
+        }
+
+        /* --- CARDS DE EXEMPLO DETALHADO --- */
+        .step-box {
+            background-color: #ECFDF5; 
+            border-left: 5px solid #059669;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .step-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #047857;
+            margin-bottom: 10px;
+            display: block;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        .math-symbol {
+            font-weight: bold;
+            color: #059669;
+        }
+
+        .explanation-text {
+            font-size: 0.9rem;
+            color: #4A5568;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .highlight {
+            color: #059669;
+            font-weight: 700;
+        }
+
+        /* --- QUIZ MAPA --- */
+        .question-map {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-active);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        /* --- OPÇÕES --- */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK DETALHADO --- */
+        .feedback-box {
+            display: block; 
+            margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- TELA DE RESULTADO --- */
+        #viewResult {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+
+        .btn-retry {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--theme-active);
+            color: white;
+            border: 2px solid black;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px black;
+            transition: transform 0.1s;
+        }
+        
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- RODAPÉ FIXO --- */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            border-top: 2px solid var(--border-color);
+            padding: 15px 20px;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="9ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">9º ANO</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Juros Simples e Compostos</h1>
+            <p style="color: #555; margin-bottom: 20px;">O dinheiro muda de valor com o tempo. Aprenda a diferença entre crescer em "linha reta" (Simples) e crescer como uma "bola de neve" (Compostos).</p>
+            
+            <div class="card-content">
+                <h3>1. Juros Simples (A Linha Reta)</h3>
+                <p class="explanation-text">O juro é calculado sempre sobre o valor <strong>INICIAL</strong> (Capital). O valor do juro é sempre igual todo mês.</p>
+                
+                <div class="visual-row">
+                    
+                    <svg width="200" height="100" viewBox="0 0 200 100">
+                        <line x1="20" y1="80" x2="180" y2="80" stroke="#333"/> <line x1="20" y1="80" x2="20" y2="10" stroke="#333"/> <line x1="20" y1="80" x2="180" y2="20" stroke="#059669" stroke-width="3"/> <text x="100" y="95" font-size="10">Tempo</text>
+                        <text x="100" y="40" font-size="12" fill="#059669" font-weight="bold">Linear</text>
+                    </svg>
+                </div>
+                
+                <div class="step-box">
+                    <span class="step-title">Fórmula: J = C · i · t</span>
+                    <p class="explanation-text"><strong>C</strong> = Capital (Dinheiro inicial)</p>
+                    <p class="explanation-text"><strong>i</strong> = Taxa (em decimal, ex: 10% = 0,10)</p>
+                    <p class="explanation-text"><strong>t</strong> = Tempo</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>2. Juros Compostos (A Bola de Neve)</h3>
+                <p class="explanation-text">É "juros sobre juros". O juro é calculado sobre o valor <strong>ACUMULADO</strong> do mês anterior. Cresce muito mais rápido!</p>
+                
+                <div class="visual-row">
+                    
+                    <svg width="200" height="100" viewBox="0 0 200 100">
+                        <line x1="20" y1="80" x2="180" y2="80" stroke="#333"/> <line x1="20" y1="80" x2="20" y2="10" stroke="#333"/> <path d="M 20 80 Q 100 80 180 10" fill="none" stroke="#D97706" stroke-width="3"/> <text x="100" y="95" font-size="10">Tempo</text>
+                        <text x="80" y="40" font-size="12" fill="#D97706" font-weight="bold">Exponencial</text>
+                    </svg>
+                </div>
+
+                <div class="step-box">
+                    <span class="step-title">Fórmula: M = C · (1 + i)ᵗ</span>
+                    <p class="explanation-text">Aqui o tempo é <strong>expoente</strong> (potência), por isso a curva sobe rápido.</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>3. Comparando na Prática</h3>
+                <p class="explanation-text">R$ 100,00 a 10% ao mês por 2 meses.</p>
+                
+                <table style="width:100%; border-collapse:collapse; margin-top:10px; font-size:0.9rem;">
+                    <tr style="background:#059669; color:white;">
+                        <th style="padding:8px;">Mês</th>
+                        <th style="padding:8px;">Simples</th>
+                        <th style="padding:8px;">Composto</th>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px; border-bottom:1px solid #ccc;">1</td>
+                        <td style="padding:8px; border-bottom:1px solid #ccc;">+10 (Total 110)</td>
+                        <td style="padding:8px; border-bottom:1px solid #ccc;">+10 (Total 110)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px;">2</td>
+                        <td style="padding:8px;">+10 (Total 120)</td>
+                        <td style="padding:8px; font-weight:bold; color:#D97706;">+11 (Total 121)</td>
+                    </tr>
+                </table>
+                <p class="explanation-text" style="font-size:0.8rem; margin-top:5px;">*No composto, o 2º mês rendeu 10% de 110, não de 100.</p>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Calcule os rendimentos.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Resultado</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente!</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (JUROS) ---
+        const questions = [
+            // NÍVEL 1: CONCEITOS E FÓRMULAS
+            {
+                id: 1,
+                text: "O que caracteriza os <strong>Juros Simples</strong>?",
+                visual: `
+                    <svg width="150" height="50" viewBox="0 0 150 50">
+                        <text x="75" y="30" text-anchor="middle" font-size="16" fill="#059669">Juros sempre iguais</text>
+                    </svg>
+                `,
+                options: ["O juro é calculado sobre o valor acumulado", "O juro é calculado sempre sobre o valor inicial", "O juro diminui com o tempo", "Não existe juro"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Isso é juro composto.<br>
+                    <strong>(B) Correta:</strong> No regime simples, a base de cálculo é fixa (Capital Inicial). Se rendeu 10 reais no primeiro mês, vai render 10 reais para sempre.<br>
+                    <strong>(C) Incorreta:</strong> Ele é constante.<br>
+                    <strong>(D) Incorreta:</strong> Existe.`
+            },
+            {
+                id: 2,
+                text: "Qual é a fórmula para calcular o Juro Simples?",
+                options: ["J = C · i · t", "M = C · (1 + i)ᵗ", "J = C + i", "J = C · i²"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Juro = Capital x Taxa x Tempo. É linear.<br>
+                    <strong>(B) Incorreta:</strong> Fórmula do Montante em Juros Compostos.<br>
+                    <strong>(C) Incorreta:</strong> Soma de capital e taxa não faz sentido.<br>
+                    <strong>(D) Incorreta:</strong> Taxa ao quadrado não se usa aqui.`
+            },
+            {
+                id: 3,
+                text: "O que significa 'Juros sobre Juros'?",
+                visual: `
+                    <svg width="150" height="50" viewBox="0 0 150 50">
+                        <circle cx="20" cy="25" r="5" fill="#D97706"/>
+                        <circle cx="40" cy="25" r="8" fill="#D97706"/>
+                        <circle cx="70" cy="25" r="12" fill="#D97706"/>
+                        <circle cx="110" cy="25" r="18" fill="#D97706"/>
+                    </svg>
+                `,
+                options: ["Juros Simples", "Juros Compostos", "Desconto", "Taxa Zero"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Simples é sobre o capital.<br>
+                    <strong>(B) Correta:</strong> No composto, o juro do mês passado se integra ao capital para render mais juro no mês seguinte (bola de neve).<br>
+                    <strong>(C) Incorreta:</strong> É acréscimo.<br>
+                    <strong>(D) Incorreta:</strong> Sem taxa não tem juro.`
+            },
+            // NÍVEL 2: CÁLCULOS SIMPLES
+            {
+                id: 4,
+                text: "Aplique R$ 200,00 a juros simples de 10% ao mês por 3 meses. Quanto rendeu de juros?",
+                options: ["R$ 20,00", "R$ 60,00", "R$ 30,00", "R$ 260,00"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Isso é 1 mês.<br>
+                    <strong>(B) Correta:</strong> J = 200 · 0,10 · 3. J = 20 · 3 = 60 reais.<br>
+                    <strong>(C) Incorreta:</strong> Erro de conta.<br>
+                    <strong>(D) Incorreta:</strong> Isso é o Montante (200+60).`
+            },
+            {
+                id: 5,
+                text: "No regime de juros compostos, R$ 100,00 a 10% ao mês após 2 meses vira:",
+                options: ["R$ 120,00", "R$ 121,00", "R$ 110,00", "R$ 200,00"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Isso seria juro simples.<br>
+                    <strong>(B) Correta:</strong> Mês 1: 100 + 10 = 110. Mês 2: 110 + 10% de 110 (11) = 121.<br>
+                    <strong>(C) Incorreta:</strong> Só 1 mês.<br>
+                    <strong>(D) Incorreta:</strong> Dobrou? Não.`
+            },
+            {
+                id: 6,
+                text: "Qual o Montante (Total) se o Capital é 500 e o Juro é 50?",
+                options: ["450", "550", "500", "50"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Subtraiu.<br>
+                    <strong>(B) Correta:</strong> Montante = Capital + Juros. M = 500 + 50 = 550.<br>
+                    <strong>(C) Incorreta:</strong> Só o capital.<br>
+                    <strong>(D) Incorreta:</strong> Só o juro.`
+            },
+            // NÍVEL 3: COMPARAÇÃO E GRÁFICOS
+            {
+                id: 7,
+                text: "No gráfico, qual linha representa os Juros Compostos?",
+                visual: `
+                    <svg width="150" height="80" viewBox="0 0 150 80">
+                        <line x1="10" y1="70" x2="140" y2="20" stroke="#059669" stroke-width="2"/> <path d="M 10 70 Q 70 70 140 5" fill="none" stroke="#D97706" stroke-width="2"/> <text x="120" y="30" font-size="10" fill="#059669">A</text>
+                        <text x="120" y="10" font-size="10" fill="#D97706">B</text>
+                    </svg>
+                `,
+                options: ["A linha reta (A)", "A linha curva (B)", "Ambas", "Nenhuma"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Reta é crescimento linear (Simples).<br>
+                    <strong>(B) Correta:</strong> A curva que sobe cada vez mais rápido (exponencial) representa os Juros Compostos.<br>
+                    <strong>(C) Incorreta:</strong> São diferentes.<br>
+                    <strong>(D) Incorreta:</strong> B é a certa.`
+            },
+            {
+                id: 8,
+                text: "Para um período curto (1 mês), qual rende mais?",
+                options: ["Juros Simples", "Juros Compostos", "Rendem igual no 1º mês", "Depende do valor"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Igual.<br>
+                    <strong>(B) Incorreta:</strong> Igual.<br>
+                    <strong>(C) Correta:</strong> No primeiro período, ambos aplicam a taxa sobre o capital inicial. A diferença só aparece a partir do segundo mês (juro sobre juro).<br>
+                    <strong>(D) Incorreta:</strong> A regra é matemática.`
+            },
+            {
+                id: 9,
+                text: "Se a taxa é 2% ao mês e o tempo é 1 ano, qual valor de 't' usar na fórmula?",
+                options: ["1", "12", "2", "24"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Unidades diferentes (mês vs ano).<br>
+                    <strong>(B) Correta:</strong> A taxa está em meses, então o tempo deve ser em meses. 1 ano = 12 meses.<br>
+                    <strong>(C) Incorreta:</strong> Erro.<br>
+                    <strong>(D) Incorreta:</strong> Erro.`
+            },
+            // NÍVEL 4: CÁLCULO E FÓRMULA COMPOSTA
+            {
+                id: 10,
+                text: "Na fórmula M = C · (1 + i)ᵗ, o que representa o 't'?",
+                options: ["Taxa", "Total", "Tempo (expoente)", "Trabalho"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> i é taxa.<br>
+                    <strong>(B) Incorreta:</strong> M é o total.<br>
+                    <strong>(C) Correta:</strong> t é o Tempo, e ele aparece como expoente (potência), indicando crescimento exponencial.<br>
+                    <strong>(D) Incorreta:</strong> Física.`
+            },
+            {
+                id: 11,
+                text: "Se tenho uma dívida que cresce a juros compostos, é melhor pagar:",
+                options: ["O mais rápido possível", "Daqui a 10 anos", "Não faz diferença", "Esperar o juro baixar"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Como é uma 'bola de neve' (exponencial), quanto mais o tempo passa, muito maior a dívida fica. Pague logo!<br>
+                    <strong>(B) Incorreta:</strong> Vai estar gigante.<br>
+                    <strong>(C) Incorreta:</strong> Faz muita diferença.<br>
+                    <strong>(D) Incorreta:</strong> O valor só sobe.`
+            },
+            {
+                id: 12,
+                text: "Calcule mentalmente: 10% de 200 (Simples) vs 10% de 200 (Composto) em 1 mês.",
+                options: ["20 e 21", "20 e 20", "22 e 20", "21 e 21"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Só no 2º mês muda.<br>
+                    <strong>(B) Correta:</strong> No primeiro mês, o rendimento é idêntico: 10% de 200 = 20 reais para ambos.<br>
+                    <strong>(C) Incorreta:</strong> Erro.<br>
+                    <strong>(D) Incorreta:</strong> Erro.`
+            },
+            // NÍVEL 5: DESAFIOS E LOGICA
+            {
+                id: 13,
+                text: "Investimento A: Juros Simples 10% a.m. Investimento B: Juros Compostos 8% a.m. Para longo prazo, qual escolher?",
+                options: ["Investimento A", "Investimento B", "Tanto faz", "Nenhum"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Cresce em linha reta.<br>
+                    <strong>(B) Correta:</strong> Mesmo com taxa menor (8% vs 10%), a longo prazo o poder exponencial dos Juros Compostos (B) SEMPRE ultrapassa o linear (A).<br>
+                    <strong>(C) Incorreta:</strong> B ganha longe.<br>
+                    <strong>(D) Incorreta:</strong> B é ótimo.`
+            },
+            {
+                id: 14,
+                text: "Se triplico o tempo em juros simples, o valor dos juros:",
+                options: ["Triplica", "Eleva ao cubo", "Fica igual", "Soma 3"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> A relação é linear. J = C·i·t. Se 't' multiplica por 3, 'J' também multiplica por 3.<br>
+                    <strong>(B) Incorreta:</strong> Isso seria composto (exponencial).<br>
+                    <strong>(C) Incorreta:</strong> Muda.<br>
+                    <strong>(D) Incorreta:</strong> Proporcional.`
+            },
+            {
+                id: 15,
+                text: "Qual a taxa mensal equivalente a 24% ao ano em Juros Simples?",
+                options: ["2% ao mês", "12% ao mês", "2,4% ao mês", "24% ao mês"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> No juro simples, a taxa é proporcional. 24% dividido por 12 meses = 2% ao mês.<br>
+                    <strong>(B) Incorreta:</strong> Metade.<br>
+                    <strong>(C) Incorreta:</strong> Divisão por 10.<br>
+                    <strong>(D) Incorreta:</strong> Igual.`
+            }
+        ];
+
+        // --- LÓGICA DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.90rem; line-height: 1.6;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; 
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#059669"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        function finishQuiz() {
+            score = 0;
+            let feedbackHTML = '<div style="text-align: left; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">';
+
+            userAnswers.forEach((ans, idx) => {
+                const q = questions[idx];
+                const isCorrect = (ans === q.correct);
+                if (isCorrect) score++;
+                
+                if (isCorrect) {
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: #F0FFF4; border-radius: 8px; border-left: 4px solid #48BB78;">
+                            <p style="font-size: 0.9rem;"><strong>Questão ${idx+1}:</strong> ✅ Acertou!</p>
+                        </div>`;
+                } else {
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 15px; background: #FFF5F5; border-radius: 8px; border-left: 4px solid #F56565;">
+                            <p style="font-weight: 700; color: #C53030;">Questão ${idx+1}: ${q.text}</p>
+                            <div style="font-size: 0.85rem; margin-top: 10px; color: #4A5568;">
+                                ${q.explanation}
+                            </div>
+                        </div>`;
+                }
+            });
+            feedbackHTML += '</div>';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            let actionButtonsHTML = "";
+
+            if (percent >= 80) {
+                stars = "⭐⭐⭐⭐⭐"; 
+                msg = "Parabéns! Você dominou o conteúdo.";
+                actionButtonsHTML = `
+                    <button onclick="window.location.href='9ano-matematica.html'" style="width: 100%; padding: 15px; background-color: #48BB78; color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;">
+                        Concluir Atividade
+                    </button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Voltar para o Assunto
+                    </button>
+                `;
+            } else {
+                stars = "💪 Estude mais"; 
+                msg = `Você fez ${percent}%. Precisa de 80% para passar.`;
+                actionButtonsHTML = `
+                    <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Exercícios</button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Revisar Explicação
+                    </button>
+                `;
+            }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+            
+            document.getElementById('review-container').innerHTML = feedbackHTML;
+            document.getElementById('action-buttons').innerHTML = actionButtonsHTML;
+
+            if (percent >= 80) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            document.getElementById('review-container').innerHTML = ""; 
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

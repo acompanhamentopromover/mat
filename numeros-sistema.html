@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Numeração Decimal - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA TEAL (Estrutura/Ordem) */
+            --theme-color: #B2F5EA; 
+            --theme-active: #319795; 
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR (ERRO) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- LOGO --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--theme-active);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO --- */
+        .section-view {
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .example-box {
+            background-color: #E6FFFA; /* Teal bem claro */
+            border-left: 5px solid #319795;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .example-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #285E61;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* TABELA DE CLASSES */
+        .class-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        .class-table th {
+            background-color: #319795;
+            color: white;
+            padding: 5px;
+            border: 1px solid #000;
+        }
+        .class-table td {
+            border: 1px solid #000;
+            padding: 5px;
+        }
+        .class-header {
+            background-color: #B2F5EA;
+            font-weight: 700;
+            color: #234E52;
+        }
+
+        /* --- QUIZ MAPA --- */
+        .question-map {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-active);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        /* --- OPÇÕES --- */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK DETALHADO --- */
+        .feedback-box {
+            display: block; 
+            margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- TELA DE RESULTADO --- */
+        #viewResult {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+
+        .btn-retry {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--theme-active);
+            color: white;
+            border: 2px solid black;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px black;
+            transition: transform 0.1s;
+        }
+        
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- RODAPÉ FIXO --- */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            border-top: 2px solid var(--border-color);
+            padding: 15px 20px;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="6ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Sistema de Numeração</h1>
+            <p style="color: #555; margin-bottom: 20px;">O nosso sistema é <strong>Decimal</strong> (base 10) e <strong>Posicional</strong> (o lugar do número muda seu valor).</p>
+            
+            <div class="card-content">
+                <h3>🏛️ Classes e Ordens</h3>
+                <p>Os números são organizados em "casinhas" da direita para a esquerda. Cada 3 algarismos formam uma <strong>Classe</strong>.</p>
+                
+                <table class="class-table">
+                    <tr>
+                        <th colspan="3" class="class-header" style="background-color:#E6FFFA; color:black;">Classe dos Milhares</th>
+                        <th colspan="3" class="class-header" style="background-color:#E6FFFA; color:black;">Classe das Unidades</th>
+                    </tr>
+                    <tr>
+                        <td>CM</td>
+                        <td>DM</td>
+                        <td>UM</td>
+                        <td>C</td>
+                        <td>D</td>
+                        <td>U</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3</strong></td>
+                        <td><strong>2</strong></td>
+                        <td><strong>5</strong></td>
+                        <td><strong>4</strong></td>
+                        <td><strong>1</strong></td>
+                        <td><strong>9</strong></td>
+                    </tr>
+                </table>
+                <p style="margin-top: 10px; font-size: 0.9rem; text-align: center;">Lemos: "Trezentos e vinte e cinco <strong>MIL</strong>, quatrocentos e dezenove".</p>
+            </div>
+
+            <div class="card-content">
+                <h3>🧐 Valor Posicional</h3>
+                <p>O mesmo algarismo tem valores diferentes dependendo de onde está.</p>
+                <div class="example-box">
+                    <span class="example-tag">Número 222</span>
+                    <p><strong>1º "2" (Direita):</strong> Vale 2 unidades.</p>
+                    <p><strong>2º "2" (Meio):</strong> Vale 20 (2 dezenas).</p>
+                    <p><strong>3º "2" (Esquerda):</strong> Vale 200 (2 centenas).</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>⚖️ Comparação e Ordenação</h3>
+                <p>Para saber qual número é maior:</p>
+                <ol style="margin-left: 20px; margin-top: 10px; font-size: 0.95rem;">
+                    <li style="margin-bottom: 5px;">Conte os algarismos. Quem tem mais algarismos é maior. (Ex: 100 > 99).</li>
+                    <li>Se tiverem a mesma quantidade, compare o primeiro algarismo da esquerda. (Ex: <strong>5</strong>20 > <strong>4</strong>90).</li>
+                </ol>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Acerte para ganhar estrelas.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Simulado Finalizado!</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Incrível! Você domina o sistema decimal.</p>
+            </div>
+            <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Simulado</button>
+            <a href="6ano-matematica.html" style="display:block; margin-top:15px; text-decoration:none; color:#555; font-weight:600;">Voltar para o Menu</a>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (SISTEMA DE NUMERAÇÃO) ---
+        const questions = [
+            // NÍVEL 1: CONCEITO DE ALGARISMO E VALOR
+            {
+                id: 1,
+                text: "Quantos algarismos existem no nosso sistema decimal?",
+                options: ["9", "10", "Infinitos", "100", "5"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> São 10 símbolos: 0, 1, 2, 3, 4, 5, 6, 7, 8 e 9. Com eles formamos qualquer número.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Muita gente esquece de contar o Zero, achando que são 9.</div>`
+            },
+            {
+                id: 2,
+                text: "No número <strong>5.432</strong>, qual algarismo ocupa a ordem das centenas?",
+                options: ["5", "4", "3", "2", "Nenhum"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Vamos ler da direita para a esquerda: 2 (unidade), 3 (dezena), 4 (centena).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 5 é milhar, 3 é dezena.</div>`
+            },
+            {
+                id: 3,
+                text: "O valor posicional do algarismo 7 no número <strong>702</strong> é:",
+                options: ["7", "70", "700", "7000", "702"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> O 7 está na casa das centenas. 7 centenas = 700.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 7 seria se estivesse na unidade. 70 na dezena.</div>`
+            },
+            // NÍVEL 2: CLASSES E ORDENS
+            {
+                id: 4,
+                text: "O número <strong>1.234.567</strong> tem quantas classes?",
+                options: ["2", "3", "7", "4", "1"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Classes são grupos de 3 números. Temos: (567) Unidades, (234) Milhares, (1) Milhões. Total: 3 classes.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 7 é o número de ordens (algarismos).</div>`
+            },
+            {
+                id: 5,
+                text: "A <strong>5ª ordem</strong> de um número corresponde a:",
+                options: ["Unidade de Milhar", "Dezena de Milhar", "Centena", "Unidade de Milhão", "Dezena"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> 1ª(U), 2ª(D), 3ª(C), 4ª(UM), 5ª(Dezena de Milhar).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Centena é a 3ª. Unidade de milhar é a 4ª.</div>`
+            },
+            {
+                id: 6,
+                text: "Como se escreve o número formado por <strong>3 centenas e 5 unidades</strong>?",
+                options: ["35", "350", "305", "3005", "53"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> 3 centenas = 300. 5 unidades = 5. Soma: 300 + 5 = 305.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 35 são 3 dezenas. 350 são 3 centenas e 5 dezenas. Cuidado com o zero no meio!</div>`
+            },
+            // NÍVEL 3: LEITURA E ESCRITA
+            {
+                id: 7,
+                text: "Qual a escrita correta de <strong>12.040</strong>?",
+                options: ["Doze mil e quarenta", "Doze mil e quatrocentos", "Cento e vinte e quarenta", "Doze mil e quatro", "Mil duzentos e quarenta"],
+                correct: 0,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Temos 12 na classe dos milhares e 040 na classe das unidades (quarenta).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Quatrocentos seria 12.400. Quatro seria 12.004.</div>`
+            },
+            {
+                id: 8,
+                text: "O número <strong>'cinco milhões e trezentos'</strong> é representado por:",
+                options: ["5.300", "5.000.300", "5.003.000", "5.300.000", "500.300"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> 5 na classe dos milhões, 000 nos milhares (não falou nada) e 300 nas unidades.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 5.300 é cinco mil. 5.300.000 é cinco milhões e trezentos MIL.</div>`
+            },
+            {
+                id: 9,
+                text: "Decompondo o número <strong>4.502</strong>, temos:",
+                options: ["4000 + 500 + 2", "4000 + 50 + 2", "4 + 5 + 0 + 2", "400 + 50 + 2", "4000 + 500 + 20"],
+                correct: 0,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> 4 unidades de milhar (4000), 5 centenas (500) e 2 unidades (2).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Não há dezenas, então não usamos 50 ou 20.</div>`
+            },
+            // NÍVEL 4: COMPARAÇÃO E ORDENAÇÃO
+            {
+                id: 10,
+                text: "Qual destes números é o <strong>maior</strong>?",
+                options: ["9.999", "10.000", "9.899", "1.999", "8.999"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> 10.000 tem 5 algarismos. Todos os outros têm apenas 4. Quem tem mais casas ganha.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Mesmo cheios de noves, eles não chegam a dez mil.</div>`
+            },
+            {
+                id: 11,
+                text: "Coloque em ordem crescente: <strong>205, 250, 25, 2005</strong>.",
+                options: ["25, 205, 250, 2005", "25, 250, 205, 2005", "2005, 250, 205, 25", "25, 205, 2005, 250", "Nenhuma"],
+                correct: 0,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> 25 (2 dígitos) < 205 (3 dígitos, centena 2, dezena 0) < 250 (3 dígitos, centena 2, dezena 5) < 2005 (4 dígitos).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Atenção na comparação entre 205 e 250.</div>`
+            },
+            {
+                id: 12,
+                text: "Qual sinal completa corretamente: <strong>4.500 ___ 4.050</strong>",
+                options: ["> (Maior que)", "< (Menor que)", "= (Igual)", "+ (Mais)", "x (Vezes)"],
+                correct: 0,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Ambos têm 4 dígitos. A unidade de milhar é igual (4). A centena do primeiro é 5, do segundo é 0. Logo, 4.500 é maior.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> O número 4.050 é menor.</div>`
+            },
+            // NÍVEL 5: DESAFIOS E LÓGICA
+            {
+                id: 13,
+                text: "Sou o maior número par de 3 algarismos diferentes. Quem sou eu?",
+                options: ["998", "986", "987", "988", "100"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Começo com o maior (9), depois o próximo (8). O próximo seria 7, mas sou PAR, então uso o 6. Resposta: 986.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 998 repete o 9. 988 repete o 8. 987 é ímpar.</div>`
+            },
+            {
+                id: 14,
+                text: "Qual é o antecessor de <strong>1.000.000</strong>?",
+                options: ["999.999", "999.000", "1.000.001", "900.000", "99.999"],
+                correct: 0,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> É só subtrair 1. Um milhão menos um é novecentos e noventa e nove mil, novecentos e noventa e nove.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 99.999 está longe. 1.000.001 é o sucessor.</div>`
+            },
+            {
+                id: 15,
+                text: "Quantas centenas cabem no número <strong>2.500</strong>?",
+                options: ["2", "5", "25", "250", "20"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> 2.500 dividido por 100 é 25. Ou seja, são 25 notas de 100 reais.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> O algarismo da centena é 5, mas o número TOTAL de centenas é 25.</div>`
+            }
+        ];
+
+        // --- ESTADO DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        // --- NAVEGAÇÃO ENTRE ABAS ---
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // --- RENDERIZAÇÃO DO QUIZ ---
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.95rem; line-height: 1.5;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; // Já respondeu
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#276749"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        function finishQuiz() {
+            score = 0;
+            userAnswers.forEach((ans, idx) => {
+                if (ans === questions[idx].correct) score++;
+            });
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            if (percent === 100) { stars = "⭐⭐⭐⭐⭐"; msg = "Perfeito! Você é um mestre!"; }
+            else if (percent >= 80) { stars = "⭐⭐⭐⭐"; msg = "Muito bom! Quase gabaritou."; }
+            else if (percent >= 60) { stars = "⭐⭐⭐"; msg = "Bom trabalho. Continue praticando."; }
+            else if (percent >= 40) { stars = "⭐⭐"; msg = "Você pode melhorar. Revise a explicação."; }
+            else { stars = "⭐"; msg = "Não desista! Leia a explicação e tente de novo."; }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+
+            if (percent >= 60) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

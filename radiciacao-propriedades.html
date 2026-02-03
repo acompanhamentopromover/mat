@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radiciação e Propriedades - 9º Ano</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA MAGENTA (Raízes/Inverso) */
+            --theme-color: #FCE7F3; 
+            --theme-active: #BE185D; 
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR (ERRO) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- LOGO --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--theme-active);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO --- */
+        .section-view {
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: center; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+        .visual-svg { color: var(--theme-active); }
+        
+        /* Estilo para SVGs dentro das questões */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #FCE7F3;
+            border-radius: 12px;
+            border: 1px dashed var(--theme-active);
+        }
+
+        /* --- CARDS DE EXEMPLO DETALHADO --- */
+        .step-box {
+            background-color: #FDF2F8; 
+            border-left: 5px solid #BE185D;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .step-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #9D174D;
+            margin-bottom: 10px;
+            display: block;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        .math-symbol {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #BE185D;
+        }
+
+        .explanation-text {
+            font-size: 0.9rem;
+            color: #4A5568;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .highlight {
+            color: #BE185D;
+            font-weight: 700;
+        }
+
+        /* --- QUIZ MAPA --- */
+        .question-map {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-active);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        /* --- OPÇÕES --- */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK DETALHADO --- */
+        .feedback-box {
+            display: block; 
+            margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- TELA DE RESULTADO --- */
+        #viewResult {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+
+        .btn-retry {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--theme-active);
+            color: white;
+            border: 2px solid black;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px black;
+            transition: transform 0.1s;
+        }
+        
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- RODAPÉ FIXO --- */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            border-top: 2px solid var(--border-color);
+            padding: 15px 20px;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="9ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">9º ANO</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Radiciação</h1>
+            <p style="color: #555; margin-bottom: 20px;">A Radiciação é a operação inversa da Potenciação. É encontrar qual número, multiplicado por ele mesmo, resulta no valor que temos.</p>
+            
+            <div class="card-content">
+                <h3>1. As Partes da Raiz</h3>
+                <div class="visual-row">
+                    
+                    <svg width="200" height="100" viewBox="0 0 200 100">
+                        <text x="25" y="40" font-size="14" fill="#BE185D">Índice</text>
+                        <text x="35" y="60" font-size="24" font-weight="bold" fill="#333">ⁿ</text>
+                        <polyline points="45,60 55,80 70,30 150,30" fill="none" stroke="#333" stroke-width="3"/>
+                        <text x="80" y="70" font-size="30" font-weight="bold" fill="#333">a</text>
+                        <text x="80" y="90" font-size="14" fill="#BE185D">Radicando</text>
+                        <text x="160" y="60" font-size="30" fill="#333">= b</text>
+                        <text x="165" y="80" font-size="14" fill="#BE185D">Raiz</text>
+                    </svg>
+                </div>
+                <p class="explanation-text">Lê-se: "Raiz <strong>enésima</strong> de <strong>a</strong> é igual a <strong>b</strong>".</p>
+                <p class="explanation-text">Isso significa que <strong>bⁿ = a</strong>.</p>
+            </div>
+
+            <div class="card-content">
+                <h3>2. Propriedades Mágicas</h3>
+                
+                <div class="step-box">
+                    <span class="step-title">Regra do Sol e da Sombra</span>
+                    <p class="explanation-text">Para transformar Raiz em Potência com Fração:</p>
+                    <div style="display:flex; justify-content:center; align-items:center; gap:10px; margin:10px 0;">
+                        <span style="font-size:1.2rem; font-weight:bold;">ⁿ√aᵐ</span>
+                        <span>=</span>
+                        <span style="font-size:1.2rem; font-weight:bold;">a ᵐ/ⁿ</span>
+                    </div>
+                    <p class="explanation-text">"Quem está na sombra (m) vai para o sol (cima). Quem está no sol (n) vai para a sombra (baixo)."</p>
+                </div>
+
+                <div class="step-box">
+                    <span class="step-title">Raiz de Produto e Divisão</span>
+                    <p class="explanation-text">Você pode separar ou juntar raízes de mesmo índice.</p>
+                    <p class="explanation-text"><strong>Multiplicação:</strong> √(a · b) = √a · √b</p>
+                    <p class="explanation-text"><strong>Divisão:</strong> √(a / b) = √a / √b</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>3. Simplificação de Radicais</h3>
+                <p class="explanation-text">Quando a raiz não é exata, podemos simplificar fatorando o número.</p>
+                <div class="step-box">
+                    <span class="step-title">Exemplo: √12</span>
+                    <p class="explanation-text">1. Fatore o 12: <strong>2² · 3</strong></p>
+                    <p class="explanation-text">2. Quem tem quadrado (2²) sai da raiz quadrada.</p>
+                    <p class="explanation-text">3. Resultado: <span class="highlight">2√3</span></p>
+                </div>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Calcule e simplifique.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Resultado</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente!</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (RADICIAÇÃO) ---
+        const questions = [
+            // NÍVEL 1: CONCEITOS BÁSICOS
+            {
+                id: 1,
+                text: "Qual é o valor de <strong>√81</strong>?",
+                visual: `
+                    <svg width="100" height="60" viewBox="0 0 100 60">
+                        <text x="50" y="40" text-anchor="middle" font-size="24" fill="#BE185D">? · ? = 81</text>
+                    </svg>
+                `,
+                options: ["8", "9", "81", "40,5"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 8 · 8 = 64.<br>
+                    <strong>(B) Correta:</strong> 9 · 9 = 81. Portanto, a raiz quadrada de 81 é 9.<br>
+                    <strong>(C) Incorreta:</strong> O próprio número.<br>
+                    <strong>(D) Incorreta:</strong> Metade de 81.`
+            },
+            {
+                id: 2,
+                text: "Qual é a <strong>Raiz Cúbica</strong> de 8 (∛8)?",
+                visual: `
+                    <svg width="100" height="60" viewBox="0 0 100 60">
+                        <text x="50" y="40" text-anchor="middle" font-size="20" fill="#333">∛8 = ?</text>
+                    </svg>
+                `,
+                options: ["2", "4", "3", "24"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Qual número multiplicado por ele mesmo 3 vezes dá 8? 2 · 2 · 2 = 8.<br>
+                    <strong>(B) Incorreta:</strong> 4 · 4 · 4 = 64.<br>
+                    <strong>(C) Incorreta:</strong> 3 · 3 · 3 = 27.<br>
+                    <strong>(D) Incorreta:</strong> Multiplicou por 3.`
+            },
+            {
+                id: 3,
+                text: "Na expressão <strong>³√27</strong>, o número 3 pequeno é chamado de:",
+                visual: `
+                    <svg width="100" height="60" viewBox="0 0 100 60">
+                        <text x="25" y="30" font-size="18" fill="#BE185D" font-weight="bold">3</text>
+                        <polyline points="30,30 40,50 50,10 90,10" fill="none" stroke="#333" stroke-width="2"/>
+                    </svg>
+                `,
+                options: ["Raiz", "Radicando", "Índice", "Base"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Raiz é o resultado.<br>
+                    <strong>(B) Incorreta:</strong> Radicando é o número dentro (27).<br>
+                    <strong>(C) Correta:</strong> O número pequeno que indica o 'grau' da raiz chama-se Índice.<br>
+                    <strong>(D) Incorreta:</strong> Base é de potência.`
+            },
+            // NÍVEL 2: POTÊNCIA FRACIONÁRIA (SOL E SOMBRA)
+            {
+                id: 4,
+                text: "Como escrevemos <strong>√5</strong> em forma de potência?",
+                visual: `
+                    <svg width="150" height="60" viewBox="0 0 150 60">
+                        <text x="75" y="35" text-anchor="middle" font-size="18" fill="#333">²√5¹ = 5 ?/?</text>
+                    </svg>
+                `,
+                options: ["5¹/²", "5²/¹", "5²", "5⁰"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Regra do Sol/Sombra: O expoente do 5 (que é 1) vai para cima. O índice da raiz (que é 2, escondido) vai para baixo.<br>
+                    <strong>(B) Incorreta:</strong> Inverteu a ordem.<br>
+                    <strong>(C) Incorreta:</strong> Removeu a raiz.<br>
+                    <strong>(D) Incorreta:</strong> Erro.`
+            },
+            {
+                id: 5,
+                text: "Transforme <strong>2³/⁴</strong> em raiz.",
+                visual: `
+                    <svg width="150" height="60" viewBox="0 0 150 60">
+                        <text x="75" y="35" text-anchor="middle" font-size="18" fill="#BE185D">2 ¾ → ?</text>
+                    </svg>
+                `,
+                options: ["³√2⁴", "⁴√2³", "√2", "4√3"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Trocou índice e expoente.<br>
+                    <strong>(B) Correta:</strong> O denominador (4) vira o Índice (vai para o sol). O numerador (3) vira o expoente do radicando (vai para a sombra).<br>
+                    <strong>(C) Incorreta:</strong> Simplificou errado.<br>
+                    <strong>(D) Incorreta:</strong> Confusão.`
+            },
+            {
+                id: 6,
+                text: "Qual é o valor de <strong>9¹/²</strong>?",
+                options: ["4,5", "9", "3", "81"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Metade.<br>
+                    <strong>(B) Incorreta:</strong> O próprio número.<br>
+                    <strong>(C) Correta:</strong> Elevar a 1/2 é o mesmo que tirar a Raiz Quadrada. √9 = 3.<br>
+                    <strong>(D) Incorreta:</strong> Elevou ao quadrado.`
+            },
+            // NÍVEL 3: PROPRIEDADES (PRODUTO E DIVISÃO)
+            {
+                id: 7,
+                text: "Quanto é <strong>√4 · √9</strong>?",
+                visual: `
+                    <svg width="150" height="50" viewBox="0 0 150 50">
+                        <text x="75" y="30" text-anchor="middle" font-size="18" fill="#333">2 · 3 = ?</text>
+                    </svg>
+                `,
+                options: ["5", "6", "13", "√13"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Somou.<br>
+                    <strong>(B) Correta:</strong> Podemos calcular separado: 2 · 3 = 6. Ou juntar: √(4·9) = √36 = 6.<br>
+                    <strong>(C) Incorreta:</strong> Somou dentro.<br>
+                    <strong>(D) Incorreta:</strong> Erro.`
+            },
+            {
+                id: 8,
+                text: "Simplifique: <strong>√(50) ÷ √(2)</strong>",
+                visual: `
+                    <svg width="150" height="50" viewBox="0 0 150 50">
+                        <text x="75" y="30" text-anchor="middle" font-size="18" fill="#333">√(50 ÷ 2)</text>
+                    </svg>
+                `,
+                options: ["5", "25", "√48", "10"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Podemos juntar na divisão: √(50/2) = √25 = 5.<br>
+                    <strong>(B) Incorreta:</strong> Esqueceu de tirar a raiz do 25.<br>
+                    <strong>(C) Incorreta:</strong> Subtraiu.<br>
+                    <strong>(D) Incorreta:</strong> Dividiu por 5.`
+            },
+            {
+                id: 9,
+                text: "Como simplificar a raiz de uma raiz: <strong>³√(√64)</strong>?",
+                options: ["⁶√64", "⁵√64", "√64", "8"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Multiplica-se os índices. 3 · 2 = 6. Vira a Raiz Sexta de 64 (que é 2).<br>
+                    <strong>(B) Incorreta:</strong> Somou índices.<br>
+                    <strong>(C) Incorreta:</strong> Ignorou uma raiz.<br>
+                    <strong>(D) Incorreta:</strong> Valor errado.`
+            },
+            // NÍVEL 4: SIMPLIFICAÇÃO E OPERAÇÕES
+            {
+                id: 10,
+                text: "Simplifique <strong>√18</strong>. (Fatore: 18 = 2 · 9)",
+                visual: `
+                    <svg width="150" height="50" viewBox="0 0 150 50">
+                        <text x="75" y="30" text-anchor="middle" font-size="18" fill="#BE185D">√(9 · 2)</text>
+                    </svg>
+                `,
+                options: ["2√3", "3√2", "9√2", "18"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Trocou os números.<br>
+                    <strong>(B) Correta:</strong> √18 = √(9·2). A raiz de 9 é 3 (sai). O 2 fica. Resultado: 3√2.<br>
+                    <strong>(C) Incorreta:</strong> Não tirou a raiz do 9.<br>
+                    <strong>(D) Incorreta:</strong> O próprio número.`
+            },
+            {
+                id: 11,
+                text: "Quanto é <strong>√16 + √9</strong>? (Cuidado!)",
+                visual: `
+                    <svg width="150" height="50" viewBox="0 0 150 50">
+                        <text x="75" y="30" text-anchor="middle" font-size="18" fill="#333">4 + 3 = ?</text>
+                    </svg>
+                `,
+                options: ["√25 (ou 5)", "7", "12", "25"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> NÃO pode somar dentro de raízes separadas. √(16+9) é diferente de √16 + √9.<br>
+                    <strong>(B) Correta:</strong> Calculamos separado: 4 + 3 = 7.<br>
+                    <strong>(C) Incorreta:</strong> Erro.<br>
+                    <strong>(D) Incorreta:</strong> Soma dos radicandos.`
+            },
+            {
+                id: 12,
+                text: "Resolva: <strong>2√3 + 5√3</strong>",
+                options: ["7√6", "7√3", "10√3", "√21"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Somou os radicais.<br>
+                    <strong>(B) Correta:</strong> Como os radicais são iguais (semelhantes), somamos os números de fora: 2+5=7. Mantemos a raiz. 7√3.<br>
+                    <strong>(C) Incorreta:</strong> Multiplicou.<br>
+                    <strong>(D) Incorreta:</strong> Erro.`
+            },
+            // NÍVEL 5: DESAFIOS E NÚMEROS NEGATIVOS
+            {
+                id: 13,
+                text: "Existe <strong>√-4</strong> (Raiz quadrada de negativo) nos Reais?",
+                visual: `
+                    <svg width="100" height="50" viewBox="0 0 100 50">
+                        <text x="50" y="35" text-anchor="middle" font-size="20" fill="#BE185D">? · ? = -4</text>
+                    </svg>
+                `,
+                options: ["Sim, é -2", "Sim, é 2", "Não existe nos Reais", "Sim, é +/- 2"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> -2 · -2 = +4.<br>
+                    <strong>(B) Incorreta:</strong> 2 · 2 = +4.<br>
+                    <strong>(C) Correta:</strong> Nenhum número real multiplicado por ele mesmo dá negativo. Isso só existe nos Números Complexos.<br>
+                    <strong>(D) Incorreta:</strong> Erro.`
+            },
+            {
+                id: 14,
+                text: "Mas e a <strong>Raiz Cúbica de -8</strong> (∛-8)?",
+                options: ["Não existe", "-2", "2", "-4"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Índice ímpar permite negativo.<br>
+                    <strong>(B) Correta:</strong> (-2) · (-2) · (-2) = -8. Se o índice é ÍMPAR, a raiz de negativo existe!<br>
+                    <strong>(C) Incorreta:</strong> Daria 8 positivo.<br>
+                    <strong>(D) Incorreta:</strong> Erro.`
+            },
+            {
+                id: 15,
+                text: "Simplifique: <strong>√(x²)</strong> (Considerando x positivo)",
+                options: ["x²", "1", "x", "2x"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Manteve.<br>
+                    <strong>(B) Incorreta:</strong> Erro.<br>
+                    <strong>(C) Correta:</strong> A raiz quadrada anula o quadrado. O resultado é a base x.<br>
+                    <strong>(D) Incorreta:</strong> Dobro.`
+            }
+        ];
+
+        // --- LÓGICA DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.90rem; line-height: 1.6;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; 
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#BE185D"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        function finishQuiz() {
+            score = 0;
+            let feedbackHTML = '<div style="text-align: left; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">';
+
+            userAnswers.forEach((ans, idx) => {
+                const q = questions[idx];
+                const isCorrect = (ans === q.correct);
+                
+                if (isCorrect) {
+                    score++;
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: #F0FFF4; border-radius: 8px; border-left: 4px solid #48BB78;">
+                            <p style="font-size: 0.9rem;"><strong>Questão ${idx+1}:</strong> ✅ Acertou!</p>
+                        </div>`;
+                } else {
+                    const userAnswerText = q.options[ans];
+                    const correctAnswerText = q.options[q.correct];
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 15px; background: #FFF5F5; border-radius: 8px; border-left: 4px solid #F56565;">
+                            <p style="font-weight: 700; color: #C53030;">Questão ${idx+1}: ${q.text}</p>
+                            <p style="font-size: 0.9rem; margin-top: 5px;">❌ <strong>Você marcou:</strong> ${userAnswerText}</p>
+                            <p style="font-size: 0.9rem;">🎯 <strong>Correto seria:</strong> ${correctAnswerText}</p>
+                            <div style="font-size: 0.85rem; margin-top: 10px; color: #4A5568; background: rgba(255,255,255,0.5); padding: 8px; border-radius: 4px;">
+                                ${q.explanation}
+                            </div>
+                        </div>`;
+                }
+            });
+            feedbackHTML += '</div>';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            let actionButtonsHTML = "";
+
+            if (percent >= 80) {
+                stars = "⭐⭐⭐⭐⭐"; 
+                msg = "Parabéns! Você dominou o conteúdo.";
+                actionButtonsHTML = `
+                    <button onclick="window.location.href='9ano-matematica.html'" style="width: 100%; padding: 15px; background-color: #48BB78; color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;">
+                        Concluir Atividade
+                    </button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Voltar para o Assunto
+                    </button>
+                `;
+            } else {
+                stars = "💪 Estude mais"; 
+                msg = `Você fez ${percent}%. Precisa de 80% para passar.`;
+                actionButtonsHTML = `
+                    <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Exercícios</button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Revisar Explicação
+                    </button>
+                `;
+            }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+            
+            document.getElementById('review-container').innerHTML = feedbackHTML;
+            document.getElementById('action-buttons').innerHTML = actionButtonsHTML;
+
+            if (percent >= 80) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            document.getElementById('review-container').innerHTML = ""; 
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teorema de Tales - 9º Ano</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #451a03; /* Marrom Bronze */
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA BRONZE ARQUITETÔNICO */
+            --theme-light: #FFEDD5; 
+            --theme-medium: #FDBA74;
+            --theme-dark: #C2410C; 
+            --theme-contrast: #EA580C; /* Laranja Queimado */
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        /* --- HEADER --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+        .logo-img { max-height: 80px; width: auto; display: block; }
+
+        .container { width: 100%; max-width: 600px; padding: 20px; }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .toggle-btn.active {
+            background-color: var(--theme-contrast);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO EXPLICATIVO --- */
+        .section-view { display: none; animation: fadeIn 0.3s ease-in-out; }
+        
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* --- CAIXAS DE EXEMPLO --- */
+        .example-box {
+            background-color: #FFF7ED;
+            border-left: 5px solid var(--theme-dark);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .step-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--theme-dark);
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .math-block {
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: #333;
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #FFEDD5;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .visual-row { display: flex; align-items: center; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+
+        /* --- QUIZ --- */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: var(--theme-light);
+            border-radius: 12px;
+            border: 1px dashed var(--theme-dark);
+        }
+
+        .question-map {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-contrast);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK --- */
+        .feedback-box {
+            display: block; margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+        .feedback-title { font-weight: 800; text-transform: uppercase; font-size: 0.85rem; margin-bottom: 10px; }
+
+        /* --- RESULTADO --- */
+        #viewResult { text-align: center; display: none; animation: fadeIn 0.5s; }
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-contrast); line-height: 1; margin: 10px 0; }
+        .btn-retry {
+            width: 100%; padding: 15px; background-color: var(--theme-contrast); color: white;
+            border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700;
+            cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;
+        }
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- FOOTER --- */
+        .quiz-footer {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background-color: var(--white); border-top: 2px solid var(--border-color);
+            padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100;
+        }
+        .nav-btn {
+            padding: 12px 24px; border-radius: 8px; font-weight: 700; border: 2px solid var(--border-color); cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-contrast); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        <nav class="top-nav">
+            <a href="9ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">9º ANO</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Teorema de Tales</h1>
+            <p style="color: #555; margin-bottom: 20px;">Quando retas paralelas são cortadas por retas transversais, formam-se segmentos proporcionais.</p>
+            
+            <div class="card-content">
+                <h3>1. A Regra das Paralelas</h3>
+                <div class="visual-row">
+                    
+                    <svg width="250" height="120" viewBox="0 0 250 120">
+                        <line x1="10" y1="30" x2="240" y2="30" stroke="#C2410C" stroke-width="2"/>
+                        <line x1="10" y1="60" x2="240" y2="60" stroke="#C2410C" stroke-width="2"/>
+                        <line x1="10" y1="90" x2="240" y2="90" stroke="#C2410C" stroke-width="2"/>
+                        
+                        <line x1="40" y1="10" x2="80" y2="110" stroke="#333" stroke-width="2"/>
+                        <line x1="140" y1="10" x2="180" y2="110" stroke="#333" stroke-width="2"/>
+                        
+                        <text x="45" y="45" font-size="12" font-weight="bold">A</text>
+                        <text x="60" y="75" font-size="12" font-weight="bold">B</text>
+                        <text x="145" y="45" font-size="12" font-weight="bold">C</text>
+                        <text x="160" y="75" font-size="12" font-weight="bold">D</text>
+                    </svg>
+                </div>
+                <p class="explanation-text">Se as retas laranjas são paralelas, a proporção se mantém:</p>
+                <div class="math-block" style="font-size: 1.3rem;">A / B = C / D</div>
+            </div>
+
+            <div class="card-content">
+                <h3>2. Calculando o 'x'</h3>
+                <div class="example-box">
+                    <strong>Exemplo:</strong>
+                    <div class="visual-row">
+                        <svg width="150" height="80" viewBox="0 0 150 80">
+                            <line x1="0" y1="20" x2="150" y2="20" stroke="#C2410C"/>
+                            <line x1="0" y1="40" x2="150" y2="40" stroke="#C2410C"/>
+                            <line x1="0" y1="60" x2="150" y2="60" stroke="#C2410C"/>
+                            <line x1="30" y1="10" x2="50" y2="70" stroke="#333"/>
+                            <line x1="100" y1="10" x2="120" y2="70" stroke="#333"/>
+                            <text x="25" y="30" font-size="10">2</text>
+                            <text x="35" y="50" font-size="10">3</text>
+                            <text x="95" y="30" font-size="10">4</text>
+                            <text x="105" y="50" font-size="10" fill="#EA580C" font-weight="bold">x</text>
+                        </svg>
+                    </div>
+                    <span class="step-label">Passo 1: Montar a Proporção</span>
+                    <div class="math-block">2 / 3 = 4 / x</div>
+                    
+                    <span class="step-label">Passo 2: Multiplicar Cruzado</span>
+                    <div class="math-block">2 · x = 3 · 4</div>
+                    <div class="math-block">2x = 12</div>
+                    
+                    <span class="step-label">Passo 3: Resolver</span>
+                    <div class="math-block">x = 12 ÷ 2 = <strong>6</strong></div>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>3. No Triângulo</h3>
+                <p class="explanation-text">Se traçarmos uma linha paralela à base de um triângulo, criamos um triângulo menor proporcional ao maior.</p>
+                <div class="visual-row">
+                    <svg width="150" height="100" viewBox="0 0 150 100">
+                        <polygon points="75,10 10,90 140,90" fill="none" stroke="#333" stroke-width="2"/>
+                        <line x1="35" y1="60" x2="115" y2="60" stroke="#C2410C" stroke-width="2" stroke-dasharray="4"/>
+                    </svg>
+                </div>
+                <p class="explanation-text">As laterais ficam divididas proporcionalmente.</p>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Encontre os valores desconhecidos.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Resultado</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente!</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES DETALHADO ---
+        const questions = [
+            // NÍVEL 1: CONCEITO BÁSICO
+            {
+                id: 1,
+                text: "Para aplicar o Teorema de Tales, o que é obrigatório ter?",
+                options: ["Um círculo", "Um feixe de retas paralelas cortadas por transversais", "Um ângulo de 90 graus", "Números pares"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Tales trabalha com retas.<br>
+                    <strong>(B) Correta:</strong> A definição do teorema exige retas paralelas (que nunca se tocam) sendo atravessadas por outras retas (transversais).<br>
+                    <strong>(C) Incorreta:</strong> Não exige perpendicularidade.<br>
+                    <strong>(D) Incorreta:</strong> Funciona com qualquer número real.`
+            },
+            {
+                id: 2,
+                text: "Se a / b = c / d, como calculamos o valor de uma incógnita?",
+                visual: `
+                    <svg width="150" height="40" viewBox="0 0 150 40">
+                        <text x="75" y="25" text-anchor="middle" font-size="14" fill="#EA580C">Multiplicação Cruzada</text>
+                    </svg>
+                `,
+                options: ["Somamos os termos (a+b = c+d)", "Multiplicamos reto (a·c = b·d)", "Multiplicamos cruzado (a·d = b·c)", "Dividimos tudo"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Soma não resolve proporção.<br>
+                    <strong>(B) Incorreta:</strong> Multiplicação linear é para frações.<br>
+                    <strong>(C) Correta:</strong> A propriedade fundamental das proporções é que o produto dos meios é igual ao produto dos extremos (cruzado).<br>
+                    <strong>(D) Incorreta:</strong> Não resolve a igualdade.`
+            },
+            {
+                id: 3,
+                text: "Calcule x na proporção: 2 / 4 = 3 / x",
+                options: ["5", "6", "8", "12"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 2/4 = 0,5 e 3/5 = 0,6.<br>
+                    <strong>(B) Correta:</strong> 2 · x = 4 · 3 -> 2x = 12 -> x = 6. (2/4 é metade, 3/6 também é metade).<br>
+                    <strong>(C) Incorreta:</strong> Daria 24.<br>
+                    <strong>(D) Incorreta:</strong> Daria 36.`
+            },
+            // NÍVEL 2: CÁLCULOS VISUAIS
+            {
+                id: 4,
+                text: "Encontre o valor de x na figura:",
+                visual: `
+                    <svg width="200" height="80" viewBox="0 0 200 80">
+                        <line x1="0" y1="20" x2="200" y2="20" stroke="#C2410C"/>
+                        <line x1="0" y1="40" x2="200" y2="40" stroke="#C2410C"/>
+                        <line x1="0" y1="60" x2="200" y2="60" stroke="#C2410C"/>
+                        <line x1="40" y1="10" x2="60" y2="70" stroke="#333"/>
+                        <line x1="140" y1="10" x2="160" y2="70" stroke="#333"/>
+                        
+                        <text x="35" y="32" font-size="10">5</text>
+                        <text x="45" y="52" font-size="10">10</text>
+                        
+                        <text x="135" y="32" font-size="10">x</text>
+                        <text x="145" y="52" font-size="10">20</text>
+                    </svg>
+                `,
+                options: ["5", "10", "15", "8"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 5/20 ≠ 5/10.<br>
+                    <strong>(B) Correta:</strong> A proporção é 5 / 10 = x / 20. Note que 10 é o dobro de 5. Então 20 deve ser o dobro de x. Logo, x = 10.<br>
+                    <strong>(C) Incorreta:</strong> Erro.<br>
+                    <strong>(D) Incorreta:</strong> Erro.`
+            },
+            {
+                id: 5,
+                text: "Determine x: 4 / x = 2 / 3",
+                options: ["5", "6", "8", "12"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Erro.<br>
+                    <strong>(B) Correta:</strong> 2 · x = 4 · 3 -> 2x = 12 -> x = 6.<br>
+                    <strong>(C) Incorreta:</strong> 2·8 = 16.<br>
+                    <strong>(D) Incorreta:</strong> 2·12 = 24.`
+            },
+            {
+                id: 6,
+                text: "Se temos segmentos 3, 6, 4 e x (nesta ordem), qual o valor de x?",
+                options: ["8", "7", "5", "12"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> 3 / 6 = 4 / x. Como 6 é o dobro de 3, x deve ser o dobro de 4. x = 8.<br>
+                    <strong>(B) Incorreta:</strong> Erro.<br>
+                    <strong>(C) Incorreta:</strong> Erro.<br>
+                    <strong>(D) Incorreta:</strong> Triplo.`
+            },
+            // NÍVEL 3: TRIÂNGULOS
+            {
+                id: 7,
+                text: "Num triângulo, uma reta paralela à base divide um lado em segmentos de 2cm e 3cm. O outro lado mede 10cm no total. Quanto medem as partes?",
+                options: ["2 e 8", "4 e 6", "5 e 5", "3 e 7"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Proporção errada.<br>
+                    <strong>(B) Correta:</strong> A razão é 2 para 3. O total de partes é 2+3=5. O lado total é 10 (que é o dobro de 5). Então as partes são o dobro de 2 e 3: 4cm e 6cm.<br>
+                    <strong>(C) Incorreta:</strong> Partes iguais não respeitam a proporção 2/3.<br>
+                    <strong>(D) Incorreta:</strong> Soma 10, mas razão errada.`
+            },
+            {
+                id: 8,
+                text: "Qual o valor de x na figura abaixo?",
+                visual: `
+                    <svg width="150" height="80" viewBox="0 0 150 80">
+                        <line x1="0" y1="20" x2="150" y2="20" stroke="#C2410C"/>
+                        <line x1="0" y1="60" x2="150" y2="60" stroke="#C2410C"/>
+                        <line x1="30" y1="10" x2="50" y2="70" stroke="#333"/>
+                        <line x1="100" y1="10" x2="120" y2="70" stroke="#333"/>
+                        
+                        <text x="25" y="40" font-size="10">x</text>
+                        <text x="45" y="40" font-size="10">6</text>
+                        
+                        <text x="95" y="40" font-size="10">2</text>
+                        <text x="115" y="40" font-size="10">3</text>
+                    </svg>
+                `,
+                options: ["3", "4", "5", "9"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 3/6 = 0,5. 2/3 = 0,66.<br>
+                    <strong>(B) Correta:</strong> Montando a proporção verticalmente: x / 2 = 6 / 3. 3x = 12 -> x = 4.<br>
+                    <strong>(C) Incorreta:</strong> Erro.<br>
+                    <strong>(D) Incorreta:</strong> Erro.`
+            },
+            {
+                id: 9,
+                text: "Se x / 10 = 3 / 5, x vale:",
+                options: ["6", "15", "2", "30"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> 5x = 30 -> x = 6.<br>
+                    <strong>(B) Incorreta:</strong> Inverteu.<br>
+                    <strong>(C) Incorreta:</strong> Erro.<br>
+                    <strong>(D) Incorreta:</strong> Multiplicou tudo.`
+            },
+            // NÍVEL 4: PROBLEMAS COM SOMA
+            {
+                id: 10,
+                text: "Sabemos que x/y = 2/3 e que x + y = 20. Quanto valem x e y?",
+                options: ["x=8, y=12", "x=10, y=10", "x=5, y=15", "x=2, y=18"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> A soma das partes da razão é 2+3=5. O total real é 20. 20÷5 = 4 (cada parte vale 4). x = 2·4 = 8. y = 3·4 = 12.<br>
+                    <strong>(B) Incorreta:</strong> Razão 1/1.<br>
+                    <strong>(C) Incorreta:</strong> Razão 1/3.<br>
+                    <strong>(D) Incorreta:</strong> Razão 1/9.`
+            },
+            {
+                id: 11,
+                text: "Calcule x na figura: 3 / x = 4 / (x + 2)",
+                options: ["4", "5", "6", "2"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 3/4 ≠ 4/6.<br>
+                    <strong>(B) Incorreta:</strong> 3/5 ≠ 4/7.<br>
+                    <strong>(C) Correta:</strong> 3(x + 2) = 4x -> 3x + 6 = 4x -> 6 = 4x - 3x -> x = 6.<br>
+                    <strong>(D) Incorreta:</strong> 3/2 = 1,5. 4/4 = 1.`
+            },
+            {
+                id: 12,
+                text: "A sombra de um poste mede 10m. No mesmo instante, a sombra de uma vara de 1m mede 2m. Qual a altura do poste?",
+                visual: `
+                    <svg width="150" height="50" viewBox="0 0 150 50">
+                        <text x="75" y="30" text-anchor="middle" font-size="12" fill="#333">h/10 = 1/2</text>
+                    </svg>
+                `,
+                options: ["5m", "20m", "10m", "15m"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Altura Poste / Sombra Poste = Altura Vara / Sombra Vara. h / 10 = 1 / 2. 2h = 10 -> h = 5 metros.<br>
+                    <strong>(B) Incorreta:</strong> Multiplicou.<br>
+                    <strong>(C) Incorreta:</strong> Igual à sombra.<br>
+                    <strong>(D) Incorreta:</strong> Erro.`
+            },
+            // NÍVEL 5: DESAFIOS FINAIS
+            {
+                id: 13,
+                text: "Se três retas paralelas cortam duas transversais determinando segmentos 2, 3 e 5 de um lado, e x, y, 10 do outro. Quanto vale x?",
+                options: ["4", "2", "5", "10"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> A relação é direta. O segmento 5 virou 10 (dobrou). Então todos dobram. O segmento correspondente ao 2 será x = 4.<br>
+                    <strong>(B) Incorreta:</strong> Não dobrou.<br>
+                    <strong>(C) Incorreta:</strong> Erro.<br>
+                    <strong>(D) Incorreta:</strong> Valor do outro segmento.`
+            },
+            {
+                id: 14,
+                text: "Qual equação representa corretamente o Teorema de Tales para segmentos A, B (numa reta) e C, D (na outra)?",
+                options: ["A · B = C · D", "A + B = C + D", "A / B = C / D", "A - B = C - D"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Produto não é proporção.<br>
+                    <strong>(B) Incorreta:</strong> Soma não é proporção.<br>
+                    <strong>(C) Correta:</strong> A razão entre os segmentos de uma reta é igual à razão dos segmentos correspondentes na outra.<br>
+                    <strong>(D) Incorreta:</strong> Diferença.`
+            },
+            {
+                id: 15,
+                text: "Se x / 4 = y / 6 e x + y = 50, quanto vale x?",
+                options: ["20", "30", "10", "25"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Propriedade: (x+y)/(4+6) = x/4. 50/10 = 5. A constante é 5. x = 4·5 = 20.<br>
+                    <strong>(B) Incorreta:</strong> Valor de y.<br>
+                    <strong>(C) Incorreta:</strong> Metade.<br>
+                    <strong>(D) Incorreta:</strong> Meio a meio.`
+            }
+        ];
+
+        // --- LÓGICA DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.90rem; line-height: 1.6;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; 
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#EA580C"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        function finishQuiz() {
+            score = 0;
+            let feedbackHTML = '<div style="text-align: left; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">';
+
+            userAnswers.forEach((ans, idx) => {
+                const q = questions[idx];
+                const isCorrect = (ans === q.correct);
+                if (isCorrect) score++;
+                
+                if (isCorrect) {
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: #F0FFF4; border-radius: 8px; border-left: 4px solid #48BB78;">
+                            <p style="font-size: 0.9rem;"><strong>Questão ${idx+1}:</strong> ✅ Acertou!</p>
+                        </div>`;
+                } else {
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 15px; background: #FFF5F5; border-radius: 8px; border-left: 4px solid #F56565;">
+                            <p style="font-weight: 700; color: #C53030;">Questão ${idx+1}: ${q.text}</p>
+                            <div style="font-size: 0.85rem; margin-top: 10px; color: #4A5568;">
+                                ${q.explanation}
+                            </div>
+                        </div>`;
+                }
+            });
+            feedbackHTML += '</div>';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            let actionButtonsHTML = "";
+
+            if (percent >= 80) {
+                stars = "⭐⭐⭐⭐⭐"; 
+                msg = "Parabéns! Você dominou o conteúdo.";
+                actionButtonsHTML = `
+                    <button onclick="window.location.href='9ano-matematica.html'" style="width: 100%; padding: 15px; background-color: #48BB78; color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;">
+                        Concluir Atividade
+                    </button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Voltar para o Assunto
+                    </button>
+                `;
+            } else {
+                stars = "💪 Estude mais"; 
+                msg = `Você fez ${percent}%. Precisa de 80% para passar.`;
+                actionButtonsHTML = `
+                    <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Exercícios</button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Revisar Explicação
+                    </button>
+                `;
+            }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+            
+            document.getElementById('review-container').innerHTML = feedbackHTML;
+            document.getElementById('action-buttons').innerHTML = actionButtonsHTML;
+
+            if (percent >= 80) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            document.getElementById('review-container').innerHTML = ""; 
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

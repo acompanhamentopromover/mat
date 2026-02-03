@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Potenciação e Raiz - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA */
+            --theme-color: #D0EFFF; 
+            --theme-active: #2B9AF3; 
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR (ERRO) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- LOGO --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--theme-active);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO --- */
+        .section-view {
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .example-box {
+            background-color: #E6FFFA;
+            border-left: 5px solid #38B2AC;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .example-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #234E52;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* --- QUIZ MAPA --- */
+        .question-map {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-active);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        /* --- OPÇÕES --- */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK DETALHADO (CORRIGIDO) --- */
+        .feedback-box {
+            display: block; /* Garante que apareça */
+            margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- TELA DE RESULTADO --- */
+        #viewResult {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+
+        .btn-retry {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--theme-active);
+            color: white;
+            border: 2px solid black;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px black;
+            transition: transform 0.1s;
+        }
+        
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- RODAPÉ FIXO --- */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            border-top: 2px solid var(--border-color);
+            padding: 15px 20px;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="6ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Potenciação e Raiz</h1>
+            <p style="color: #555; margin-bottom: 20px;">Entenda como multiplicar o mesmo número várias vezes e como fazer o caminho inverso.</p>
+            
+            <div class="card-content">
+                <h3>⚡ Potenciação</h3>
+                <p style="margin-top: 10px;">É a multiplicação de fatores iguais. Em vez de somar, multiplicamos o número por ele mesmo.</p>
+                
+                <div class="example-box">
+                    <span class="example-tag">Estrutura</span>
+                    <p style="font-size: 1.5rem; font-weight: 700;">2<sup>3</sup> = 8</p>
+                    <ul style="font-size: 0.9rem; margin-top: 5px;">
+                        <li><strong>2</strong> é a Base (o número que repete).</li>
+                        <li><strong>3</strong> é o Expoente (quantas vezes repete).</li>
+                        <li><strong>8</strong> é a Potência (resultado).</li>
+                    </ul>
+                </div>
+
+                <div class="example-box">
+                    <span class="example-tag">Como calcular?</span>
+                    <p><strong>2³ = 2 x 2 x 2 = 8</strong></p>
+                    <p style="color:#C53030; font-size: 0.9rem;">⚠️ Erro comum: Fazer 2 x 3 = 6. Está errado! É 2 vezes 2 vezes 2.</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>🌟 Casos Especiais</h3>
+                <div class="example-box">
+                    <span class="example-tag">Expoente 1 e 0</span>
+                    <p>Todo número elevado a <strong>1</strong> é ele mesmo.<br>Ex: 5¹ = 5</p>
+                    <p>Todo número (não nulo) elevado a <strong>0</strong> é igual a 1.<br>Ex: 5⁰ = 1</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>🌱 Raiz Quadrada Exata</h3>
+                <p style="margin-top: 10px;">É a operação inversa da potenciação. "Qual número vezes ele mesmo dá esse resultado?"</p>
+                
+                <div class="example-box">
+                    <span class="example-tag">Exemplo</span>
+                    <p>Quanto é <strong>√16</strong>?</p>
+                    <p>A resposta é <strong>4</strong>.</p>
+                    <p>Por quê? Porque <strong>4 x 4 = 16</strong>.</p>
+                </div>
+                
+                <div class="example-box">
+                    <span class="example-tag">Outro exemplo</span>
+                    <p><strong>√81 = 9</strong> (Pois 9 x 9 = 81).</p>
+                </div>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Agora é sua vez!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Responda para ganhar estrelas.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Simulado Finalizado!</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente! Você domina o assunto.</p>
+            </div>
+            <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Simulado</button>
+            <a href="6ano-matematica.html" style="display:block; margin-top:15px; text-decoration:none; color:#555; font-weight:600;">Voltar para o Menu</a>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES DETALHADO ---
+        const questions = [
+            // FIXAÇÃO (1-5)
+            {
+                id: 1,
+                text: "Qual é o valor de <strong>5²</strong>?",
+                options: ["10", "25", "7", "52", "20"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> 5² (lê-se "cinco ao quadrado") é 5 vezes ele mesmo: 5 x 5 = 25.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Um erro muito comum é multiplicar a base pelo expoente (5x2=10). Outro erro é juntar os números (52).</div>`
+            },
+            {
+                id: 2,
+                text: "Na potência <strong>3⁴</strong>, quem é a Base?",
+                options: ["3", "4", "81", "12", "7"],
+                correct: 0,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A Base é o número maior que fica embaixo (o 3). É ele quem vai ser multiplicado repetidamente.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> O 4 é o Expoente (indica quantas vezes repetimos a base). 81 é a Potência (o resultado).</div>`
+            },
+            {
+                id: 3,
+                text: "Todo número elevado a <strong>zero</strong> é igual a:",
+                options: ["Zero", "Ele mesmo", "Um", "Dez", "Infinito"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Essa é uma regra fundamental da potenciação: qualquer número (diferente de zero) elevado a zero vale 1. Exemplo: 100⁰ = 1.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> É intuitivo pensar que daria zero ou o próprio número, mas a regra matemática define como 1.</div>`
+            },
+            {
+                id: 4,
+                text: "Quanto vale <strong>√36</strong> (Raiz quadrada de 36)?",
+                options: ["4", "18", "6", "12", "9"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A raiz quadrada procura um número que multiplicado por si mesmo dê 36. Como 6 x 6 = 36, a resposta é 6.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 18 é a metade de 36 (erro comum). 4x4=16 e 9x9=81.</div>`
+            },
+            {
+                id: 5,
+                text: "O resultado de <strong>1¹⁰</strong> (um elevado a décima potência) é:",
+                options: ["10", "1", "100", "0", "11"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> 1 x 1 x 1 x 1... Não importa quantas vezes você multiplique o 1 por ele mesmo, o resultado sempre será 1.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 10 seria se somássemos o 1 dez vezes, ou se fizéssemos 1 x 10.</div>`
+            },
+            // PRÁTICA (6-15)
+            {
+                id: 6,
+                text: "Qual é o valor de <strong>2³</strong>?",
+                options: ["6", "8", "9", "4", "5"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> 2³ = 2 x 2 x 2. Fazendo a conta: 2x2=4, e 4x2=8.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 6 é o erro mais comum (2x3). 9 seria se fosse 3 ao quadrado (3²).</div>`
+            },
+            {
+                id: 7,
+                text: "A raiz quadrada de <strong>81</strong> é:",
+                options: ["8", "7", "9", "81", "40,5"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Estamos buscando o número que "vezes ele mesmo" dá 81. Pela tabuada: 9 x 9 = 81.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 40,5 é a metade. 8x8=64 e 7x7=49.</div>`
+            },
+            {
+                id: 8,
+                text: "Quanto é <strong>10²</strong>?",
+                options: ["20", "100", "200", "12", "10"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> 10 ao quadrado é 10 x 10, que é igual a 100.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 20 seria 10 + 10 (ou 10x2). Na potência, o número cresce muito mais rápido!</div>`
+            },
+            {
+                id: 9,
+                text: "Qual destas operações é o inverso de <strong>6²</strong>?",
+                options: ["6 x 2", "6 ÷ 2", "√36", "6 + 6", "6 - 2"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A operação inversa de elevar ao quadrado é tirar a raiz quadrada. Se 6² = 36, então √36 = 6.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Divisão é o inverso da multiplicação. Subtração é o inverso da adição.</div>`
+            },
+            {
+                id: 10,
+                text: "Qual o valor de <strong>4³</strong>?",
+                options: ["12", "16", "64", "43", "24"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> 4³ = 4 x 4 x 4. Primeiro: 4x4 = 16. Depois: 16x4 = 64.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 12 é (4x3). 16 é (4²). 43 é apenas juntar os números.</div>`
+            },
+            {
+                id: 11,
+                text: "A raiz quadrada de <strong>144</strong> é:",
+                options: ["12", "14", "10", "11", "15"],
+                correct: 0,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> É um quadrado perfeito famoso. 12 x 12 = 144.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 10x10=100. 11x11=121. 15x15=225.</div>`
+            },
+            {
+                id: 12,
+                text: "Se o lado de um quadrado é 5, sua área é <strong>5²</strong>. Qual a área?",
+                options: ["10", "20", "25", "15", "50"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A fórmula da área do quadrado é Lado x Lado. Então, 5 x 5 = 25.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 10 é o perímetro (5+5, apenas dois lados). 20 é o perímetro total (5+5+5+5). Área é multiplicação!</div>`
+            },
+            {
+                id: 13,
+                text: "Qual o resultado de <strong>0⁵</strong>?",
+                options: ["0", "1", "5", "10", "Impossível"],
+                correct: 0,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Zero multiplicado por zero, quantas vezes for, sempre será zero. 0x0x0x0x0 = 0.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> A resposta seria 1 apenas se o expoente fosse 0 (ex: 5⁰). Mas base zero com expoente positivo é sempre 0.</div>`
+            },
+            {
+                id: 14,
+                text: "Qual número elevado ao quadrado dá <strong>49</strong>?",
+                options: ["6", "7", "8", "9", "49"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A pergunta é o mesmo que "Qual a raiz de 49?". A resposta é 7, pois 7 x 7 = 49.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 6x6=36. 8x8=64. 9x9=81.</div>`
+            },
+            {
+                id: 15,
+                text: "O valor de <strong>2⁵</strong> é:",
+                options: ["10", "25", "32", "64", "16"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Vamos multiplicar o 2 cinco vezes: 2x2=4; 4x2=8; 8x2=16; 16x2=32.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 10 é o erro clássico (2x5). 25 seria 5². 64 seria 2⁶.</div>`
+            }
+        ];
+
+        // --- ESTADO DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        // --- NAVEGAÇÃO ENTRE ABAS ---
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // --- RENDERIZAÇÃO DO QUIZ ---
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.95rem; line-height: 1.5;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; // Já respondeu
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                // Efeito Confete
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                // Efeito Tremor
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#276749"; // Verde escuro para finalizar
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; // Reset cor
+            }
+        }
+
+        // --- LÓGICA DE FINALIZAÇÃO ---
+        function finishQuiz() {
+            score = 0;
+            userAnswers.forEach((ans, idx) => {
+                if (ans === questions[idx].correct) score++;
+            });
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            if (percent === 100) { stars = "⭐⭐⭐⭐⭐"; msg = "Perfeito! Você é um mestre!"; }
+            else if (percent >= 80) { stars = "⭐⭐⭐⭐"; msg = "Muito bom! Quase gabaritou."; }
+            else if (percent >= 60) { stars = "⭐⭐⭐"; msg = "Bom trabalho. Continue praticando."; }
+            else if (percent >= 40) { stars = "⭐⭐"; msg = "Você pode melhorar. Revise a explicação."; }
+            else { stars = "⭐"; msg = "Não desista! Leia a explicação e tente de novo."; }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+
+            if (percent >= 60) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

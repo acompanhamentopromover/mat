@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equações do 1º Grau - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA INDIGO/BALANCE (Equilíbrio) */
+            --theme-color: #E0E7FF; 
+            --theme-active: #4C51BF; 
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR (ERRO) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- LOGO --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--theme-active);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO --- */
+        .section-view {
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: flex-end; gap: 10px; justify-content: space-around; flex-wrap: wrap; }
+        .visual-item { text-align: center; width: 30%; min-width: 80px; }
+        .visual-svg { color: var(--theme-active); margin-bottom: 5px; }
+        
+        /* Estilo para SVGs dentro das questões */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #E0E7FF;
+            border-radius: 12px;
+            border: 1px dashed var(--theme-active);
+        }
+
+        .example-box {
+            background-color: #EEF2FF; /* Indigo muito claro */
+            border-left: 5px solid #4C51BF;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .example-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #4338CA;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* --- QUIZ MAPA --- */
+        .question-map {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-active);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        /* --- OPÇÕES --- */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK DETALHADO --- */
+        .feedback-box {
+            display: block; 
+            margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- TELA DE RESULTADO --- */
+        #viewResult {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+
+        .btn-retry {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--theme-active);
+            color: white;
+            border: 2px solid black;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px black;
+            transition: transform 0.1s;
+        }
+        
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- RODAPÉ FIXO --- */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            border-top: 2px solid var(--border-color);
+            padding: 15px 20px;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="7ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Equações do 1º Grau</h1>
+            <p style="color: #555; margin-bottom: 20px;">Uma equação é como uma balança equilibrada. O objetivo é descobrir o valor da letra (incógnita).</p>
+            
+            <div class="card-content">
+                <h3>⚖️ O Princípio da Balança</h3>
+                <p>Tudo o que tem de um lado do sinal de igual (=) tem o mesmo valor do que está do outro lado.</p>
+                <br>
+                <div class="visual-row">
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="80" height="60" viewBox="0 0 80 60" fill="none" stroke="currentColor" stroke-width="3">
+                            <path d="M10 40 L40 50 L70 40 M40 50 V60 M20 60 H60" stroke="#4C51BF"/>
+                            <rect x="15" y="20" width="20" height="20" fill="#E0E7FF" stroke="#4C51BF"/>
+                            <text x="25" y="35" font-size="12" fill="#4C51BF" text-anchor="middle" stroke="none">x</text>
+                            <circle cx="65" cy="30" r="8" fill="#E0E7FF" stroke="#4C51BF"/>
+                            <text x="65" y="34" font-size="10" fill="#4C51BF" text-anchor="middle" stroke="none">5</text>
+                        </svg>
+                        <p style="font-size:0.75rem;">Equilíbrio</p>
+                    </div>
+                    
+                    <div style="visual-item">
+                        <p style="font-size: 1.2rem; font-weight: 700; color: #4C51BF;">x + 2 = 7</p>
+                        <p style="font-size: 0.8rem;">"Qual número somado a 2 dá 7?"</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>🔄 Operações Inversas</h3>
+                <p>Para deixar o <strong>x</strong> sozinho (isolar), jogamos os números para o outro lado trocando a operação.</p>
+                
+                <div class="example-box">
+                    <span class="example-tag">Soma vira Subtração</span>
+                    <p>x + 5 = 10</p>
+                    <p>x = 10 <strong>- 5</strong></p>
+                    <p style="font-weight:700;">x = 5</p>
+                </div>
+
+                <div class="example-box">
+                    <span class="example-tag">Multiplicação vira Divisão</span>
+                    <p>2x = 8 (o 2 está multiplicando)</p>
+                    <p>x = 8 <strong>÷ 2</strong></p>
+                    <p style="font-weight:700;">x = 4</p>
+                </div>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Encontre o valor de X.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Resultado</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente!</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (EQUAÇÕES DO 1º GRAU) ---
+        const questions = [
+            // NÍVEL 1: CONCEITOS BÁSICOS
+            {
+                id: 1,
+                text: "Para que uma expressão matemática seja considerada uma <strong>equação</strong>, o que ela precisa ter obrigatoriamente?",
+                options: ["Apenas números", "Um sinal de igualdade (=) e uma incógnita", "Parênteses", "Uma conta de vezes"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Apenas números formam uma expressão numérica, não uma equação.<br>
+                    <strong>(B) Correta:</strong> Equação vem de "equar" (igualar). Precisa ter o sinal de igual (=) e uma letra desconhecida (incógnita) para descobrir.<br>
+                    <strong>(C) Incorreta:</strong> Parênteses organizam a conta, mas não definem uma equação.<br>
+                    <strong>(D) Incorreta:</strong> Pode haver equações apenas com soma, sem multiplicação.`
+            },
+            {
+                id: 2,
+                text: "Qual é o objetivo principal ao resolver uma equação do 1º grau?",
+                options: ["Somar todos os números", "Descobrir o valor da incógnita (x)", "Eliminar o sinal de igual", "Deixar a conta maior"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Somar tudo nem sempre é o caminho; muitas vezes subtraímos ou dividimos.<br>
+                    <strong>(B) Correta:</strong> O objetivo é isolar a letra (deixá-la sozinha) para descobrir quanto ela vale.<br>
+                    <strong>(C) Incorreta:</strong> O sinal de igual é essencial para manter o equilíbrio.<br>
+                    <strong>(D) Incorreta:</strong> Geralmente queremos simplificar a conta, não aumentá-la.`
+            },
+            {
+                id: 3,
+                text: "Na equação <strong>x + 5 = 12</strong>, qual é a operação inversa que devemos usar para isolar o x?",
+                options: ["Adição (+)", "Subtração (-)", "Multiplicação (x)", "Divisão (÷)"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Se somarmos mais 5, ficaria x + 10.<br>
+                    <strong>(B) Correta:</strong> O 5 está somando. Para tirá-lo dali, usamos a operação inversa: subtração (-5).<br>
+                    <strong>(C) Incorreta:</strong> Não há multiplicação envolvida.<br>
+                    <strong>(D) Incorreta:</strong> Não há divisão envolvida.`
+            },
+            // NÍVEL 2: EQUAÇÕES DE UM PASSO (SOMA/SUBTRAÇÃO)
+            {
+                id: 4,
+                text: "Qual o valor de x na equação: <strong>x - 3 = 10</strong>?",
+                options: ["7", "10", "13", "30"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 7 - 3 daria 4, não 10.<br>
+                    <strong>(B) Incorreta:</strong> 10 - 3 daria 7.<br>
+                    <strong>(C) Correta:</strong> O inverso de subtrair 3 é somar 3. x = 10 + 3, logo x = 13.<br>
+                    <strong>(D) Incorreta:</strong> Você multiplicou 10 por 3, o que está errado.`
+            },
+            {
+                id: 5,
+                text: "Resolva: <strong>x + 8 = 20</strong>",
+                options: ["28", "12", "16", "10"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Você somou 20 + 8. O 8 passa subtraindo.<br>
+                    <strong>(B) Correta:</strong> x = 20 - 8. O resultado é 12.<br>
+                    <strong>(C) Incorreta:</strong> Erro de cálculo na subtração.<br>
+                    <strong>(D) Incorreta:</strong> 10 + 8 daria 18, não 20.`
+            },
+            {
+                id: 6,
+                text: "Se <strong>5 + x = 9</strong>, quanto vale x?",
+                options: ["4", "14", "5", "9"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> x = 9 - 5. Portanto, x = 4.<br>
+                    <strong>(B) Incorreta:</strong> Você somou 9 + 5.<br>
+                    <strong>(C) Incorreta:</strong> Repetiu um dos números da conta.<br>
+                    <strong>(D) Incorreta:</strong> O x não pode ser igual ao total se já temos o 5 somando.`
+            },
+            // NÍVEL 3: EQUAÇÕES DE UM PASSO (MULTIPLICAÇÃO/DIVISÃO)
+            {
+                id: 7,
+                text: "Qual o valor de x em: <strong>3x = 12</strong>?",
+                options: ["9", "15", "36", "4"],
+                correct: 3,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 12 - 3 = 9 (mas aqui é multiplicação, não soma).<br>
+                    <strong>(B) Incorreta:</strong> 12 + 3 = 15.<br>
+                    <strong>(C) Incorreta:</strong> 12 x 3 = 36 (o 3 passa dividindo, não multiplicando).<br>
+                    <strong>(D) Correta:</strong> 3x significa 3 vezes x. O inverso é dividir. 12 ÷ 3 = 4.`
+            },
+            {
+                id: 8,
+                text: "Resolva: <strong>x / 2 = 5</strong> (x dividido por 2 é igual a 5)",
+                options: ["2,5", "7", "3", "10"],
+                correct: 3,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 5 ÷ 2 = 2,5. O 2 passa multiplicando.<br>
+                    <strong>(B) Incorreta:</strong> 5 + 2 = 7.<br>
+                    <strong>(C) Incorreta:</strong> 5 - 2 = 3.<br>
+                    <strong>(D) Correta:</strong> O 2 está dividindo, passa multiplicando. x = 5 x 2, logo x = 10.`
+            },
+            {
+                id: 9,
+                text: "Se <strong>2x = 10</strong>, qual é o valor de x?",
+                options: ["20", "5", "8", "12"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 10 x 2 = 20 (operação errada).<br>
+                    <strong>(B) Correta:</strong> x = 10 ÷ 2. A metade de 10 é 5.<br>
+                    <strong>(C) Incorreta:</strong> 10 - 2 = 8 (aqui é multiplicação, não soma).<br>
+                    <strong>(D) Incorreta:</strong> 10 + 2 = 12.`
+            },
+            // NÍVEL 4: EQUAÇÕES DE DOIS PASSOS
+            {
+                id: 10,
+                text: "Resolva: <strong>2x + 1 = 7</strong>",
+                options: ["3", "4", "2", "6"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> 1º passo: Tira o 1 (fica 2x = 6). 2º passo: Divide por 2 (x = 3).<br>
+                    <strong>(B) Incorreta:</strong> Se x fosse 4, 2x4+1 = 9.<br>
+                    <strong>(C) Incorreta:</strong> Se x fosse 2, 2x2+1 = 5.<br>
+                    <strong>(D) Incorreta:</strong> Você apenas subtraiu 1 e esqueceu de dividir por 2.`
+            },
+            {
+                id: 11,
+                text: "Qual o valor de x em <strong>3x - 2 = 10</strong>?",
+                options: ["8", "12", "4", "6"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Você subtraiu 2 em vez de somar.<br>
+                    <strong>(B) Incorreta:</strong> Você somou 10+2, mas esqueceu de dividir por 3.<br>
+                    <strong>(C) Correta:</strong> O -2 passa somando (3x = 12). O 3 passa dividindo (x = 4).<br>
+                    <strong>(D) Incorreta:</strong> 3x6-2 = 16.`
+            },
+            {
+                id: 12,
+                text: "Resolva: <strong>x/2 + 3 = 8</strong>",
+                options: ["5", "10", "16", "11"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Você só fez 8-3.<br>
+                    <strong>(B) Correta:</strong> Primeiro tira o 3: x/2 = 5. Depois o 2 passa multiplicando: x = 5 x 2 = 10.<br>
+                    <strong>(C) Incorreta:</strong> Se x fosse 16, 16/2+3 = 11.<br>
+                    <strong>(D) Incorreta:</strong> Erro na ordem das operações.`
+            },
+            // NÍVEL 5: PROBLEMAS E DESAFIOS
+            {
+                id: 13,
+                text: "O dobro de um número mais 5 é igual a 15. Que número é esse?",
+                options: ["10", "5", "20", "2"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 2x10+5 = 25.<br>
+                    <strong>(B) Correta:</strong> Montando a equação: 2x + 5 = 15. 2x = 10. x = 5.<br>
+                    <strong>(C) Incorreta:</strong> 2x20+5 = 45.<br>
+                    <strong>(D) Incorreta:</strong> 2x2+5 = 9.`
+            },
+            {
+                id: 14,
+                text: "Resolva: <strong>2x = x + 5</strong> (Tem x dos dois lados!)",
+                options: ["5", "2", "3", "10"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Passa o x da direita para a esquerda subtraindo: 2x - x = 5. Logo, x = 5.<br>
+                    <strong>(B) Incorreta:</strong> 2x2 = 4 e 2+5=7. Não são iguais.<br>
+                    <strong>(C) Incorreta:</strong> 2x3 = 6 e 3+5=8.<br>
+                    <strong>(D) Incorreta:</strong> 2x10 = 20 e 10+5=15.`
+            },
+            {
+                id: 15,
+                text: "Pensei em um número, multipliquei por 3 e deu 21. Qual é o número?",
+                options: ["18", "24", "7", "63"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 21 - 3 = 18 (erro de operação).<br>
+                    <strong>(B) Incorreta:</strong> 21 + 3 = 24.<br>
+                    <strong>(C) Correta:</strong> A conta é 3x = 21. O inverso de multiplicar por 3 é dividir por 3. 21 ÷ 3 = 7.<br>
+                    <strong>(D) Incorreta:</strong> 21 x 3 = 63 (operação errada).`
+            }
+        ];
+
+        // --- ESTADO DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        // --- NAVEGAÇÃO ENTRE ABAS ---
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // --- RENDERIZAÇÃO DO QUIZ ---
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.90rem; line-height: 1.6;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            // Verifica se tem imagem visual na questão
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; // Já respondeu
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#4C51BF"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        // --- LÓGICA DE FINALIZAÇÃO E FEEDBACK DETALHADO ---
+        function finishQuiz() {
+            score = 0;
+            let feedbackHTML = '<div style="text-align: left; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">';
+
+            userAnswers.forEach((ans, idx) => {
+                const q = questions[idx];
+                const isCorrect = (ans === q.correct);
+                
+                if (isCorrect) {
+                    score++;
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: #F0FFF4; border-radius: 8px; border-left: 4px solid #48BB78;">
+                            <p style="font-size: 0.9rem;"><strong>Questão ${idx+1}:</strong> ✅ Acertou!</p>
+                        </div>`;
+                } else {
+                    const userAnswerText = q.options[ans];
+                    const correctAnswerText = q.options[q.correct];
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 15px; background: #FFF5F5; border-radius: 8px; border-left: 4px solid #F56565;">
+                            <p style="font-weight: 700; color: #C53030;">Questão ${idx+1}: ${q.text}</p>
+                            <p style="font-size: 0.9rem; margin-top: 5px;">❌ <strong>Você marcou:</strong> ${userAnswerText}</p>
+                            <p style="font-size: 0.9rem;">🎯 <strong>Correto seria:</strong> ${correctAnswerText}</p>
+                            <div style="font-size: 0.85rem; margin-top: 10px; color: #4A5568; background: rgba(255,255,255,0.5); padding: 8px; border-radius: 4px;">
+                                ${q.explanation}
+                            </div>
+                        </div>`;
+                }
+            });
+            feedbackHTML += '</div>';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            let actionButtonsHTML = "";
+
+            // CRITÉRIO DE 80%
+            if (percent >= 80) {
+                stars = "⭐⭐⭐⭐⭐"; 
+                msg = "Parabéns! Você dominou o conteúdo.";
+                actionButtonsHTML = `
+                    <button onclick="window.location.href='7ano-matematica.html'" style="width: 100%; padding: 15px; background-color: #48BB78; color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;">
+                        Concluir Atividade
+                    </button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Voltar para o Assunto
+                    </button>
+                `;
+            } else {
+                stars = "💪 Estude mais"; 
+                msg = `Você fez ${percent}%. Precisa de 80% para passar.`;
+                actionButtonsHTML = `
+                    <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Exercícios</button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Revisar Explicação
+                    </button>
+                `;
+            }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+            
+            // Injeta o feedback detalhado
+            document.getElementById('review-container').innerHTML = feedbackHTML;
+            // Injeta os botões de ação corretos
+            document.getElementById('action-buttons').innerHTML = actionButtonsHTML;
+
+            if (percent >= 80) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            document.getElementById('review-container').innerHTML = ""; // Limpa feedback anterior
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

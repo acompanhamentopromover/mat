@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matemática 7º Ano - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- ESTILO PROMOVER (Identidade Visual Padrão) --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            --white: #FFFFFF;
+            
+            /* Cores das Seções */
+            --color-numbers: #E9D8FD; /* Roxo */
+            --color-algebra: #FED7E2; /* Rosa */
+            --color-geo: #C6F6D5;     /* Verde */
+            --color-measures: #FEFCBF;/* Amarelo */
+            --color-prob: #E0FCFF;    /* Azul Claro */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* --- HEADER --- */
+        .logo-header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+            margin: 0 auto 10px auto;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--text-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: #555;
+            font-weight: 600;
+        }
+
+        /* --- BARRA DE PESQUISA --- */
+        .search-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            background-color: var(--white);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            box-shadow: 4px 4px 0px var(--border-color);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--border-color);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+
+        /* --- SEÇÕES --- */
+        .content-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: var(--text-color);
+            color: var(--white);
+            font-size: 0.9rem;
+            font-weight: 700;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+            align-self: flex-start;
+            margin-bottom: 5px;
+        }
+
+        /* Cores das Badges */
+        .badge-num { background-color: #805AD5; }
+        .badge-alg { background-color: #D53F8C; }
+        .badge-geo { background-color: #38A169; }
+        .badge-med { background-color: #D69E2E; }
+        .badge-prob { background-color: #3182CE; }
+
+        /* --- BOTÕES --- */
+        .topic-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: var(--text-color);
+            padding: 18px 20px;
+            border-radius: 16px;
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            box-shadow: 4px 4px 0px var(--border-color);
+            transition: all 0.1s ease;
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .topic-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--border-color);
+        }
+
+        .topic-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--border-color);
+        }
+
+        /* Lateral Colorida */
+        .topic-btn::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 12px;
+            border-right: 2px solid var(--border-color);
+        }
+
+        .group-num .topic-btn::before { background-color: var(--color-numbers); }
+        .group-alg .topic-btn::before { background-color: var(--color-algebra); }
+        .group-geo .topic-btn::before { background-color: var(--color-geo); }
+        .group-med .topic-btn::before { background-color: var(--color-measures); }
+        .group-prob .topic-btn::before { background-color: var(--color-prob); }
+
+        .arrow { font-size: 1.2rem; font-weight: 900; }
+
+        #no-results {
+            text-align: center;
+            color: #888;
+            margin-top: 30px;
+            font-weight: 600;
+            display: none;
+        }
+
+        footer {
+            margin-top: 40px;
+            font-size: 0.8rem;
+            color: #888;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <img src="logo.png" alt="Logo Promover" class="logo-img"> 
+            <h1>Matemática 7º Ano</h1>
+            <p class="subtitle">Conteúdos Essenciais</p>
+        </header>
+
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar matéria... (ex: Juros)">
+        </div>
+
+        <div id="no-results">
+            <p>😕 Nenhum conteúdo encontrado.</p>
+        </div>
+
+        <div class="content-group group-num">
+            <div class="section-badge badge-num">🔢 Números</div>
+            <a href="numeros-inteiros.html" class="topic-btn">Inteiros (Z) e Reta Numérica <span class="arrow">➜</span></a>
+            <a href="operacoes-inteiros.html" class="topic-btn">Operações com Inteiros <span class="arrow">➜</span></a>
+            <a href="potenciacao-raiz-inteiros.html" class="topic-btn">Potenciação e Raiz (Inteiros) <span class="arrow">➜</span></a>
+            <a href="numeros-racionais.html" class="topic-btn">Racionais (Q) e Operações <span class="arrow">➜</span></a>
+            <a href="porcentagem-juros.html" class="topic-btn">Porcentagem e Juros Simples <span class="arrow">➜</span></a>
+        </div>
+
+        <div class="content-group group-alg">
+            <div class="section-badge badge-alg">🧩 Álgebra</div>
+            <a href="linguagem-algebrica-7.html" class="topic-btn">Linguagem Algébrica <span class="arrow">➜</span></a>
+            <a href="equacoes-1grau.html" class="topic-btn">Equações do 1º Grau <span class="arrow">➜</span></a>
+            <a href="razao-proporcao.html" class="topic-btn">Razão, Proporção e Regra de Três <span class="arrow">➜</span></a>
+            <a href="grandezas-proporcionais.html" class="topic-btn">Grandezas Proporcionais <span class="arrow">➜</span></a>
+        </div>
+
+        <div class="content-group group-geo">
+            <div class="section-badge badge-geo">📐 Geometria</div>
+            <a href="plano-cartesiano.html" class="topic-btn">Plano Cartesiano <span class="arrow">➜</span></a>
+            <a href="transformacoes-geometricas.html" class="topic-btn">Transformações Geométricas <span class="arrow">➜</span></a>
+            <a href="angulos-relacoes.html" class="topic-btn">Ângulos e Relações <span class="arrow">➜</span></a>
+            <a href="triangulos-7.html" class="topic-btn">Triângulos (Existência e Soma) <span class="arrow">➜</span></a>
+            <a href="poligonos-regulares.html" class="topic-btn">Polígonos Regulares <span class="arrow">➜</span></a>
+            <a href="circunferencia.html" class="topic-btn">Circunferência (Comprimento) <span class="arrow">➜</span></a>
+        </div>
+
+        <div class="content-group group-med">
+            <div class="section-badge badge-med">⚖️ Medidas</div>
+            <a href="area-figuras-planas.html" class="topic-btn">Área de Figuras Planas <span class="arrow">➜</span></a>
+            <a href="volume-blocos.html" class="topic-btn">Volume de Blocos <span class="arrow">➜</span></a>
+            <a href="razoes-especiais.html" class="topic-btn">Densidade e Velocidade Média <span class="arrow">➜</span></a>
+        </div>
+
+        <div class="content-group group-prob">
+            <div class="section-badge badge-prob">🎲 Probabilidade</div>
+            <a href="media-moda-mediana.html" class="topic-btn">Média, Moda e Mediana <span class="arrow">➜</span></a>
+            <a href="amplitude.html" class="topic-btn">Amplitude <span class="arrow">➜</span></a>
+            <a href="graficos-setores.html" class="topic-btn">Gráficos de Setores (Pizza) <span class="arrow">➜</span></a>
+            <a href="probabilidade-frequencial.html" class="topic-btn">Probabilidade Frequencial <span class="arrow">➜</span></a>
+        </div>
+
+        <footer>
+            © 2026 Promover Educação
+        </footer>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        searchInput.addEventListener('keyup', function(e) {
+            const term = e.target.value.toLowerCase();
+            let totalVisibleGroups = 0;
+
+            contentGroups.forEach(group => {
+                const links = group.querySelectorAll('.topic-btn');
+                let hasVisibleLink = false;
+
+                links.forEach(link => {
+                    const text = link.textContent.toLowerCase();
+                    if (text.includes(term)) {
+                        link.style.display = 'flex';
+                        hasVisibleLink = true;
+                    } else {
+                        link.style.display = 'none';
+                    }
+                });
+
+                if (hasVisibleLink) {
+                    group.style.display = 'flex';
+                    totalVisibleGroups++;
+                } else {
+                    group.style.display = 'none';
+                }
+            });
+
+            if (totalVisibleGroups === 0) {
+                noResultsMsg.style.display = 'block';
+            } else {
+                noResultsMsg.style.display = 'none';
+            }
+        });
+    </script>
+
+</body>
+</html>

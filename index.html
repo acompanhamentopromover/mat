@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9º Ano - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- Reaproveitando o CSS do Index para consistência --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* Paleta Pastel */
+            --blue-pastel: #D0EFFF;   /* Matemática */
+            --pink-pastel: #FFE5EC;   /* Português */
+            --green-pastel: #E0F5E9;  /* Ciências */
+            --yellow-pastel: #FFF6D6; /* Geografia */
+            --purple-pastel: #EAD6FF; /* História (Nova cor para diferenciar) */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Navegação de retorno */
+        .back-nav {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .btn-back {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .btn-back:hover { background-color: #e2e8f0; }
+
+        /* Cabeçalho */
+        header { text-align: center; margin-bottom: 10px; }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #555;
+            font-weight: 400;
+        }
+
+        /* Grid de Botões */
+        .subject-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Estilo dos Cards (Idêntico ao Index) */
+        .subject-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: var(--text-color);
+            padding: 18px 24px;
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+            background-color: white;
+            box-shadow: 4px 4px 0px var(--border-color); /* Sombra dura */
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+
+        .subject-card:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--border-color);
+        }
+
+        .card-content { display: flex; align-items: center; gap: 15px; }
+
+        .icon-box { font-size: 1.6rem; } /* Emojis um pouco menores que no index */
+        
+        .card-title { font-size: 1.1rem; font-weight: 700; }
+
+        .arrow-icon { font-weight: bold; font-size: 1.2rem; }
+
+        /* Classes de Cores */
+        .bg-math { background-color: var(--blue-pastel); }
+        .bg-port { background-color: var(--pink-pastel); }
+        .bg-sci  { background-color: var(--green-pastel); }
+        .bg-geo  { background-color: var(--yellow-pastel); }
+        .bg-hist { background-color: var(--purple-pastel); }
+
+        footer {
+            margin-top: auto;
+            padding-top: 40px;
+            font-size: 0.8rem;
+            color: #888;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <nav class="back-nav">
+            <a href="index.html" class="btn-back">
+                ⬅ Voltar
+            </a>
+        </nav>
+
+        <header>
+            <h1>9º Ano<br><span style="font-size: 1.2rem; font-weight: 500;">Promover</span></h1>
+            <p class="subtitle">Escolha a matéria que deseja estudar</p>
+        </header>
+
+        <main class="subject-list">
+            <a href="9ano-matematica.html" class="subject-card bg-math">
+                <div class="card-content">
+                    <span class="icon-box">📐</span>
+                    <span class="card-title">Matemática</span>
+                </div>
+                <span class="arrow-icon">➜</span>
+            </a>
+
+            <a href="9ano-portugues.html" class="subject-card bg-port">
+                <div class="card-content">
+                    <span class="icon-box">📖</span>
+                    <span class="card-title">Língua Portuguesa</span>
+                </div>
+                <span class="arrow-icon">➜</span>
+            </a>
+
+            <a href="9ano-ciencias.html" class="subject-card bg-sci">
+                <div class="card-content">
+                    <span class="icon-box">🔬</span>
+                    <span class="card-title">Ciências</span>
+                </div>
+                <span class="arrow-icon">➜</span>
+            </a>
+
+            <a href="9ano-geografia.html" class="subject-card bg-geo">
+                <div class="card-content">
+                    <span class="icon-box">🌎</span>
+                    <span class="card-title">Geografia</span>
+                </div>
+                <span class="arrow-icon">➜</span>
+            </a>
+
+            <a href="9ano-historia.html" class="subject-card bg-hist">
+                <div class="card-content">
+                    <span class="icon-box">🏛️</span>
+                    <span class="card-title">História</span>
+                </div>
+                <span class="arrow-icon">➜</span>
+            </a>
+        </main>
+
+        <footer>
+            © 2026 Promover Educação
+        </footer>
+    </div>
+
+</body>
+</html>

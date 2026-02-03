@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polígonos - Masterclass</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA CORAL (Formas/Energia) */
+            --theme-color: #FEF2F2; 
+            --theme-active: #DC2626; 
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR (ERRO) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- LOGO --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--theme-active);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO --- */
+        .section-view {
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: center; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+        .visual-svg { color: var(--theme-active); }
+        
+        /* Estilo para SVGs dentro das questões */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #FEF2F2;
+            border-radius: 12px;
+            border: 1px dashed var(--theme-active);
+        }
+
+        /* --- CARDS DE EXEMPLO DETALHADO --- */
+        .step-box {
+            background-color: #FFF1F2; 
+            border-left: 5px solid #DC2626;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .step-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #991B1B;
+            margin-bottom: 10px;
+            display: block;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        .math-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-family: monospace;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .math-comment {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.8rem;
+            color: #555;
+            margin-left: 10px;
+            font-style: italic;
+            background: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .highlight {
+            color: #DC2626;
+            font-weight: 700;
+            background-color: #FECACA;
+            padding: 0 4px;
+            border-radius: 4px;
+        }
+
+        /* --- QUIZ MAPA --- */
+        .question-map {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-active);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        /* --- OPÇÕES --- */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK DETALHADO --- */
+        .feedback-box {
+            display: block; 
+            margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- TELA DE RESULTADO --- */
+        #viewResult {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+
+        .btn-retry {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--theme-active);
+            color: white;
+            border: 2px solid black;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px black;
+            transition: transform 0.1s;
+        }
+        
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- RODAPÉ FIXO --- */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            border-top: 2px solid var(--border-color);
+            padding: 15px 20px;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="8ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Polígonos</h1>
+            <p style="color: #555; margin-bottom: 20px;">Figuras fechadas feitas de retas. A chave para entendê-los não é decorar fórmulas, mas saber dividir em triângulos!</p>
+            
+            <div class="card-content">
+                <h3>1. Convexo ou Côncavo?</h3>
+                
+                <div class="visual-row" style="justify-content: space-around;">
+                    <div style="text-align:center;">
+                        <svg width="80" height="80" viewBox="0 0 100 100">
+                            <polygon points="50,10 90,40 70,90 30,90 10,40" fill="none" stroke="#DC2626" stroke-width="3"/>
+                        </svg>
+                        <p style="font-size:0.8rem; font-weight:700;">Convexo</p>
+                        <p style="font-size:0.7rem;">Todas as pontas para fora.</p>
+                    </div>
+                    <div style="text-align:center;">
+                        <svg width="80" height="80" viewBox="0 0 100 100">
+                            <polygon points="10,10 90,10 50,50 90,90 10,90" fill="none" stroke="#333" stroke-width="3"/>
+                        </svg>
+                        <p style="font-size:0.8rem; font-weight:700;">Côncavo</p>
+                        <p style="font-size:0.7rem;">Tem uma "caverna" (buraco).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>2. A Soma dos Ângulos Internos (Si)</h3>
+                <p class="explanation-text">Não decore a fórmula. Entenda o truque: <strong>Cortar em triângulos</strong>.</p>
+                <p class="explanation-text">Escolha UM vértice e ligue aos outros. Veja quantos triângulos cabem dentro.</p>
+                
+                <div class="step-box">
+                    <span class="step-title">Exemplo: O Pentágono (5 lados)</span>
+                    <div class="visual-row">
+                        
+                        <svg width="120" height="100" viewBox="0 0 120 100">
+                            <polygon points="60,10 110,50 90,90 30,90 10,50" fill="none" stroke="#DC2626" stroke-width="2"/>
+                            <line x1="60" y1="10" x2="90" y2="90" stroke="#DC2626" stroke-dasharray="4"/>
+                            <line x1="60" y1="10" x2="30" y2="90" stroke="#DC2626" stroke-dasharray="4"/>
+                            <text x="60" y="60" font-size="12" fill="#DC2626">1</text>
+                            <text x="35" y="50" font-size="12" fill="#DC2626">2</text>
+                            <text x="85" y="50" font-size="12" fill="#DC2626">3</text>
+                        </svg>
+                    </div>
+                    
+                    <p class="explanation-text">O pentágono virou <strong>3 triângulos</strong>.</p>
+                    <div class="math-row">Soma = 3 x 180° = <span class="highlight">540°</span></div>
+                    
+                    <p class="explanation-text" style="margin-top:10px;"><strong>A Regra Geral:</strong> O número de triângulos é sempre (lados - 2).</p>
+                    <div class="math-row">Fórmula: Si = (n - 2) x 180</div>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>3. Polígonos Regulares (A Perfeição)</h3>
+                <p class="explanation-text">São aqueles que têm <strong>todos os lados iguais</strong> e <strong>todos os ângulos iguais</strong>.</p>
+                
+                <div class="step-box">
+                    <span class="step-title">Como achar 1 ângulo interno?</span>
+                    <p class="explanation-text">Primeiro calcule o total (Si), depois divida pelo número de lados (n).</p>
+                    
+                    <p class="explanation-text"><strong>Exemplo: Hexágono Regular (6 lados)</strong></p>
+                    <div class="math-row">1. Triângulos: 6 - 2 = 4</div>
+                    <div class="math-row">2. Soma Total: 4 x 180 = 720°</div>
+                    <div class="math-row">3. Cada Ângulo: 720 ÷ 6 = <span class="highlight">120°</span></div>
+                </div>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Conte os lados e calcule os ângulos.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Resultado</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente!</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (POLÍGONOS) ---
+        const questions = [
+            // NÍVEL 1: CLASSIFICAÇÃO E NOMES
+            {
+                id: 1,
+                text: "O que define um polígono ser <strong>convexo</strong>?",
+                options: ["Tem uma 'barriga' ou entrada para dentro", "Qualquer reta que liga dois pontos internos fica totalmente dentro dele", "Tem todos os lados iguais", "É um círculo"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Isso é côncavo.<br>
+                    <strong>(B) Correta:</strong> Se você esticar um elástico entre quaisquer dois pontos dentro da figura, o elástico nunca sai dela. As pontas são 'para fora'.<br>
+                    <strong>(C) Incorreta:</strong> Isso é regular.<br>
+                    <strong>(D) Incorreta:</strong> Círculo não é polígono.`
+            },
+            {
+                id: 2,
+                text: "Como se chama o polígono de 7 lados?",
+                options: ["Hexágono", "Heptágono", "Octógono", "Decágono"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 6 lados.<br>
+                    <strong>(B) Correta:</strong> Hepta = 7.<br>
+                    <strong>(C) Incorreta:</strong> 8 lados.<br>
+                    <strong>(D) Incorreta:</strong> 10 lados.`
+            },
+            {
+                id: 3,
+                text: "Qual o nome do polígono de 20 lados?",
+                options: ["Dodecágono", "Pentadecágono", "Icoságono", "Vinteágono"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 12 lados.<br>
+                    <strong>(B) Incorreta:</strong> 15 lados.<br>
+                    <strong>(C) Correta:</strong> Icoságono vem do grego 'eikosi' (vinte).<br>
+                    <strong>(D) Incorreta:</strong> Nome informal incorreto.`
+            },
+            // NÍVEL 2: SOMA DOS ÂNGULOS INTERNOS
+            {
+                id: 4,
+                text: "Quantos triângulos podemos formar dentro de um <strong>Heptágono</strong> (7 lados) a partir de um vértice?",
+                options: ["7", "6", "5", "4"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Não é n.<br>
+                    <strong>(B) Incorreta:</strong> Não é n-1.<br>
+                    <strong>(C) Correta:</strong> A regra é sempre (n - 2). Para 7 lados: 7 - 2 = 5 triângulos.<br>
+                    <strong>(D) Incorreta:</strong> Erro de cálculo.`
+            },
+            {
+                id: 5,
+                text: "Qual é a soma dos ângulos internos de um <strong>Hexágono</strong> (6 lados)?",
+                options: ["360°", "540°", "720°", "1080°"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Quadrilátero.<br>
+                    <strong>(B) Incorreta:</strong> Pentágono.<br>
+                    <strong>(C) Correta:</strong> n=6. Triângulos = 6-2=4. Soma = 4 x 180 = 720°.<br>
+                    <strong>(D) Incorreta:</strong> Octógono.`
+            },
+            {
+                id: 6,
+                text: "Calcule a soma dos ângulos internos de um <strong>Decágono</strong> (10 lados).",
+                options: ["1800°", "1440°", "1620°", "3600°"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Dodecágono.<br>
+                    <strong>(B) Correta:</strong> n=10. Triângulos = 10-2=8. Soma = 8 x 180 = 1440°.<br>
+                    <strong>(C) Incorreta:</strong> Eneágono.<br>
+                    <strong>(D) Incorreta:</strong> Erro.`
+            },
+            // NÍVEL 3: POLÍGONOS REGULARES
+            {
+                id: 7,
+                text: "Quanto mede CADA ângulo interno de um <strong>Triângulo Equilátero</strong>?",
+                options: ["45°", "90°", "60°", "180°"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Triângulo retângulo isósceles.<br>
+                    <strong>(B) Incorreta:</strong> Triângulo retângulo.<br>
+                    <strong>(C) Correta:</strong> Soma total = 180°. Dividido por 3 lados iguais = 60°.<br>
+                    <strong>(D) Incorreta:</strong> Soma total.`
+            },
+            {
+                id: 8,
+                text: "Quanto mede cada ângulo interno de um <strong>Quadrado</strong>?",
+                options: ["60°", "90°", "120°", "360°"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Triângulo.<br>
+                    <strong>(B) Correta:</strong> Soma total = 360°. Dividido por 4 = 90°.<br>
+                    <strong>(C) Incorreta:</strong> Hexágono.<br>
+                    <strong>(D) Incorreta:</strong> Soma total.`
+            },
+            {
+                id: 9,
+                text: "Qual é o valor do ângulo interno de um <strong>Pentágono Regular</strong>?",
+                options: ["108°", "120°", "72°", "540°"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Soma = (5-2)x180 = 540. Cada ângulo = 540 ÷ 5 = 108°.<br>
+                    <strong>(B) Incorreta:</strong> Hexágono.<br>
+                    <strong>(C) Incorreta:</strong> Ângulo externo.<br>
+                    <strong>(D) Incorreta:</strong> Soma total.`
+            },
+            // NÍVEL 4: ÂNGULOS EXTERNOS
+            {
+                id: 10,
+                text: "Qual é a soma dos ângulos <strong>externos</strong> de QUALQUER polígono convexo?",
+                options: ["Depende dos lados", "180°", "360°", "720°"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> É uma constante mágica.<br>
+                    <strong>(B) Incorreta:</strong> Meia volta.<br>
+                    <strong>(C) Correta:</strong> Imagine dar uma volta completa ao redor do polígono. Você sempre gira 360° no total, não importa quantos lados tenha.<br>
+                    <strong>(D) Incorreta:</strong> Muito alto.`
+            },
+            {
+                id: 11,
+                text: "Quanto mede o ângulo externo de um <strong>Hexágono Regular</strong>?",
+                options: ["120°", "60°", "30°", "360°"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Interno.<br>
+                    <strong>(B) Correta:</strong> Soma externa total = 360°. Dividido por 6 ângulos iguais = 60°.<br>
+                    <strong>(C) Incorreta:</strong> Dodecágono.<br>
+                    <strong>(D) Incorreta:</strong> Soma total.`
+            },
+            {
+                id: 12,
+                text: "A soma do ângulo interno + ângulo externo no mesmo vértice é sempre:",
+                options: ["90°", "360°", "180°", "Variável"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Complementar.<br>
+                    <strong>(B) Incorreta:</strong> Volta completa.<br>
+                    <strong>(C) Correta:</strong> Eles formam um par linear (estão sobre uma reta). São suplementares.<br>
+                    <strong>(D) Incorreta:</strong> É fixo.`
+            },
+            // NÍVEL 5: DESAFIOS E LÓGICA
+            {
+                id: 13,
+                text: "Um polígono regular tem ângulo interno de 140°. Quantos lados ele tem? (Dica: Ache o externo primeiro)",
+                options: ["8", "9", "10", "12"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Externo seria 45.<br>
+                    <strong>(B) Correta:</strong> Externo = 180 - 140 = 40°. Como a soma externa é 360, n = 360 ÷ 40 = 9 lados (Eneágono).<br>
+                    <strong>(C) Incorreta:</strong> Externo seria 36.<br>
+                    <strong>(D) Incorreta:</strong> Externo seria 30.`
+            },
+            {
+                id: 14,
+                text: "Qual polígono tem a soma dos ângulos internos igual a 1800°?",
+                options: ["Decágono (10)", "Dodecágono (12)", "Icoságono (20)", "Octógono (8)"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 1440°.<br>
+                    <strong>(B) Correta:</strong> (n-2)x180 = 1800 ➝ n-2 = 10 ➝ n = 12.<br>
+                    <strong>(C) Incorreta:</strong> 3240°.<br>
+                    <strong>(D) Incorreta:</strong> 1080°`
+            },
+            {
+                id: 15,
+                text: "Quantas diagonais saem de UM ÚNICO vértice de um pentágono?",
+                options: ["2", "5", "3", "0"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Do vértice, ele não pode ligar para ele mesmo nem para os 2 vizinhos. 5 - 3 = 2 diagonais.<br>
+                    <strong>(B) Incorreta:</strong> Total de vértices.<br>
+                    <strong>(C) Incorreta:</strong> Número de triângulos.<br>
+                    <strong>(D) Incorreta:</strong> Triângulo tem 0.`
+            }
+        ];
+
+        // --- ESTADO DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        // --- NAVEGAÇÃO ENTRE ABAS ---
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // --- RENDERIZAÇÃO DO QUIZ ---
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.90rem; line-height: 1.6;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            // Verifica se tem imagem visual na questão
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; // Já respondeu
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#DC2626"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        // --- LÓGICA DE FINALIZAÇÃO E FEEDBACK DETALHADO ---
+        function finishQuiz() {
+            score = 0;
+            let feedbackHTML = '<div style="text-align: left; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">';
+
+            userAnswers.forEach((ans, idx) => {
+                const q = questions[idx];
+                const isCorrect = (ans === q.correct);
+                
+                if (isCorrect) {
+                    score++;
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: #F0FFF4; border-radius: 8px; border-left: 4px solid #48BB78;">
+                            <p style="font-size: 0.9rem;"><strong>Questão ${idx+1}:</strong> ✅ Acertou!</p>
+                        </div>`;
+                } else {
+                    const userAnswerText = q.options[ans];
+                    const correctAnswerText = q.options[q.correct];
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 15px; background: #FFF5F5; border-radius: 8px; border-left: 4px solid #F56565;">
+                            <p style="font-weight: 700; color: #C53030;">Questão ${idx+1}: ${q.text}</p>
+                            <p style="font-size: 0.9rem; margin-top: 5px;">❌ <strong>Você marcou:</strong> ${userAnswerText}</p>
+                            <p style="font-size: 0.9rem;">🎯 <strong>Correto seria:</strong> ${correctAnswerText}</p>
+                            <div style="font-size: 0.85rem; margin-top: 10px; color: #4A5568; background: rgba(255,255,255,0.5); padding: 8px; border-radius: 4px;">
+                                ${q.explanation}
+                            </div>
+                        </div>`;
+                }
+            });
+            feedbackHTML += '</div>';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            let actionButtonsHTML = "";
+
+            // CRITÉRIO DE 80%
+            if (percent >= 80) {
+                stars = "⭐⭐⭐⭐⭐"; 
+                msg = "Parabéns! Você dominou o conteúdo.";
+                actionButtonsHTML = `
+                    <button onclick="window.location.href='8ano-matematica.html'" style="width: 100%; padding: 15px; background-color: #48BB78; color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;">
+                        Concluir Atividade
+                    </button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Voltar para o Assunto
+                    </button>
+                `;
+            } else {
+                stars = "💪 Estude mais"; 
+                msg = `Você fez ${percent}%. Precisa de 80% para passar.`;
+                actionButtonsHTML = `
+                    <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Exercícios</button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Revisar Explicação
+                    </button>
+                `;
+            }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+            
+            // Injeta o feedback detalhado
+            document.getElementById('review-container').innerHTML = feedbackHTML;
+            // Injeta os botões de ação corretos
+            document.getElementById('action-buttons').innerHTML = actionButtonsHTML;
+
+            if (percent >= 80) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            document.getElementById('review-container').innerHTML = ""; // Limpa feedback anterior
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

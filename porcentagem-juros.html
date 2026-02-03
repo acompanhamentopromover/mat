@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Porcentagem e Juros - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA VERDE DINHEIRO (Crescimento/Valor) */
+            --theme-color: #F0FFF4; 
+            --theme-active: #38A169; 
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR (ERRO) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- LOGO --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--theme-active);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO --- */
+        .section-view {
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: flex-end; gap: 10px; justify-content: space-around; flex-wrap: wrap; }
+        .visual-item { text-align: center; width: 30%; min-width: 80px; }
+        .visual-svg { color: var(--theme-active); margin-bottom: 5px; }
+        
+        /* Estilo para SVGs dentro das questões */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #F0FFF4;
+            border-radius: 12px;
+            border: 1px dashed var(--theme-active);
+        }
+
+        .example-box {
+            background-color: #F0FFF4; /* Verde muito claro */
+            border-left: 5px solid #38A169;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .example-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #2F855A;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* --- QUIZ MAPA --- */
+        .question-map {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-active);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        /* --- OPÇÕES --- */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK DETALHADO --- */
+        .feedback-box {
+            display: block; 
+            margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- TELA DE RESULTADO --- */
+        #viewResult {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+
+        .btn-retry {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--theme-active);
+            color: white;
+            border: 2px solid black;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px black;
+            transition: transform 0.1s;
+        }
+        
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- RODAPÉ FIXO --- */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            border-top: 2px solid var(--border-color);
+            padding: 15px 20px;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="7ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Porcentagem e Juros Simples</h1>
+            <p style="color: #555; margin-bottom: 20px;">Porcentagem é uma parte de 100. Juros é o "aluguel" do dinheiro.</p>
+            
+            <div class="card-content">
+                <h3>% Porcentagem</h3>
+                <p>Significa "por cada cento". É uma fração com denominador 100.</p>
+                <br>
+                <div class="visual-row">
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="3">
+                            <circle cx="30" cy="30" r="25" stroke="#38A169" stroke-width="2"/>
+                            <path d="M30 5 A25 25 0 0 1 30 55" fill="#C6F6D5" stroke="none"/>
+                            <line x1="30" y1="5" x2="30" y2="55" stroke="#38A169"/>
+                            <text x="40" y="35" font-size="12" fill="#276749" font-weight="bold">50%</text>
+                        </svg>
+                        <p style="font-size:0.75rem;">50% = Metade</p>
+                    </div>
+                    
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="3">
+                            <circle cx="30" cy="30" r="25" stroke="#38A169" stroke-width="2"/>
+                            <path d="M30 30 L30 5 A25 25 0 0 1 55 30 Z" fill="#C6F6D5" stroke="none"/>
+                            <text x="35" y="25" font-size="10" fill="#276749" font-weight="bold">25%</text>
+                        </svg>
+                        <p style="font-size:0.75rem;">25% = Um quarto</p>
+                    </div>
+
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="3">
+                            <text x="30" y="38" font-size="24" font-weight="bold" fill="#38A169" text-anchor="middle" stroke="none">%</text>
+                        </svg>
+                        <p style="font-size:0.75rem;">Símbolo</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>💰 Juros Simples</h3>
+                <p>É o rendimento calculado apenas sobre o valor inicial.</p>
+                
+                <div class="example-box">
+                    <span class="example-tag">A Fórmula: J = C . i . t</span>
+                    <p>Para calcular os juros (J), multiplicamos:</p>
+                    <ul style="margin-left:20px; font-size:0.9rem; margin-top:5px;">
+                        <li><strong>C</strong> = Capital (dinheiro inicial)</li>
+                        <li><strong>i</strong> = Taxa (porcentagem)</li>
+                        <li><strong>t</strong> = Tempo</li>
+                    </ul>
+                </div>
+
+                <div class="example-box">
+                    <span class="example-tag">Exemplo Prático</span>
+                    <p>Emprestei R$ 100,00 a 10% ao mês por 2 meses.</p>
+                    <p style="font-weight:700; margin-top:5px;">J = 100 x 0,10 x 2 = R$ 20,00</p>
+                    <p style="font-size:0.8rem;">(Total a receber: 100 + 20 = 120)</p>
+                </div>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Calculadora mental ativada?</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Resultado</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente!</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (PORCENTAGEM E JUROS) ---
+        const questions = [
+            // NÍVEL 1: CONCEITO DE PORCENTAGEM
+            {
+                id: 1,
+                text: "O que significa dizer <strong>50%</strong> de algo?",
+                options: ["A metade", "O dobro", "Um terço", "Tudo"],
+                correct: 0,
+                explanation: "<strong>Lógica Correta:</strong> 50/100 é o mesmo que 1/2. Portanto, é a metade.<br><strong>Erro Comum:</strong> Confundir com 100% (tudo) ou não saber a fração equivalente."
+            },
+            {
+                id: 2,
+                text: "Como escrevemos <strong>25%</strong> em forma de fração?",
+                options: ["1/4", "1/2", "1/5", "3/4"],
+                correct: 0,
+                explanation: "<strong>Lógica Correta:</strong> 25/100 simplificando por 25 dá 1/4.<br><strong>Erro Comum:</strong> Achar que é 1/5 ou 1/2."
+            },
+            {
+                id: 3,
+                text: "Qual número decimal representa <strong>10%</strong>?",
+                options: ["0,10", "1,0", "0,01", "10,0"],
+                correct: 0,
+                explanation: "<strong>Lógica Correta:</strong> 10 dividido por 100 é 0,10.<br><strong>Erro Comum:</strong> Confundir 0,10 com 0,01 (que seria 1%)."
+            },
+            // NÍVEL 2: CÁLCULO DE PORCENTAGEM
+            {
+                id: 4,
+                text: "Quanto é <strong>10% de 200</strong>?",
+                options: ["20", "2", "10", "100"],
+                correct: 0,
+                explanation: "<strong>Lógica Correta:</strong> Para achar 10%, basta cortar um zero ou andar a vírgula uma casa. 200 -> 20.<br><strong>Erro Comum:</strong> Dividir por 2 ou subtrair 10."
+            },
+            {
+                id: 5,
+                text: "Calcule <strong>50% de 80</strong>.",
+                options: ["40", "80", "160", "4"],
+                correct: 0,
+                explanation: "<strong>Lógica Correta:</strong> 50% é a metade. A metade de 80 é 40.<br><strong>Erro Comum:</strong> Tentar regra de três complicada ao invés de dividir por 2."
+            },
+            {
+                id: 6,
+                text: "Quanto é <strong>25% de 100 reais</strong>?",
+                options: ["R$ 25,00", "R$ 50,00", "R$ 75,00", "R$ 4,00"],
+                correct: 0,
+                explanation: "<strong>Lógica Correta:</strong> 25% de 100 é o próprio 25. É um quarto do valor total.<br><strong>Erro Comum:</strong> Calcular 1/2 (50) ou 1/5."
+            },
+            // NÍVEL 3: APLICAÇÃO (DESCONTO E AUMENTO)
+            {
+                id: 7,
+                text: "Uma camisa custa R$ 100,00 e tem <strong>20% de desconto</strong>. Quanto vou pagar?",
+                options: ["R$ 80,00", "R$ 20,00", "R$ 120,00", "R$ 90,00"],
+                correct: 0,
+                explanation: "<strong>Lógica Correta:</strong> O desconto é R$ 20,00 (20% de 100). Preço final: 100 - 20 = 80.<br><strong>Erro Comum:</strong> Responder o valor do desconto (20) em vez do preço final."
+            },
+            {
+                id: 8,
+                text: "Se meu salário de R$ 1000,00 aumentar <strong>10%</strong>, para quanto ele vai?",
+                options: ["R$ 1100,00", "R$ 1010,00", "R$ 2000,00", "R$ 100,00"],
+                correct: 0,
+                explanation: "<strong>Lógica Correta:</strong> 10% de 1000 é 100. Novo salário: 1000 + 100 = 1100.<br><strong>Erro Comum:</strong> Somar apenas 10 reais (1010)."
+            },
+            {
+                id: 9,
+                text: "Numa sala de 20 alunos, <strong>50%</strong> são meninas. Quantas meninas há?",
+                options: ["10 meninas", "5 meninas", "20 meninas", "2 meninas"],
+                correct: 0,
+                explanation: "<strong>Lógica Correta:</strong> 50% é a metade. Metade de 20 é 10.<br><strong>Erro Comum:</strong> Calcular errado a metade."
+            },
+            // NÍVEL 4: CONCEITO DE JUROS
+            {
+                id: 10,
+                text: "Na fórmula de Juros Simples (<strong>J = C.i.t</strong>), o que significa o 'C'?",
+                options: ["Capital (dinheiro inicial)", "Calculadora", "Conta", "Custo final"],
+                correct: 0,
+                explanation: "<strong>Lógica Correta:</strong> C é de Capital, o valor que você investe ou pega emprestado.<br><strong>Erro Comum:</strong> Achar que é Custo."
+            },
+            {
+                id: 11,
+                text: "O que acontece se eu esquecer de transformar a taxa (%) em decimal na fórmula?",
+                options: ["A conta dá errado (valor muito alto)", "Não muda nada", "O valor fica menor", "A conta dá zero"],
+                correct: 0,
+                explanation: "<strong>Lógica Correta:</strong> Usar 10 em vez de 0,10 faz o resultado ficar 100 vezes maior que o real.<br><strong>Erro Comum:</strong> Achar que pode multiplicar direto pelo número da porcentagem."
+            },
+            {
+                id: 12,
+                text: "Se a taxa é mensal, o tempo deve estar em:",
+                options: ["Meses", "Anos", "Dias", "Semanas"],
+                correct: 0,
+                explanation: "<strong>Lógica Correta:</strong> Taxa e Tempo devem sempre 'falar a mesma língua' (mesma unidade).<br><strong>Erro Comum:</strong> Misturar taxa mensal com tempo em anos."
+            },
+            // NÍVEL 5: CÁLCULO DE JUROS SIMPLES
+            {
+                id: 13,
+                text: "Capital: R$ 100,00. Taxa: 2% ao mês. Tempo: 1 mês. Qual o <strong>Juro</strong>?",
+                options: ["R$ 2,00", "R$ 20,00", "R$ 102,00", "R$ 200,00"],
+                correct: 0,
+                explanation: "<strong>Lógica Correta:</strong> J = 100 x 0,02 x 1 = 2 reais.<br><strong>Erro Comum:</strong> Responder o montante (102) ou errar a vírgula (20)."
+            },
+            {
+                id: 14,
+                text: "Capital: R$ 200,00. Taxa: 10% ao mês. Tempo: 2 meses. Quanto rendeu de Juros?",
+                options: ["R$ 40,00", "R$ 20,00", "R$ 220,00", "R$ 10,00"],
+                correct: 0,
+                explanation: "<strong>Lógica Correta:</strong> J = 200 x 0,10 x 2. 200 x 0,10 = 20. 20 x 2 = 40.<br><strong>Erro Comum:</strong> Esquecer de multiplicar pelo tempo (responder 20)."
+            },
+            {
+                id: 15,
+                text: "Peguei R$ 50,00 emprestado. Juros foram R$ 5,00. Quanto devolvo no <strong>Total</strong>?",
+                options: ["R$ 55,00", "R$ 45,00", "R$ 50,00", "R$ 5,00"],
+                correct: 0,
+                explanation: "<strong>Lógica Correta:</strong> Total (Montante) = Capital + Juros. 50 + 5 = 55.<br><strong>Erro Comum:</strong> Subtrair os juros ou responder só o juro."
+            }
+        ];
+
+        // --- ESTADO DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        // --- NAVEGAÇÃO ENTRE ABAS ---
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // --- RENDERIZAÇÃO DO QUIZ ---
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.95rem; line-height: 1.5;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            // Verifica se tem imagem visual na questão
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; // Já respondeu
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#38A169"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        // --- LÓGICA DE FINALIZAÇÃO E FEEDBACK DETALHADO ---
+        function finishQuiz() {
+            score = 0;
+            let feedbackHTML = '<div style="text-align: left; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">';
+
+            userAnswers.forEach((ans, idx) => {
+                const q = questions[idx];
+                const isCorrect = (ans === q.correct);
+                
+                if (isCorrect) {
+                    score++;
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: #F0FFF4; border-radius: 8px; border-left: 4px solid #48BB78;">
+                            <p style="font-size: 0.9rem;"><strong>Questão ${idx+1}:</strong> ✅ Acertou!</p>
+                        </div>`;
+                } else {
+                    const userAnswerText = q.options[ans];
+                    const correctAnswerText = q.options[q.correct];
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 15px; background: #FFF5F5; border-radius: 8px; border-left: 4px solid #F56565;">
+                            <p style="font-weight: 700; color: #C53030;">Questão ${idx+1}: ${q.text}</p>
+                            <p style="font-size: 0.9rem; margin-top: 5px;">❌ <strong>Você marcou:</strong> ${userAnswerText}</p>
+                            <p style="font-size: 0.9rem;">🎯 <strong>Correto seria:</strong> ${correctAnswerText}</p>
+                            <div style="font-size: 0.85rem; margin-top: 10px; color: #4A5568; background: rgba(255,255,255,0.5); padding: 8px; border-radius: 4px;">
+                                ${q.explanation}
+                            </div>
+                        </div>`;
+                }
+            });
+            feedbackHTML += '</div>';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            let actionButtonsHTML = "";
+
+            // CRITÉRIO DE 80%
+            if (percent >= 80) {
+                stars = "⭐⭐⭐⭐⭐"; 
+                msg = "Parabéns! Você dominou o conteúdo.";
+                actionButtonsHTML = `
+                    <button onclick="window.location.href='7ano-matematica.html'" style="width: 100%; padding: 15px; background-color: #48BB78; color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;">
+                        Concluir Atividade
+                    </button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Voltar para o Assunto
+                    </button>
+                `;
+            } else {
+                stars = "💪 Estude mais"; 
+                msg = `Você fez ${percent}%. Precisa de 80% para passar.`;
+                actionButtonsHTML = `
+                    <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Exercícios</button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Revisar Explicação
+                    </button>
+                `;
+            }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+            
+            // Injeta o feedback detalhado
+            document.getElementById('review-container').innerHTML = feedbackHTML;
+            // Injeta os botões de ação corretos
+            document.getElementById('action-buttons').innerHTML = actionButtonsHTML;
+
+            if (percent >= 80) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            document.getElementById('review-container').innerHTML = ""; // Limpa feedback anterior
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

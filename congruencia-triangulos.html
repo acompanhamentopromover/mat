@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Congruência de Triângulos - Ilustrado</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA ÍNDIGO (Geometria/Igualdade) */
+            --theme-color: #E0E7FF; 
+            --theme-active: #4338CA; 
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR (ERRO) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- LOGO --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--theme-active);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO --- */
+        .section-view {
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: center; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+        .visual-svg { color: var(--theme-active); }
+        
+        /* Estilo para SVGs dentro das questões */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #E0E7FF;
+            border-radius: 12px;
+            border: 1px dashed var(--theme-active);
+        }
+
+        /* --- CARDS DE EXEMPLO DETALHADO --- */
+        .step-box {
+            background-color: #EEF2FF; 
+            border-left: 5px solid #4338CA;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .step-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #3730A3;
+            margin-bottom: 10px;
+            display: block;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        .math-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-family: monospace;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .highlight {
+            color: #4338CA;
+            font-weight: 700;
+        }
+
+        /* --- QUIZ MAPA --- */
+        .question-map {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-active);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        /* --- OPÇÕES --- */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK DETALHADO --- */
+        .feedback-box {
+            display: block; 
+            margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- TELA DE RESULTADO --- */
+        #viewResult {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+
+        .btn-retry {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--theme-active);
+            color: white;
+            border: 2px solid black;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px black;
+            transition: transform 0.1s;
+        }
+        
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- RODAPÉ FIXO --- */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            border-top: 2px solid var(--border-color);
+            padding: 15px 20px;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="8ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Congruência de Triângulos</h1>
+            <p style="color: #555; margin-bottom: 20px;">Dois triângulos são congruentes quando são "cópias perfeitas": têm as mesmas medidas de lados e ângulos. Usamos os "Casos de Congruência" para identificar isso sem medir tudo.</p>
+            
+            <div class="card-content">
+                <h3>🔍 O que é Congruência?</h3>
+                <p class="explanation-text">Significa que se você recortar um triângulo e colocar sobre o outro, eles se encaixam perfeitamente.</p>
+                <div class="visual-row">
+                    <svg width="80" height="80" viewBox="0 0 100 100" class="visual-svg">
+                        <polygon points="10,90 90,90 50,20" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <text x="40" y="60" font-size="10" fill="currentColor">A</text>
+                    </svg>
+                    <div style="font-size:2rem; color:var(--theme-active);">≅</div>
+                    <svg width="80" height="80" viewBox="0 0 100 100" class="visual-svg">
+                        <polygon points="10,90 90,90 50,20" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <text x="40" y="60" font-size="10" fill="currentColor">B</text>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>1. Caso LLL (Lado-Lado-Lado)</h3>
+                <p class="explanation-text">Se os <strong>3 lados</strong> de um triângulo são iguais aos 3 lados do outro, eles são congruentes.</p>
+                
+                <div class="visual-row">
+                    <svg width="100" height="80" viewBox="0 0 100 80" class="visual-svg">
+                        <polygon points="10,70 90,70 50,10" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <line x1="45" y1="70" x2="55" y2="70" stroke="currentColor" stroke-width="2"/> <line x1="25" y1="40" x2="35" y2="35" stroke="currentColor" stroke-width="2"/> <line x1="28" y1="43" x2="38" y2="38" stroke="currentColor" stroke-width="2"/> <line x1="65" y1="35" x2="75" y2="40" stroke="currentColor" stroke-width="2"/> <line x1="68" y1="38" x2="78" y2="43" stroke="currentColor" stroke-width="2"/> <line x1="71" y1="41" x2="81" y2="46" stroke="currentColor" stroke-width="2"/> </svg>
+                    <div style="font-size:2rem; color:var(--theme-active);">≅</div>
+                    <svg width="100" height="80" viewBox="0 0 100 80" class="visual-svg">
+                        <polygon points="10,70 90,70 50,10" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <line x1="45" y1="70" x2="55" y2="70" stroke="currentColor" stroke-width="2"/>
+                        <line x1="25" y1="40" x2="35" y2="35" stroke="currentColor" stroke-width="2"/> <line x1="28" y1="43" x2="38" y2="38" stroke="currentColor" stroke-width="2"/>
+                        <line x1="65" y1="35" x2="75" y2="40" stroke="currentColor" stroke-width="2"/> <line x1="68" y1="38" x2="78" y2="43" stroke="currentColor" stroke-width="2"/> <line x1="71" y1="41" x2="81" y2="46" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </div>
+                <p class="explanation-text" style="text-align:center; font-size:0.8rem;">Marcas iguais indicam lados de mesma medida.</p>
+            </div>
+
+            <div class="card-content">
+                <h3>2. Caso LAL (Lado-Ângulo-Lado)</h3>
+                <p class="explanation-text">Dois lados iguais e o <strong>ângulo entre eles</strong> também igual.</p>
+                
+                <div class="visual-row">
+                     <svg width="100" height="80" viewBox="0 0 100 80" class="visual-svg">
+                        <polygon points="10,70 90,70 30,10" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <line x1="45" y1="70" x2="55" y2="70" stroke="currentColor" stroke-width="2"/> <line x1="18" y1="40" x2="28" y2="35" stroke="currentColor" stroke-width="2"/> <line x1="21" y1="43" x2="31" y2="38" stroke="currentColor" stroke-width="2"/> <path d="M 25 70 A 15 15 0 0 1 18 55" fill="none" stroke="currentColor" stroke-width="2"/> </svg>
+                    <div style="font-size:2rem; color:var(--theme-active);">≅</div>
+                     <svg width="100" height="80" viewBox="0 0 100 80" class="visual-svg">
+                        <polygon points="10,70 90,70 30,10" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <line x1="45" y1="70" x2="55" y2="70" stroke="currentColor" stroke-width="2"/>
+                        <line x1="18" y1="40" x2="28" y2="35" stroke="currentColor" stroke-width="2"/> <line x1="21" y1="43" x2="31" y2="38" stroke="currentColor" stroke-width="2"/>
+                        <path d="M 25 70 A 15 15 0 0 1 18 55" fill="none" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </div>
+                <p class="explanation-text" style="text-align:center; font-size:0.8rem;">O ângulo deve estar "preso" entre os dois lados marcados.</p>
+            </div>
+
+            <div class="card-content">
+                <h3>3. Caso ALA (Ângulo-Lado-Ângulo)</h3>
+                <p class="explanation-text">Dois ângulos iguais e o <strong>lado entre eles</strong> igual.</p>
+                
+                <div class="visual-row">
+                    <svg width="100" height="80" viewBox="0 0 100 80" class="visual-svg">
+                       <polygon points="10,70 90,70 50,10" fill="none" stroke="currentColor" stroke-width="2"/>
+                       <path d="M 25 70 A 15 15 0 0 1 20 55" fill="none" stroke="currentColor" stroke-width="2"/> <path d="M 75 70 A 15 15 0 0 0 80 55" fill="none" stroke="currentColor" stroke-width="2"/> <path d="M 72 70 A 18 18 0 0 0 77 52" fill="none" stroke="currentColor" stroke-width="2"/> <line x1="45" y1="70" x2="55" y2="70" stroke="currentColor" stroke-width="2"/> </svg>
+                   <div style="font-size:2rem; color:var(--theme-active);">≅</div>
+                    <svg width="100" height="80" viewBox="0 0 100 80" class="visual-svg">
+                       <polygon points="10,70 90,70 50,10" fill="none" stroke="currentColor" stroke-width="2"/>
+                       <path d="M 25 70 A 15 15 0 0 1 20 55" fill="none" stroke="currentColor" stroke-width="2"/>
+                       <path d="M 75 70 A 15 15 0 0 0 80 55" fill="none" stroke="currentColor" stroke-width="2"/> <path d="M 72 70 A 18 18 0 0 0 77 52" fill="none" stroke="currentColor" stroke-width="2"/>
+                       <line x1="45" y1="70" x2="55" y2="70" stroke="currentColor" stroke-width="2"/>
+                   </svg>
+               </div>
+            </div>
+
+            <div class="card-content">
+                <h3>4. Caso LAA (Lado-Ângulo-Ângulo Oposto)</h3>
+                <p class="explanation-text">Um lado igual, um ângulo adjacente (grudado) e o ângulo <strong>oposto</strong> ao lado também igual.</p>
+                
+                <div class="visual-row">
+                    <svg width="100" height="80" viewBox="0 0 100 80" class="visual-svg">
+                       <polygon points="10,70 90,70 30,10" fill="none" stroke="currentColor" stroke-width="2"/>
+                       <line x1="45" y1="70" x2="55" y2="70" stroke="currentColor" stroke-width="2"/> <path d="M 25 70 A 15 15 0 0 1 18 55" fill="none" stroke="currentColor" stroke-width="2"/> <path d="M 30 25 A 15 15 0 0 1 45 25" fill="none" stroke="currentColor" stroke-width="2"/> <path d="M 30 22 A 18 18 0 0 1 48 22" fill="none" stroke="currentColor" stroke-width="2"/> </svg>
+                   <div style="font-size:2rem; color:var(--theme-active);">≅</div>
+                    <svg width="100" height="80" viewBox="0 0 100 80" class="visual-svg">
+                       <polygon points="10,70 90,70 30,10" fill="none" stroke="currentColor" stroke-width="2"/>
+                       <line x1="45" y1="70" x2="55" y2="70" stroke="currentColor" stroke-width="2"/>
+                       <path d="M 25 70 A 15 15 0 0 1 18 55" fill="none" stroke="currentColor" stroke-width="2"/>
+                       <path d="M 30 25 A 15 15 0 0 1 45 25" fill="none" stroke="currentColor" stroke-width="2"/> <path d="M 30 22 A 18 18 0 0 1 48 22" fill="none" stroke="currentColor" stroke-width="2"/>
+                   </svg>
+               </div>
+               <p class="explanation-text" style="text-align:center; font-size:0.8rem;">O ângulo com dois arcos está oposto ao lado marcado.</p>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Identifique o caso de congruência.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Resultado</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente!</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (CONGRUÊNCIA DE TRIÂNGULOS) ---
+        const questions = [
+            // NÍVEL 1: CONCEITOS BÁSICOS
+            {
+                id: 1,
+                text: "O que significa dizer que dois triângulos são <strong>congruentes</strong>?",
+                options: ["Têm a mesma área, mas formatos diferentes", "Têm os mesmos ângulos, mas tamanhos diferentes", "São exatamente iguais em medidas de lados e ângulos", "Possuem apenas um lado igual"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Área igual não garante congruência (ex: retângulo e quadrado podem ter mesma área).<br>
+                    <strong>(B) Incorreta:</strong> Isso é Semelhança, não congruência.<br>
+                    <strong>(C) Correta:</strong> Congruência na geometria significa coincidência perfeita: mesmos lados e mesmos ângulos correspondentes.<br>
+                    <strong>(D) Incorreta:</strong> Isso não é suficiente.`
+            },
+            {
+                id: 2,
+                text: "Qual símbolo matemático usamos para indicar congruência?",
+                options: ["=", "≈", "≅", "≠"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Igualdade numérica.<br>
+                    <strong>(B) Incorreta:</strong> Aproximadamente.<br>
+                    <strong>(C) Correta:</strong> O símbolo ≅ (igual com um til em cima) representa congruência geométrica.<br>
+                    <strong>(D) Incorreta:</strong> Diferente.`
+            },
+            {
+                id: 3,
+                text: "Se o triângulo ABC é congruente ao DEF (ABC ≅ DEF), o lado AB corresponde a qual lado?",
+                options: ["EF", "DF", "DE", "BC"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> EF corresponde a BC.<br>
+                    <strong>(B) Incorreta:</strong> DF corresponde a AC.<br>
+                    <strong>(C) Correta:</strong> A ordem das letras importa. As duas primeiras (AB) correspondem às duas primeiras do outro (DE).<br>
+                    <strong>(D) Incorreta:</strong> Lado do próprio triângulo.`
+            },
+            // NÍVEL 2: IDENTIFICAÇÃO DE CASOS (SIMPLES)
+            {
+                id: 4,
+                text: "Dois triângulos têm os três lados respectivamente iguais (3cm, 4cm, 5cm). Qual o caso de congruência?",
+                options: ["LAL", "ALA", "LLL", "LAA"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Não envolve ângulos.<br>
+                    <strong>(B) Incorreta:</strong> Não envolve ângulos.<br>
+                    <strong>(C) Correta:</strong> Como conhecemos apenas os 3 Lados (Lado-Lado-Lado), o caso é LLL.<br>
+                    <strong>(D) Incorreta:</strong> Requer ângulo.`
+            },
+            {
+                id: 5,
+                text: "Você sabe que dois triângulos têm: Lado=5cm, Ângulo=30°, Lado=8cm. O ângulo está entre os lados. Qual é o caso?",
+                options: ["LLL", "LAL", "ALA", "LAA"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Falta o terceiro lado.<br>
+                    <strong>(B) Correta:</strong> Temos Lado, Ângulo no meio, e outro Lado. A sigla segue a ordem visual: L-A-L.<br>
+                    <strong>(C) Incorreta:</strong> Precisaria de dois ângulos.<br>
+                    <strong>(D) Incorreta:</strong> O ângulo não é oposto.`
+            },
+            {
+                id: 6,
+                text: "Dois triângulos têm um lado de 10cm, e os dois ângulos adjacentes a esse lado medem 45° e 60°. Caso:",
+                options: ["ALA", "LAL", "LLL", "LAA"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Temos Ângulo, Lado no meio, Ângulo. A ordem é A-L-A.<br>
+                    <strong>(B) Incorreta:</strong> Precisaria de dois lados.<br>
+                    <strong>(C) Incorreta:</strong> Não temos 3 lados.<br>
+                    <strong>(D) Incorreta:</strong> O lado está entre os ângulos.`
+            },
+            // NÍVEL 3: LÓGICA E CASOS INVÁLIDOS
+            {
+                id: 7,
+                text: "Por que 'AAA' (Ângulo-Ângulo-Ângulo) NÃO é um caso de congruência?",
+                options: ["Porque não existe triângulo assim", "Porque os triângulos podem ter tamanhos diferentes (zoom)", "Porque a soma passa de 180°", "É um caso válido sim"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Existem infinitos.<br>
+                    <strong>(B) Correta:</strong> Dois triângulos podem ter os mesmos ângulos mas um ser gigante e o outro minúsculo (Semelhança). Congruência exige mesmo tamanho.<br>
+                    <strong>(C) Incorreta:</strong> Não tem relação.<br>
+                    <strong>(D) Incorreta:</strong> Não garante igualdade de tamanho.`
+            },
+            {
+                id: 8,
+                text: "No caso LAA (Lado-Ângulo-Ângulo Oposto), onde está o ângulo oposto?",
+                options: ["Entre os dois lados", "Adjacente ao lado conhecido", "De frente para o lado conhecido", "Fora do triângulo"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Esse seria LAL.<br>
+                    <strong>(B) Incorreta:</strong> Esse é o ângulo adjacente.<br>
+                    <strong>(C) Correta:</strong> Ângulo oposto é aquele que 'olha' para o lado de frente, sem tocá-lo.<br>
+                    <strong>(D) Incorreta:</strong> Não faz sentido.`
+            },
+            {
+                id: 9,
+                text: "O caso LLA (Lado-Lado-Ângulo não incluso) é sempre válido?",
+                options: ["Sim, sempre", "Não, é um caso ambíguo", "Só para triângulos equiláteros", "Depende da cor"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> É uma pegadinha clássica.<br>
+                    <strong>(B) Correta:</strong> LLA pode formar dois triângulos diferentes com as mesmas medidas iniciais. Não garante congruência única.<br>
+                    <strong>(C) Incorreta:</strong> Irrelevante.<br>
+                    <strong>(D) Incorreta:</strong> Sem sentido.`
+            },
+            // NÍVEL 4: APLICAÇÕES E PROPRIEDADES
+            {
+                id: 10,
+                text: "Se dois triângulos são congruentes, o que podemos dizer sobre seus perímetros?",
+                options: ["São iguais", "Um é o dobro do outro", "São diferentes", "Depende da altura"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Se todos os lados correspondentes são iguais, a soma deles (perímetro) também será idêntica.<br>
+                    <strong>(B) Incorreta:</strong> Isso seria semelhança razão 2.<br>
+                    <strong>(C) Incorreta:</strong> Contradiz a congruência.<br>
+                    <strong>(D) Incorreta:</strong> Não depende.`
+            },
+            {
+                id: 11,
+                text: "Em um triângulo isósceles, a altura relativa à base divide o triângulo em dois menores. Esses dois são congruentes?",
+                options: ["Sim, pelo caso LLL", "Sim, pelo caso LAL ou LAA", "Não, são diferentes", "Apenas se for equilátero"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Também possível, mas LAL é mais direto.<br>
+                    <strong>(B) Correta:</strong> A altura é comum (L), os lados oblíquos são iguais (L) e o ângulo da base ou o ângulo reto garantem a congruência.<br>
+                    <strong>(C) Incorreta:</strong> Eles são espelhados e iguais.<br>
+                    <strong>(D) Incorreta:</strong> Vale para qualquer isósceles.`
+            },
+            {
+                id: 12,
+                text: "Traçamos uma diagonal em um quadrado. Os dois triângulos formados são congruentes?",
+                options: ["Sim, caso LLL", "Sim, caso LAL", "Sim, caso ALA", "Todas as anteriores estão corretas"],
+                correct: 3,
+                explanation: `
+                    <strong>(A) Correta:</strong> Lados do quadrado iguais + diagonal comum.<br>
+                    <strong>(B) Correta:</strong> Lados iguais + ângulo de 90°.<br>
+                    <strong>(C) Correta:</strong> Ângulos de 45° + diagonal.<br>
+                    <strong>(D) Correta:</strong> Num quadrado, todos os critérios de congruência são satisfeitos.`
+            },
+            // NÍVEL 5: DESAFIOS LÓGICOS
+            {
+                id: 13,
+                text: "Dois triângulos retângulos têm hipotenusas iguais e um cateto igual. Eles são congruentes?",
+                options: ["Sim, é um caso especial (Cateto-Hipotenusa)", "Não, falta o ângulo", "Não, falta o outro cateto", "Talvez"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Pitágoras garante que se dois lados são iguais num triângulo retângulo, o terceiro também será. Logo, cai no caso LLL.<br>
+                    <strong>(B) Incorreta:</strong> O ângulo reto já é conhecido.<br>
+                    <strong>(C) Incorreta:</strong> O terceiro cateto será consequência.<br>
+                    <strong>(D) Incorreta:</strong> É certeza.`
+            },
+            {
+                id: 14,
+                text: "Se $\\Delta ABC \\cong \\Delta XYZ$ e o ângulo A = 50°, qual é o ângulo X?",
+                options: ["50°", "130°", "Não dá para saber", "40°"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Partes correspondentes de triângulos congruentes são iguais. A é o primeiro, X é o primeiro. A = X.<br>
+                    <strong>(B) Incorreta:</strong> Suplementar.<br>
+                    <strong>(C) Incorreta:</strong> A notação garante a ordem.<br>
+                    <strong>(D) Incorreta:</strong> Complementar.`
+            },
+            {
+                id: 15,
+                text: "Para provar que dois triângulos são congruentes, qual é o número MÍNIMO de informações necessárias?",
+                options: ["1", "2", "3", "6"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Muito pouco.<br>
+                    <strong>(B) Incorreta:</strong> Insuficiente.<br>
+                    <strong>(C) Correta:</strong> Todos os casos (LLL, LAL, ALA, LAA) exigem exatamente 3 informações específicas (sendo pelo menos uma delas um lado).<br>
+                    <strong>(D) Incorreta:</strong> 6 seria medir tudo (desnecessário).`
+            }
+        ];
+
+        // --- ESTADO DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        // --- NAVEGAÇÃO ENTRE ABAS ---
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // --- RENDERIZAÇÃO DO QUIZ ---
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.90rem; line-height: 1.6;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            // Verifica se tem imagem visual na questão
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; // Já respondeu
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#4338CA"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        // --- LÓGICA DE FINALIZAÇÃO E FEEDBACK DETALHADO ---
+        function finishQuiz() {
+            score = 0;
+            let feedbackHTML = '<div style="text-align: left; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">';
+
+            userAnswers.forEach((ans, idx) => {
+                const q = questions[idx];
+                const isCorrect = (ans === q.correct);
+                
+                if (isCorrect) {
+                    score++;
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: #F0FFF4; border-radius: 8px; border-left: 4px solid #48BB78;">
+                            <p style="font-size: 0.9rem;"><strong>Questão ${idx+1}:</strong> ✅ Acertou!</p>
+                        </div>`;
+                } else {
+                    const userAnswerText = q.options[ans];
+                    const correctAnswerText = q.options[q.correct];
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 15px; background: #FFF5F5; border-radius: 8px; border-left: 4px solid #F56565;">
+                            <p style="font-weight: 700; color: #C53030;">Questão ${idx+1}: ${q.text}</p>
+                            <p style="font-size: 0.9rem; margin-top: 5px;">❌ <strong>Você marcou:</strong> ${userAnswerText}</p>
+                            <p style="font-size: 0.9rem;">🎯 <strong>Correto seria:</strong> ${correctAnswerText}</p>
+                            <div style="font-size: 0.85rem; margin-top: 10px; color: #4A5568; background: rgba(255,255,255,0.5); padding: 8px; border-radius: 4px;">
+                                ${q.explanation}
+                            </div>
+                        </div>`;
+                }
+            });
+            feedbackHTML += '</div>';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            let actionButtonsHTML = "";
+
+            // CRITÉRIO DE 80%
+            if (percent >= 80) {
+                stars = "⭐⭐⭐⭐⭐"; 
+                msg = "Parabéns! Você dominou o conteúdo.";
+                actionButtonsHTML = `
+                    <button onclick="window.location.href='8ano-matematica.html'" style="width: 100%; padding: 15px; background-color: #48BB78; color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;">
+                        Concluir Atividade
+                    </button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Voltar para o Assunto
+                    </button>
+                `;
+            } else {
+                stars = "💪 Estude mais"; 
+                msg = `Você fez ${percent}%. Precisa de 80% para passar.`;
+                actionButtonsHTML = `
+                    <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Exercícios</button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Revisar Explicação
+                    </button>
+                `;
+            }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+            
+            // Injeta o feedback detalhado
+            document.getElementById('review-container').innerHTML = feedbackHTML;
+            // Injeta os botões de ação corretos
+            document.getElementById('action-buttons').innerHTML = actionButtonsHTML;
+
+            if (percent >= 80) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            document.getElementById('review-container').innerHTML = ""; // Limpa feedback anterior
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

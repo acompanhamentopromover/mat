@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operações com Inteiros - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA INDIGO (Frio/Negativo/Lógico) */
+            --theme-color: #E0E7FF; 
+            --theme-active: #4338CA; 
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR (ERRO) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- LOGO --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--theme-active);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO --- */
+        .section-view {
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: flex-end; gap: 10px; justify-content: space-around; flex-wrap: wrap; }
+        .visual-item { text-align: center; width: 30%; min-width: 80px; }
+        .visual-svg { color: var(--theme-active); margin-bottom: 5px; }
+        
+        /* Estilo para SVGs dentro das questões */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #E0E7FF;
+            border-radius: 12px;
+            border: 1px dashed var(--theme-active);
+        }
+
+        .example-box {
+            background-color: #EEF2FF; /* Indigo muito claro */
+            border-left: 5px solid #4338CA;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .example-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #3730A3;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* --- QUIZ MAPA --- */
+        .question-map {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-active);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        /* --- OPÇÕES --- */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK DETALHADO --- */
+        .feedback-box {
+            display: block; 
+            margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- TELA DE RESULTADO --- */
+        #viewResult {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+
+        .btn-retry {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--theme-active);
+            color: white;
+            border: 2px solid black;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px black;
+            transition: transform 0.1s;
+        }
+        
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- RODAPÉ FIXO --- */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            border-top: 2px solid var(--border-color);
+            padding: 15px 20px;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="7ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Operações com Inteiros</h1>
+            <p style="color: #555; margin-bottom: 20px;">Inteiros são os números positivos e negativos. Domine as regras de sinais.</p>
+            
+            <div class="card-content">
+                <h3>🌡️ O Jogo dos Sinais</h3>
+                <p>Imagine o dinheiro. Positivo é o que você tem, negativo é o que você deve.</p>
+                <br>
+                <div class="visual-row">
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="3">
+                            <circle cx="30" cy="30" r="25" stroke="#276749" stroke-width="2" fill="#C6F6D5"/>
+                            <path d="M15 30 H45 M30 15 V45" stroke="#276749" stroke-width="4"/>
+                        </svg>
+                        <p style="font-weight:700;">Positivo (+)</p>
+                        <p style="font-size:0.75rem;">Dinheiro</p>
+                    </div>
+                    
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="3">
+                            <circle cx="30" cy="30" r="25" stroke="#C53030" stroke-width="2" fill="#FED7D7"/>
+                            <path d="M15 30 H45" stroke="#C53030" stroke-width="4"/>
+                        </svg>
+                        <p style="font-weight:700;">Negativo (-)</p>
+                        <p style="font-size:0.75rem;">Dívida</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>➕ Adição e Subtração</h3>
+                
+                <div class="example-box">
+                    <span class="example-tag">Sinais Iguais = SOMA</span>
+                    <p>Devo 5 e faço outra dívida de 3. Fico devendo 8.</p>
+                    <p style="font-weight:700; color:#C53030; margin-top:5px;">(-5) + (-3) = -8</p>
+                </div>
+
+                <div class="example-box">
+                    <span class="example-tag">Sinais Diferentes = DIMINUI</span>
+                    <p>Devo 10, mas pago 4. Ainda devo, mas menos.</p>
+                    <p style="font-weight:700; margin-top:5px;">(-10) + 4 = -6</p>
+                    <p style="font-size:0.8rem;">(Repete o sinal do número "maior")</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>✖️ Multiplicação e Divisão</h3>
+                <p>Aqui a regra muda! Lembre-se:</p>
+                <div class="visual-row" style="justify-content: center; gap: 20px; margin-top:15px;">
+                    <div style="text-align:center;">
+                        <p style="font-weight:bold; color:#276749;">(+) com (+) = +</p>
+                        <p style="font-weight:bold; color:#276749;">(-) com (-) = +</p>
+                        <p style="font-size:0.8rem;">Amigos iguais = Positivo</p>
+                    </div>
+                    <div style="text-align:center;">
+                        <p style="font-weight:bold; color:#C53030;">(+) com (-) = -</p>
+                        <p style="font-weight:bold; color:#C53030;">(-) com (+) = -</p>
+                        <p style="font-size:0.8rem;">Diferentes = Negativo</p>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Cuidado com os sinais.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Resultado</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente!</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (OPERAÇÕES COM INTEIROS) ---
+        const questions = [
+            // NÍVEL 1: CONCEITO E CONTEXTO
+            {
+                id: 1,
+                text: "Se a temperatura está 5 graus abaixo de zero, como representamos?",
+                options: ["+5", "-5", "50", "0"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> +5 representa temperatura acima de zero (calor).<br>
+                    <strong>(B) Correta:</strong> "Abaixo de zero" sempre indica um número negativo (-5).<br>
+                    <strong>(C) Incorreta:</strong> 50 é um valor muito alto.<br>
+                    <strong>(D) Incorreta:</strong> Zero é o ponto de congelamento neutro.`
+            },
+            {
+                id: 2,
+                text: "No extrato bancário, o que significa um saldo de <strong>-R$ 100,00</strong>?",
+                options: ["Você tem R$ 100", "Você deve R$ 100 ao banco", "O banco te deu R$ 100", "Você tem R$ 0"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Isso seria saldo positivo (+100).<br>
+                    <strong>(B) Correta:</strong> Saldo negativo significa dívida. Você está no 'vermelho'.<br>
+                    <strong>(C) Incorreta:</strong> O banco não dá dinheiro assim.<br>
+                    <strong>(D) Incorreta:</strong> Zero seria nem dever nem ter.`
+            },
+            {
+                id: 3,
+                text: "O oposto de -8 é:",
+                options: ["+8", "-8", "0", "1/8"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> O oposto (ou simétrico) troca o sinal. Oposto de negativo é positivo.<br>
+                    <strong>(B) Incorreta:</strong> É o próprio número.<br>
+                    <strong>(C) Incorreta:</strong> Zero é neutro.<br>
+                    <strong>(D) Incorreta:</strong> Isso é o inverso multiplicativo.`
+            },
+            // NÍVEL 2: ADIÇÃO E SUBTRAÇÃO (SINAIS IGUAIS)
+            {
+                id: 4,
+                text: "Quanto é: <strong>-3 - 4</strong>?",
+                options: ["+1", "-1", "-7", "+7"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Teria que subtrair e errar o sinal.<br>
+                    <strong>(B) Incorreta:</strong> Erro de cálculo.<br>
+                    <strong>(C) Correta:</strong> Dívida de 3 com Dívida de 4 = Dívida de 7. Sinais iguais, soma e repete o sinal.<br>
+                    <strong>(D) Incorreta:</strong> "Menos com menos dá mais" só vale na multiplicação.`
+            },
+            {
+                id: 5,
+                text: "Resolva: <strong>+10 + 5</strong>",
+                options: ["+15", "-15", "+5", "-5"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Tenho 10 e ganho 5. Fico com 15 positivos.<br>
+                    <strong>(B) Incorreta:</strong> Não vira negativo.<br>
+                    <strong>(C) Incorreta:</strong> Subtraiu em vez de somar.<br>
+                    <strong>(D) Incorreta:</strong> Sinal errado.`
+            },
+            {
+                id: 6,
+                text: "Soma de negativos: <strong>(-20) + (-10)</strong>",
+                options: ["-10", "+30", "-30", "+10"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Subtraiu.<br>
+                    <strong>(B) Incorreta:</strong> Soma correta, mas sinal errado.<br>
+                    <strong>(C) Correta:</strong> Juntando duas dívidas (20 e 10), o total é uma dívida de 30.<br>
+                    <strong>(D) Incorreta:</strong> Subtraiu e trocou sinal.`
+            },
+            // NÍVEL 3: ADIÇÃO E SUBTRAÇÃO (SINAIS DIFERENTES)
+            {
+                id: 7,
+                text: "Tenho R$ 5,00 mas devo R$ 8,00. Qual meu saldo?",
+                options: ["R$ 3,00 (+3)", "R$ -3,00 (Devo 3)", "R$ 13,00", "R$ -13,00"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Seria se você tivesse mais dinheiro que dívida.<br>
+                    <strong>(B) Correta:</strong> 5 - 8. Como a dívida (8) é maior, pago os 5 e ainda fico devendo 3.<br>
+                    <strong>(C) Incorreta:</strong> Somou os valores.<br>
+                    <strong>(D) Incorreta:</strong> Somou dívidas.`
+            },
+            {
+                id: 8,
+                text: "Resolva: <strong>-10 + 20</strong>",
+                options: ["-10", "-30", "+10", "+30"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Sinal errado.<br>
+                    <strong>(B) Incorreta:</strong> Somou como se fossem iguais.<br>
+                    <strong>(C) Correta:</strong> Sinais diferentes: subtrai (20-10=10) e pega o sinal do maior (20 é positivo).<br>
+                    <strong>(D) Incorreta:</strong> Somou.`
+            },
+            {
+                id: 9,
+                text: "Quanto é <strong>50 - 60</strong>?",
+                options: ["10", "-10", "110", "-110"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 60 - 50 seria 10.<br>
+                    <strong>(B) Correta:</strong> Tenho 50, tiro 60. Falta 10. Resultado -10.<br>
+                    <strong>(C) Incorreta:</strong> Somou.<br>
+                    <strong>(D) Incorreta:</strong> Somou negativo.`
+            },
+            // NÍVEL 4: MULTIPLICAÇÃO E DIVISÃO (REGRA DOS SINAIS)
+            {
+                id: 10,
+                text: "Multiplicação: <strong>(-3) x (-4)</strong>",
+                options: ["-12", "+12", "-7", "+7"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Sinais iguais na multiplicação dão positivo.<br>
+                    <strong>(B) Correta:</strong> Menos vezes Menos dá MAIS. 3x4=12.<br>
+                    <strong>(C) Incorreta:</strong> Somou.<br>
+                    <strong>(D) Incorreta:</strong> Somou positivo.`
+            },
+            {
+                id: 11,
+                text: "Divisão: <strong>(-20) ÷ (+2)</strong>",
+                options: ["+10", "-10", "-18", "+22"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Sinais diferentes dão negativo.<br>
+                    <strong>(B) Correta:</strong> Menos dividido por Mais dá MENOS. 20/2 = 10. Resultado -10.<br>
+                    <strong>(C) Incorreta:</strong> Erro de operação.<br>
+                    <strong>(D) Incorreta:</strong> Erro de operação.`
+            },
+            {
+                id: 12,
+                text: "Quanto é <strong>5 x (-5)</strong>?",
+                options: ["0", "+25", "-25", "10"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Soma de opostos daria zero, mas é multiplicação.<br>
+                    <strong>(B) Incorreta:</strong> Sinais diferentes dão negativo.<br>
+                    <strong>(C) Correta:</strong> Positivo x Negativo = Negativo. 5x5=25. Resposta -25.<br>
+                    <strong>(D) Incorreta:</strong> Somou.`
+            },
+            // NÍVEL 5: EXPRESSÕES E DESAFIOS
+            {
+                id: 13,
+                text: "Subtraindo um negativo: <strong>10 - (-2)</strong>",
+                options: ["8", "12", "-12", "-8"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Fazer 10-2 é o erro comum.<br>
+                    <strong>(B) Correta:</strong> O menos fora troca o sinal de dentro. Vira 10 + 2 = 12. (Tirar uma dívida é ganhar).<br>
+                    <strong>(C) Incorreta:</strong> Sinal errado.<br>
+                    <strong>(D) Incorreta:</strong> Cálculo errado.`
+            },
+            {
+                id: 14,
+                text: "Expressão: <strong>-2 + (-3) x 2</strong>",
+                options: ["-10", "+10", "-8", "+8"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Somou antes de multiplicar (-5 x 2).<br>
+                    <strong>(B) Incorreta:</strong> Erro de sinais.<br>
+                    <strong>(C) Correta:</strong> Primeiro a multiplicação: (-3)x2 = -6. Depois a soma: -2 + (-6) = -8.<br>
+                    <strong>(D) Incorreta:</strong> Cálculo errado.`
+            },
+            {
+                id: 15,
+                text: "Qual o resultado de <strong>(-1) x (-1) x (-1)</strong>?",
+                options: ["+1", "-1", "0", "3"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Seria se fossem 2 ou 4 vezes (par).<br>
+                    <strong>(B) Correta:</strong> (-1)x(-1)=+1. Depois (+1)x(-1)=-1. Quantidade ímpar de negativos dá negativo.<br>
+                    <strong>(C) Incorreta:</strong> Multiplicação por 1 não zera.<br>
+                    <strong>(D) Incorreta:</strong> Somou.`
+            }
+        ];
+
+        // --- ESTADO DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        // --- NAVEGAÇÃO ENTRE ABAS ---
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // --- RENDERIZAÇÃO DO QUIZ ---
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.90rem; line-height: 1.6;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            // Verifica se tem imagem visual na questão
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; // Já respondeu
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#4338CA"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        // --- LÓGICA DE FINALIZAÇÃO E FEEDBACK DETALHADO ---
+        function finishQuiz() {
+            score = 0;
+            let feedbackHTML = '<div style="text-align: left; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">';
+
+            userAnswers.forEach((ans, idx) => {
+                const q = questions[idx];
+                const isCorrect = (ans === q.correct);
+                
+                if (isCorrect) {
+                    score++;
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: #F0FFF4; border-radius: 8px; border-left: 4px solid #48BB78;">
+                            <p style="font-size: 0.9rem;"><strong>Questão ${idx+1}:</strong> ✅ Acertou!</p>
+                        </div>`;
+                } else {
+                    const userAnswerText = q.options[ans];
+                    const correctAnswerText = q.options[q.correct];
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 15px; background: #FFF5F5; border-radius: 8px; border-left: 4px solid #F56565;">
+                            <p style="font-weight: 700; color: #C53030;">Questão ${idx+1}: ${q.text}</p>
+                            <p style="font-size: 0.9rem; margin-top: 5px;">❌ <strong>Você marcou:</strong> ${userAnswerText}</p>
+                            <p style="font-size: 0.9rem;">🎯 <strong>Correto seria:</strong> ${correctAnswerText}</p>
+                            <div style="font-size: 0.85rem; margin-top: 10px; color: #4A5568; background: rgba(255,255,255,0.5); padding: 8px; border-radius: 4px;">
+                                ${q.explanation}
+                            </div>
+                        </div>`;
+                }
+            });
+            feedbackHTML += '</div>';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            let actionButtonsHTML = "";
+
+            // CRITÉRIO DE 80%
+            if (percent >= 80) {
+                stars = "⭐⭐⭐⭐⭐"; 
+                msg = "Parabéns! Você dominou o conteúdo.";
+                actionButtonsHTML = `
+                    <button onclick="window.location.href='7ano-matematica.html'" style="width: 100%; padding: 15px; background-color: #48BB78; color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;">
+                        Concluir Atividade
+                    </button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Voltar para o Assunto
+                    </button>
+                `;
+            } else {
+                stars = "💪 Estude mais"; 
+                msg = `Você fez ${percent}%. Precisa de 80% para passar.`;
+                actionButtonsHTML = `
+                    <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Exercícios</button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Revisar Explicação
+                    </button>
+                `;
+            }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+            
+            // Injeta o feedback detalhado
+            document.getElementById('review-container').innerHTML = feedbackHTML;
+            // Injeta os botões de ação corretos
+            document.getElementById('action-buttons').innerHTML = actionButtonsHTML;
+
+            if (percent >= 80) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            document.getElementById('review-container').innerHTML = ""; // Limpa feedback anterior
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

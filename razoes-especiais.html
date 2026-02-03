@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Densidade e Velocidade - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA VERMELHO (Ação/Intensidade) */
+            --theme-color: #FFCDD2; 
+            --theme-active: #E53935; 
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR (ERRO) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- LOGO --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--theme-active);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO --- */
+        .section-view {
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: flex-end; gap: 10px; justify-content: space-around; flex-wrap: wrap; }
+        .visual-item { text-align: center; width: 30%; min-width: 80px; }
+        .visual-svg { color: var(--theme-active); margin-bottom: 5px; }
+        
+        /* Estilo para SVGs dentro das questões */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #FFCDD2;
+            border-radius: 12px;
+            border: 1px dashed var(--theme-active);
+        }
+
+        .example-box {
+            background-color: #FFEBEE; /* Vermelho muito claro */
+            border-left: 5px solid #E53935;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .example-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #B71C1C;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* --- QUIZ MAPA --- */
+        .question-map {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-active);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        /* --- OPÇÕES --- */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK DETALHADO --- */
+        .feedback-box {
+            display: block; 
+            margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- TELA DE RESULTADO --- */
+        #viewResult {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+
+        .btn-retry {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--theme-active);
+            color: white;
+            border: 2px solid black;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px black;
+            transition: transform 0.1s;
+        }
+        
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- RODAPÉ FIXO --- */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            border-top: 2px solid var(--border-color);
+            padding: 15px 20px;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="7ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Razões Especiais</h1>
+            <p style="color: #555; margin-bottom: 20px;">Duas das razões mais importantes do dia a dia: quão cheio é um lugar e quão rápido algo se move.</p>
+            
+            <div class="card-content">
+                <h3>🏘️ Densidade Demográfica</h3>
+                <p>Mede se um lugar está "apertado" ou "vazio". É a divisão da população pela área.</p>
+                <br>
+                <div class="visual-row">
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="3">
+                            <rect x="10" y="10" width="40" height="40" fill="#FFEBEE" stroke="#E53935"/>
+                            <circle cx="20" cy="20" r="3" fill="#E53935"/>
+                            <circle cx="40" cy="20" r="3" fill="#E53935"/>
+                            <circle cx="20" cy="40" r="3" fill="#E53935"/>
+                            <circle cx="40" cy="40" r="3" fill="#E53935"/>
+                        </svg>
+                        <p style="font-size:0.75rem; font-weight:bold;">Baixa Densidade</p>
+                    </div>
+                    
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="3">
+                            <rect x="10" y="10" width="40" height="40" fill="#FFEBEE" stroke="#E53935"/>
+                            <circle cx="15" cy="15" r="3" fill="#E53935"/> <circle cx="30" cy="15" r="3" fill="#E53935"/> <circle cx="45" cy="15" r="3" fill="#E53935"/>
+                            <circle cx="15" cy="30" r="3" fill="#E53935"/> <circle cx="30" cy="30" r="3" fill="#E53935"/> <circle cx="45" cy="30" r="3" fill="#E53935"/>
+                            <circle cx="15" cy="45" r="3" fill="#E53935"/> <circle cx="30" cy="45" r="3" fill="#E53935"/> <circle cx="45" cy="45" r="3" fill="#E53935"/>
+                        </svg>
+                        <p style="font-size:0.75rem; font-weight:bold;">Alta Densidade</p>
+                    </div>
+                </div>
+                <div class="example-box">
+                    <p style="font-weight:700;">Fórmula:</p>
+                    <p>D = Habitantes ÷ Área</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>🚗 Velocidade Média</h3>
+                <p>Mede a rapidez de um deslocamento. É a divisão da distância pelo tempo.</p>
+                <div class="visual-row" style="margin: 15px 0;">
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="3">
+                            <circle cx="30" cy="30" r="25" stroke="#E53935" fill="none"/>
+                            <line x1="30" y1="30" x2="45" y2="15" stroke="#E53935"/>
+                            <path d="M10 30 A 20 20 0 0 1 50 30" stroke="#E53935" stroke-dasharray="4 2"/>
+                        </svg>
+                        <p style="font-size:0.75rem;">Km/h</p>
+                    </div>
+                </div>
+                <div class="example-box">
+                    <p style="font-weight:700;">Fórmula:</p>
+                    <p>Vm = Distância ÷ Tempo</p>
+                </div>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Use as fórmulas para resolver.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Resultado</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente!</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (DENSIDADE E VELOCIDADE) ---
+        const questions = [
+            // NÍVEL 1: CONCEITO DE DENSIDADE
+            {
+                id: 1,
+                text: "O que mede a <strong>Densidade Demográfica</strong>?",
+                options: ["O tamanho do território apenas", "A quantidade de pessoas por unidade de área", "O número total de pessoas no mundo", "A velocidade que a população cresce"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Isso seria apenas a Área.<br>
+                    <strong>(B) Correta:</strong> É a razão (divisão) entre o número de habitantes e o espaço que eles ocupam.<br>
+                    <strong>(C) Incorreta:</strong> Isso é a População Absoluta.<br>
+                    <strong>(D) Incorreta:</strong> Isso seria taxa de crescimento.`
+            },
+            {
+                id: 2,
+                text: "Uma cidade muito 'apertada', com muita gente em pouco espaço, tem:",
+                options: ["Baixa densidade demográfica", "Alta densidade demográfica", "Densidade nula", "Área infinita"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Baixa densidade significa pouca gente espalhada.<br>
+                    <strong>(B) Correta:</strong> Muita gente dividido por pouco espaço resulta em um número alto.<br>
+                    <strong>(C) Incorreta:</strong> Nula seria se não houvesse ninguém.<br>
+                    <strong>(D) Incorreta:</strong> Área infinita faria a densidade ser quase zero.`
+            },
+            {
+                id: 3,
+                text: "Qual a fórmula correta para calcular a Densidade Demográfica (D)?",
+                options: ["D = Área ÷ Habitantes", "D = Habitantes x Área", "D = Habitantes ÷ Área", "D = Habitantes + Área"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Inverteu a divisão. O resultado seria 'espaço por pessoa'.<br>
+                    <strong>(B) Incorreta:</strong> Multiplicação não faz sentido aqui.<br>
+                    <strong>(C) Correta:</strong> Dividimos a população (quem ocupa) pela área (o lugar).<br>
+                    <strong>(D) Incorreta:</strong> Soma não se aplica.`
+            },
+            // NÍVEL 2: CÁLCULO DE DENSIDADE
+            {
+                id: 4,
+                text: "Uma ilha tem 100 habitantes e área de 2 km². Qual a densidade?",
+                options: ["200 hab/km²", "50 hab/km²", "102 hab/km²", "2 hab/km²"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Multiplicou 100 x 2.<br>
+                    <strong>(B) Correta:</strong> 100 habitantes ÷ 2 km² = 50 habitantes por km².<br>
+                    <strong>(C) Incorreta:</strong> Somou.<br>
+                    <strong>(D) Incorreta:</strong> Dividiu ao contrário.`
+            },
+            {
+                id: 5,
+                text: "Uma cidade tem 10.000 habitantes e área de 100 km². Qual a densidade?",
+                options: ["100 hab/km²", "10 hab/km²", "1.000 hab/km²", "10.100 hab/km²"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> 10.000 ÷ 100 (corta dois zeros) = 100 hab/km².<br>
+                    <strong>(B) Incorreta:</strong> Erro de cálculo.<br>
+                    <strong>(C) Incorreta:</strong> Erro de cálculo.<br>
+                    <strong>(D) Incorreta:</strong> Somou.`
+            },
+            {
+                id: 6,
+                text: "Se a densidade é 10 hab/km² e a área é 5 km², quantos habitantes existem?",
+                options: ["2 habitantes", "15 habitantes", "50 habitantes", "0,5 habitantes"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Dividiu 10 por 5.<br>
+                    <strong>(B) Incorreta:</strong> Somou.<br>
+                    <strong>(C) Correta:</strong> Se tem 10 pessoas em cada km² e temos 5 km², então 10 x 5 = 50 pessoas.<br>
+                    <strong>(D) Incorreta:</strong> Dividiu ao contrário.`
+            },
+            // NÍVEL 3: CONCEITO DE VELOCIDADE
+            {
+                id: 7,
+                text: "O que significa uma <strong>Velocidade Média</strong> de 60 km/h?",
+                options: ["O carro andou exatamente 60 km em cada hora", "O carro nunca parou", "Em média, o carro percorreu 60 km a cada hora", "O carro acelerou o tempo todo"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Ele pode ter andado mais rápido em alguns trechos e devagar em outros.<br>
+                    <strong>(B) Incorreta:</strong> Ele pode ter parado, a média conta tudo.<br>
+                    <strong>(C) Correta:</strong> A média distribui a distância total pelo tempo total, como se a velocidade fosse constante.<br>
+                    <strong>(D) Incorreta:</strong> Aceleração é outra grandeza.`
+            },
+            {
+                id: 8,
+                text: "Qual a fórmula da Velocidade Média (Vm)?",
+                options: ["Vm = Tempo ÷ Distância", "Vm = Distância x Tempo", "Vm = Distância ÷ Tempo", "Vm = Distância + Tempo"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Inverso (seria lentidão).<br>
+                    <strong>(B) Incorreta:</strong> Multiplicação não mede ritmo.<br>
+                    <strong>(C) Correta:</strong> Dividimos o quanto andou (distância) pelo quanto demorou (tempo).<br>
+                    <strong>(D) Incorreta:</strong> Soma não se aplica.`
+            },
+            {
+                id: 9,
+                text: "Se um carro percorre 100 km em 2 horas, qual sua velocidade média?",
+                options: ["200 km/h", "102 km/h", "50 km/h", "20 km/h"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Multiplicou.<br>
+                    <strong>(B) Incorreta:</strong> Somou.<br>
+                    <strong>(C) Correta:</strong> 100 km ÷ 2 h = 50 km/h.<br>
+                    <strong>(D) Incorreta:</strong> Cálculo errado.`
+            },
+            // NÍVEL 4: CÁLCULOS DE VELOCIDADE
+            {
+                id: 10,
+                text: "Um atleta correu 400 metros em 50 segundos. Qual sua velocidade em m/s?",
+                options: ["4 m/s", "8 m/s", "20 m/s", "450 m/s"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 400/100 seria 4.<br>
+                    <strong>(B) Correta:</strong> 400 ÷ 50 (corta zero) = 40 ÷ 5 = 8 m/s.<br>
+                    <strong>(C) Incorreta:</strong> Erro de cálculo.<br>
+                    <strong>(D) Incorreta:</strong> Somou.`
+            },
+            {
+                id: 11,
+                text: "Um carro viaja a 80 km/h. Quanto tempo ele leva para percorrer 160 km?",
+                options: ["1 hora", "2 horas", "3 horas", "80 horas"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Em 1h ele anda 80km.<br>
+                    <strong>(B) Correta:</strong> Distância ÷ Velocidade. 160 ÷ 80 = 2 horas.<br>
+                    <strong>(C) Incorreta:</strong> Em 3h andaria 240km.<br>
+                    <strong>(D) Incorreta:</strong> Tempo excessivo.`
+            },
+            {
+                id: 12,
+                text: "Um trem anda a 100 km/h por 3 horas. Qual a distância percorrida?",
+                options: ["300 km", "33 km", "103 km", "30 km"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Distância = Velocidade x Tempo. 100 x 3 = 300 km.<br>
+                    <strong>(B) Incorreta:</strong> Dividiu.<br>
+                    <strong>(C) Incorreta:</strong> Somou.<br>
+                    <strong>(D) Incorreta:</strong> Erro de cálculo.`
+            },
+            // NÍVEL 5: PROBLEMAS MISTOS E DESAFIOS
+            {
+                id: 13,
+                text: "Cidade A: 1000 pessoas em 10 km². Cidade B: 500 pessoas em 2 km². Qual é mais 'apertada'?",
+                options: ["Cidade A", "Cidade B", "São iguais", "Impossível saber"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Densidade A = 1000/10 = 100 hab/km².<br>
+                    <strong>(B) Correta:</strong> Densidade B = 500/2 = 250 hab/km². 250 é maior que 100, logo B é mais povoada.<br>
+                    <strong>(C) Incorreta:</strong> 100 é diferente de 250.<br>
+                    <strong>(D) Incorreta:</strong> Temos todos os dados.`
+            },
+            {
+                id: 14,
+                text: "Fiz uma viagem de 150 km em 3 horas. Minha velocidade média foi de:",
+                options: ["153 km/h", "450 km/h", "30 km/h", "50 km/h"],
+                correct: 3,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Somou.<br>
+                    <strong>(B) Incorreta:</strong> Multiplicou.<br>
+                    <strong>(C) Incorreta:</strong> Cálculo errado.<br>
+                    <strong>(D) Correta:</strong> 150 km ÷ 3 h = 50 km/h.`
+            },
+            {
+                id: 15,
+                text: "O que acontece com a densidade demográfica se a população dobrar e a área continuar a mesma?",
+                options: ["A densidade cai pela metade", "A densidade dobra", "A densidade não muda", "A densidade triplica"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Isso ocorreria se a área dobrasse.<br>
+                    <strong>(B) Correta:</strong> Se você tem o dobro de pessoas no mesmo espaço, o lugar fica duas vezes mais cheio. (2P ÷ A = 2D).<br>
+                    <strong>(C) Incorreta:</strong> Muda sim.<br>
+                    <strong>(D) Incorreta:</strong> Só se a população triplicasse.`
+            }
+        ];
+
+        // --- ESTADO DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        // --- NAVEGAÇÃO ENTRE ABAS ---
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // --- RENDERIZAÇÃO DO QUIZ ---
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.90rem; line-height: 1.6;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            // Verifica se tem imagem visual na questão
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; // Já respondeu
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#E53935"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        // --- LÓGICA DE FINALIZAÇÃO E FEEDBACK DETALHADO ---
+        function finishQuiz() {
+            score = 0;
+            let feedbackHTML = '<div style="text-align: left; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">';
+
+            userAnswers.forEach((ans, idx) => {
+                const q = questions[idx];
+                const isCorrect = (ans === q.correct);
+                
+                if (isCorrect) {
+                    score++;
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: #F0FFF4; border-radius: 8px; border-left: 4px solid #48BB78;">
+                            <p style="font-size: 0.9rem;"><strong>Questão ${idx+1}:</strong> ✅ Acertou!</p>
+                        </div>`;
+                } else {
+                    const userAnswerText = q.options[ans];
+                    const correctAnswerText = q.options[q.correct];
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 15px; background: #FFF5F5; border-radius: 8px; border-left: 4px solid #F56565;">
+                            <p style="font-weight: 700; color: #C53030;">Questão ${idx+1}: ${q.text}</p>
+                            <p style="font-size: 0.9rem; margin-top: 5px;">❌ <strong>Você marcou:</strong> ${userAnswerText}</p>
+                            <p style="font-size: 0.9rem;">🎯 <strong>Correto seria:</strong> ${correctAnswerText}</p>
+                            <div style="font-size: 0.85rem; margin-top: 10px; color: #4A5568; background: rgba(255,255,255,0.5); padding: 8px; border-radius: 4px;">
+                                ${q.explanation}
+                            </div>
+                        </div>`;
+                }
+            });
+            feedbackHTML += '</div>';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            let actionButtonsHTML = "";
+
+            // CRITÉRIO DE 80%
+            if (percent >= 80) {
+                stars = "⭐⭐⭐⭐⭐"; 
+                msg = "Parabéns! Você dominou o conteúdo.";
+                actionButtonsHTML = `
+                    <button onclick="window.location.href='7ano-matematica.html'" style="width: 100%; padding: 15px; background-color: #48BB78; color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;">
+                        Concluir Atividade
+                    </button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Voltar para o Assunto
+                    </button>
+                `;
+            } else {
+                stars = "💪 Estude mais"; 
+                msg = `Você fez ${percent}%. Precisa de 80% para passar.`;
+                actionButtonsHTML = `
+                    <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Exercícios</button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Revisar Explicação
+                    </button>
+                `;
+            }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+            
+            // Injeta o feedback detalhado
+            document.getElementById('review-container').innerHTML = feedbackHTML;
+            // Injeta os botões de ação corretos
+            document.getElementById('action-buttons').innerHTML = actionButtonsHTML;
+
+            if (percent >= 80) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            document.getElementById('review-container').innerHTML = ""; // Limpa feedback anterior
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

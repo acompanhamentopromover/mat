@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Potenciação e Propriedades - 9º Ano</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA AZUL SAFIRA */
+            --theme-color: #DBEAFE; 
+            --theme-active: #1D4ED8; 
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR (ERRO) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- LOGO --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--theme-active);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO --- */
+        .section-view {
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: center; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+        .visual-svg { color: var(--theme-active); }
+        
+        /* Estilo para SVGs dentro das questões */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #DBEAFE;
+            border-radius: 12px;
+            border: 1px dashed var(--theme-active);
+        }
+
+        /* --- CARDS DE EXEMPLO DETALHADO --- */
+        .step-box {
+            background-color: #EFF6FF; 
+            border-left: 5px solid #1D4ED8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .step-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #1E3A8A;
+            margin-bottom: 10px;
+            display: block;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        .math-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-family: monospace;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .math-comment {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.8rem;
+            color: #555;
+            margin-left: 10px;
+            font-style: italic;
+            background: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .highlight {
+            color: #1D4ED8;
+            font-weight: 700;
+            background-color: #BFDBFE;
+            padding: 0 4px;
+            border-radius: 4px;
+        }
+
+        /* --- QUIZ MAPA --- */
+        .question-map {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-active);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        /* --- OPÇÕES --- */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK DETALHADO --- */
+        .feedback-box {
+            display: block; 
+            margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- TELA DE RESULTADO --- */
+        #viewResult {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+
+        .btn-retry {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--theme-active);
+            color: white;
+            border: 2px solid black;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px black;
+            transition: transform 0.1s;
+        }
+        
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- RODAPÉ FIXO --- */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            border-top: 2px solid var(--border-color);
+            padding: 15px 20px;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="9ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Potenciação e Propriedades</h1>
+            <p style="color: #555; margin-bottom: 20px;">Potência é a multiplicação repetida. No 9º ano, focamos em expoentes negativos e nas regras que facilitam cálculos grandes.</p>
+            
+            <div class="card-content">
+                <h3>1. Expoente Negativo (O Inverso)</h3>
+                <p class="explanation-text">Quando o expoente é negativo, você deve <strong>inverter</strong> a base e tornar o expoente positivo.</p>
+                
+                <div class="visual-row">
+                    <svg width="200" height="80" viewBox="0 0 200 80">
+                        <text x="20" y="50" font-size="24" fill="#1D4ED8" font-weight="bold">a⁻ⁿ</text>
+                        <text x="70" y="50" font-size="24" fill="#333">=</text>
+                        <line x1="100" y1="40" x2="140" y2="40" stroke="#333" stroke-width="2"/>
+                        <text x="115" y="30" font-size="20" fill="#333">1</text>
+                        <text x="110" y="70" font-size="20" fill="#1D4ED8" font-weight="bold">aⁿ</text>
+                    </svg>
+                </div>
+                
+                <div class="step-box">
+                    <p class="explanation-text"><strong>Exemplo:</strong> 2⁻³</p>
+                    <p class="explanation-text">1. Inverta a base (2 vira 1/2).</p>
+                    <p class="explanation-text">2. Troque o sinal (-3 vira 3).</p>
+                    <p class="explanation-text">3. Calcule: (1/2)³ = 1/8.</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>2. Propriedades (Os Atalhos)</h3>
+                
+                <div class="step-box">
+                    <span class="step-title">Multiplicação (Base Igual)</span>
+                    <p class="explanation-text">Repete a base e <strong>SOMA</strong> os expoentes.</p>
+                    <div class="math-row">a² · a³ = a²⁺³ = <span class="highlight">a⁵</span></div>
+                </div>
+
+                <div class="step-box">
+                    <span class="step-title">Divisão (Base Igual)</span>
+                    <p class="explanation-text">Repete a base e <strong>SUBTRAI</strong> os expoentes.</p>
+                    <div class="math-row">a⁵ ÷ a² = a⁵⁻² = <span class="highlight">a³</span></div>
+                </div>
+
+                <div class="step-box">
+                    <span class="step-title">Potência de Potência</span>
+                    <p class="explanation-text">Mantém a base e <strong>MULTIPLICA</strong> os expoentes.</p>
+                    <div class="math-row">(a²)³ = a² ˣ ³ = <span class="highlight">a⁶</span></div>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>3. Cuidado com o Parêntese!</h3>
+                <p class="explanation-text">O parêntese define quem está sendo elevado.</p>
+                <div class="step-box">
+                    <div class="math-row">(-3)² = (-3) · (-3) = <span class="highlight">9</span></div>
+                    <div class="math-row">-3² = -(3 · 3) = <span class="highlight">-9</span></div>
+                </div>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Simplifique e calcule.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Resultado</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente!</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (POTENCIAÇÃO) ---
+        const questions = [
+            // NÍVEL 1: CONCEITOS BÁSICOS E SINAIS
+            {
+                id: 1,
+                text: "Qual é o valor de <strong>(-2)³</strong>?",
+                visual: `
+                    <svg width="150" height="60" viewBox="0 0 150 60">
+                        <text x="75" y="40" text-anchor="middle" font-size="20" fill="#1D4ED8">(-2) · (-2) · (-2)</text>
+                    </svg>
+                `,
+                options: ["-8", "8", "-6", "6"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Base negativa com expoente ímpar sempre dá negativo. 2 · 2 · 2 = 8. Resultado -8.<br>
+                    <strong>(B) Incorreta:</strong> Resultado positivo só acontece se o expoente for par.<br>
+                    <strong>(C) Incorreta:</strong> Você multiplicou a base pelo expoente (2x3), o que é um erro comum.<br>
+                    <strong>(D) Incorreta:</strong> Erro de sinal e de operação.`
+            },
+            {
+                id: 2,
+                text: "Qual a diferença entre <strong>(-5)²</strong> e <strong>-5²</strong>?",
+                visual: `
+                    <svg width="200" height="80" viewBox="0 0 200 80">
+                        <text x="50" y="30" font-size="16" fill="#333">(-5)² = 25</text>
+                        <text x="150" y="30" font-size="16" fill="#333">-5² = -25</text>
+                        <line x1="100" y1="10" x2="100" y2="70" stroke="#ccc"/>
+                    </svg>
+                `,
+                options: ["Nenhuma, ambos dão 25", "O primeiro é 25 e o segundo é -25", "O primeiro é -25 e o segundo é 25", "Ambos dão -25"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> O parêntese muda a prioridade da operação.<br>
+                    <strong>(B) Correta:</strong> (-5)² inclui o sinal na conta (-5 · -5 = 25). Já -5² mantém o sinal fora e calcula a potência (-(5 · 5) = -25).<br>
+                    <strong>(C) Incorreta:</strong> Inverteu os resultados.<br>
+                    <strong>(D) Incorreta:</strong> Ignorou a regra de sinais na multiplicação.`
+            },
+            {
+                id: 3,
+                text: "Todo número (diferente de zero) elevado a <strong>zero</strong> é igual a:",
+                options: ["0", "1", "Ele mesmo", "Indefinido"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Confusão comum com 0 elevado a n.<br>
+                    <strong>(B) Correta:</strong> Esta é uma regra fundamental da potenciação: a⁰ = 1.<br>
+                    <strong>(C) Incorreta:</strong> Isso acontece quando elevado a 1.<br>
+                    <strong>(D) Incorreta:</strong> Apenas 0⁰ é indefinido.`
+            },
+            // NÍVEL 2: EXPOENTE NEGATIVO
+            {
+                id: 4,
+                text: "Como reescrevemos <strong>2⁻³</strong>?",
+                visual: `
+                    <svg width="100" height="60" viewBox="0 0 100 60">
+                        <text x="50" y="35" text-anchor="middle" font-size="20" fill="#1D4ED8">1 / 2³</text>
+                    </svg>
+                `,
+                options: ["-6", "-8", "1/8", "1/6"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Multiplicou base e expoente.<br>
+                    <strong>(B) Incorreta:</strong> Achou que o expoente negativo torna o número negativo.<br>
+                    <strong>(C) Correta:</strong> Expoente negativo inverte a base. 2⁻³ vira 1 / 2³ = 1/8.<br>
+                    <strong>(D) Incorreta:</strong> Inverteu, mas calculou errado a potência.`
+            },
+            {
+                id: 5,
+                text: "Qual o valor de <strong>(3/4)⁻²</strong>?",
+                visual: `
+                    <svg width="150" height="60" viewBox="0 0 150 60">
+                        <text x="75" y="35" text-anchor="middle" font-size="18" fill="#333">Inverte: (4/3)²</text>
+                    </svg>
+                `,
+                options: ["-9/16", "9/16", "16/9", "6/8"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Resultado de potência par nunca é negativo.<br>
+                    <strong>(B) Incorreta:</strong> Elevou sem inverter a fração.<br>
+                    <strong>(C) Correta:</strong> Primeiro inverte a fração para 4/3, depois eleva ao quadrado: 16/9.<br>
+                    <strong>(D) Incorreta:</strong> Multiplicou por 2 em vez de elevar ao quadrado.`
+            },
+            {
+                id: 6,
+                text: "Quanto vale <strong>10⁻¹</strong>?",
+                options: ["-10", "0,1", "1", "0"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Erro de sinal.<br>
+                    <strong>(B) Correta:</strong> 10⁻¹ = 1/10, que em decimal é 0,1.<br>
+                    <strong>(C) Incorreta:</strong> Ignorou o expoente.<br>
+                    <strong>(D) Incorreta:</strong> Potência de 10 nunca dá zero.`
+            },
+            // NÍVEL 3: PROPRIEDADES (MULTIPLICAÇÃO E DIVISÃO)
+            {
+                id: 7,
+                text: "Simplifique: <strong>2³ · 2⁴</strong>",
+                visual: `
+                    <svg width="150" height="50" viewBox="0 0 150 50">
+                        <text x="75" y="30" text-anchor="middle" font-size="18" fill="#1D4ED8">2⁽³⁺⁴⁾</text>
+                    </svg>
+                `,
+                options: ["2¹²", "2⁷", "4⁷", "4¹²"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Multiplicou os expoentes (regra errada).<br>
+                    <strong>(B) Correta:</strong> Na multiplicação de mesma base, conserva-se a base e SOMA-SE os expoentes (3+4=7).<br>
+                    <strong>(C) Incorreta:</strong> Multiplicou as bases.<br>
+                    <strong>(D) Incorreta:</strong> Errou base e expoente.`
+            },
+            {
+                id: 8,
+                text: "Simplifique: <strong>5⁸ ÷ 5²</strong>",
+                visual: `
+                    <svg width="150" height="50" viewBox="0 0 150 50">
+                        <text x="75" y="30" text-anchor="middle" font-size="18" fill="#1D4ED8">5⁽⁸⁻²⁾</text>
+                    </svg>
+                `,
+                options: ["5⁴", "5¹⁰", "5⁶", "1⁶"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Dividiu os expoentes.<br>
+                    <strong>(B) Incorreta:</strong> Somou os expoentes (regra da multiplicação).<br>
+                    <strong>(C) Correta:</strong> Na divisão de mesma base, conserva-se a base e SUBTRAI-SE os expoentes (8-2=6).<br>
+                    <strong>(D) Incorreta:</strong> Dividiu as bases.`
+            },
+            {
+                id: 9,
+                text: "Qual o resultado de <strong>3⁵ · 3⁻²</strong>?",
+                options: ["3⁷", "3³", "3⁻¹⁰", "3¹⁰"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Ignorou o sinal negativo.<br>
+                    <strong>(B) Correta:</strong> Soma algébrica: 5 + (-2) = 3. O resultado é 3³.<br>
+                    <strong>(C) Incorreta:</strong> Multiplicou expoentes.<br>
+                    <strong>(D) Incorreta:</strong> Erro de cálculo.`
+            },
+            // NÍVEL 4: POTÊNCIA DE POTÊNCIA E MISTOS
+            {
+                id: 10,
+                text: "Simplifique: <strong>(2³)²</strong>",
+                visual: `
+                    <svg width="150" height="50" viewBox="0 0 150 50">
+                        <text x="75" y="30" text-anchor="middle" font-size="18" fill="#1D4ED8">2⁽³ ˣ ²⁾</text>
+                    </svg>
+                `,
+                options: ["2⁵", "2⁶", "2⁹", "4³"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Somou os expoentes.<br>
+                    <strong>(B) Correta:</strong> Potência de potência: conserva a base e MULTIPLICA os expoentes (3·2=6).<br>
+                    <strong>(C) Incorreta:</strong> Elevou o expoente ao quadrado (3²).<br>
+                    <strong>(D) Incorreta:</strong> Alterou a base.`
+            },
+            {
+                id: 11,
+                text: "Qual o valor de <strong>(-1)¹⁰⁰</strong>?",
+                options: ["-1", "1", "100", "-100"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Expoente par torna o resultado positivo.<br>
+                    <strong>(B) Correta:</strong> Base negativa elevada a expoente PAR sempre resulta em positivo. 1x1x1... é sempre 1.<br>
+                    <strong>(C) Incorreta:</strong> Base é 1, não muda.<br>
+                    <strong>(D) Incorreta:</strong> Erro total.`
+            },
+            {
+                id: 12,
+                text: "Resolva: <strong>(2 · 3)²</strong>",
+                options: ["2² · 3 = 12", "2 · 3² = 18", "2² · 3² = 4 · 9 = 36", "5² = 25"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Esqueceu de elevar o 3.<br>
+                    <strong>(B) Incorreta:</strong> Esqueceu de elevar o 2.<br>
+                    <strong>(C) Correta:</strong> O expoente distribui para ambos os números. 2² · 3² = 36.<br>
+                    <strong>(D) Incorreta:</strong> Somou as bases antes (errado).`
+            },
+            // NÍVEL 5: DESAFIOS
+            {
+                id: 13,
+                text: "Quanto é <strong>2³ + 2³</strong>? (Cuidado, não é multiplicação)",
+                visual: `
+                    <svg width="150" height="50" viewBox="0 0 150 50">
+                        <text x="75" y="30" text-anchor="middle" font-size="18" fill="#333">8 + 8 = ?</text>
+                    </svg>
+                `,
+                options: ["2⁶", "2⁴", "4⁶", "4³"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Aplicou regra da multiplicação na soma.<br>
+                    <strong>(B) Correta:</strong> Calculando: 8 + 8 = 16. E 16 é igual a 2⁴.<br>
+                    <strong>(C) Incorreta:</strong> Somou bases e expoentes.<br>
+                    <strong>(D) Incorreta:</strong> Somou bases.`
+            },
+            {
+                id: 14,
+                text: "Simplifique a expressão: <strong>(2⁵ · 2³) ÷ 2⁴</strong>",
+                options: ["2²", "2⁴", "2⁸", "2¹²"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Erro na subtração.<br>
+                    <strong>(B) Correta:</strong> Primeiro resolve o parêntese: 2⁸. Depois divide: 8 - 4 = 4. Resultado 2⁴.<br>
+                    <strong>(C) Incorreta:</strong> Esqueceu de dividir.<br>
+                    <strong>(D) Incorreta:</strong> Somou tudo.`
+            },
+            {
+                id: 15,
+                text: "Qual é a metade de <strong>2²⁰</strong>?",
+                options: ["2¹⁰", "1²⁰", "2¹⁹", "2⁹"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Dividiu o expoente (erro clássico).<br>
+                    <strong>(B) Incorreta:</strong> Dividiu a base.<br>
+                    <strong>(C) Correta:</strong> Metade é dividir por 2¹. 2²⁰ ÷ 2¹ = 2¹⁹.<br>
+                    <strong>(D) Incorreta:</strong> Erro de cálculo.`
+            }
+        ];
+
+        // --- ESTADO DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        // --- NAVEGAÇÃO ENTRE ABAS ---
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // --- RENDERIZAÇÃO DO QUIZ ---
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.90rem; line-height: 1.6;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; 
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#1D4ED8"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        function finishQuiz() {
+            score = 0;
+            let feedbackHTML = '<div style="text-align: left; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">';
+
+            userAnswers.forEach((ans, idx) => {
+                const q = questions[idx];
+                const isCorrect = (ans === q.correct);
+                if (isCorrect) score++;
+                
+                if (isCorrect) {
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: #F0FFF4; border-radius: 8px; border-left: 4px solid #48BB78;">
+                            <p style="font-size: 0.9rem;"><strong>Questão ${idx+1}:</strong> ✅ Acertou!</p>
+                        </div>`;
+                } else {
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 15px; background: #FFF5F5; border-radius: 8px; border-left: 4px solid #F56565;">
+                            <p style="font-weight: 700; color: #C53030;">Questão ${idx+1}: ${q.text}</p>
+                            <div style="font-size: 0.85rem; margin-top: 10px; color: #4A5568;">
+                                ${q.explanation}
+                            </div>
+                        </div>`;
+                }
+            });
+            feedbackHTML += '</div>';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            let actionButtonsHTML = "";
+
+            if (percent >= 80) {
+                stars = "⭐⭐⭐⭐⭐"; 
+                msg = "Parabéns! Você dominou o conteúdo.";
+                actionButtonsHTML = `
+                    <button onclick="window.location.href='9ano-matematica.html'" style="width: 100%; padding: 15px; background-color: #48BB78; color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;">
+                        Concluir Atividade
+                    </button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Voltar para o Assunto
+                    </button>
+                `;
+            } else {
+                stars = "💪 Estude mais"; 
+                msg = `Você fez ${percent}%. Precisa de 80% para passar.`;
+                actionButtonsHTML = `
+                    <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Exercícios</button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Revisar Explicação
+                    </button>
+                `;
+            }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+            
+            document.getElementById('review-container').innerHTML = feedbackHTML;
+            document.getElementById('action-buttons').innerHTML = actionButtonsHTML;
+
+            if (percent >= 80) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            document.getElementById('review-container').innerHTML = ""; 
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

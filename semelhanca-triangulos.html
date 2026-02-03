@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semelhança de Triângulos - 9º Ano</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #0F172A; /* Azul Escuro */
+            --border-color: #000000;
+            
+            /* CORES: AZUL E LARANJA (Geometria/Construção) */
+            --theme-light: #E0F2FE; 
+            --theme-medium: #7DD3FC;
+            --theme-dark: #0284C7; 
+            --theme-contrast: #F97316; /* Laranja para destaque */
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        /* --- HEADER --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+        .logo-img { max-height: 80px; width: auto; display: block; }
+
+        .container { width: 100%; max-width: 600px; padding: 20px; }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .toggle-btn.active {
+            background-color: var(--theme-dark);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO EXPLICATIVO --- */
+        .section-view { display: none; animation: fadeIn 0.3s ease-in-out; }
+        
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* --- CAIXAS DE EXEMPLO PASSO A PASSO --- */
+        .example-box {
+            background-color: #F0F9FF;
+            border-left: 5px solid var(--theme-dark);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .step-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--theme-dark);
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .math-block {
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: #333;
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #BAE6FD;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .visual-row { display: flex; align-items: center; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+
+        /* --- QUIZ --- */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: var(--theme-light);
+            border-radius: 12px;
+            border: 1px dashed var(--theme-dark);
+        }
+
+        .question-map {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-dark);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK --- */
+        .feedback-box {
+            display: block; margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+        .feedback-title { font-weight: 800; text-transform: uppercase; font-size: 0.85rem; margin-bottom: 10px; }
+
+        /* --- RESULTADO --- */
+        #viewResult { text-align: center; display: none; animation: fadeIn 0.5s; }
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-dark); line-height: 1; margin: 10px 0; }
+        .btn-retry {
+            width: 100%; padding: 15px; background-color: var(--theme-dark); color: white;
+            border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700;
+            cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;
+        }
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- FOOTER --- */
+        .quiz-footer {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background-color: var(--white); border-top: 2px solid var(--border-color);
+            padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100;
+        }
+        .nav-btn {
+            padding: 12px 24px; border-radius: 8px; font-weight: 700; border: 2px solid var(--border-color); cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        <nav class="top-nav">
+            <a href="9ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">9º ANO</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Semelhança de Triângulos</h1>
+            <p style="color: #555; margin-bottom: 20px;">Dois triângulos são semelhantes quando têm a <strong>mesma forma</strong>, mas não necessariamente o mesmo tamanho. Isso significa ângulos iguais e lados proporcionais.</p>
+            
+            <div class="card-content">
+                <h3>1. Teorema Fundamental</h3>
+                <p class="explanation-text">Se você traçar uma reta paralela a um dos lados de um triângulo, cortando os outros dois lados, você cria um triângulo menor <strong>semelhante</strong> ao original.</p>
+                <div class="visual-row">
+                    <svg width="200" height="120" viewBox="0 0 200 120">
+                        <polygon points="100,10 20,110 180,110" fill="none" stroke="#333" stroke-width="2"/>
+                        <line x1="60" y1="60" x2="140" y2="60" stroke="#F97316" stroke-width="2" stroke-dasharray="4"/>
+                        <text x="100" y="50" font-size="10" fill="#F97316" font-weight="bold">Pequeno</text>
+                        <text x="100" y="100" font-size="10" fill="#333">Grande</text>
+                    </svg>
+                </div>
+                <p class="explanation-text">A proporção se mantém: (Lado Pequeno) / (Lado Grande) = (Base Pequena) / (Base Grande).</p>
+            </div>
+
+            <div class="card-content">
+                <h3>2. Os 3 Casos de Detetive</h3>
+                <p class="explanation-text">Como saber se são semelhantes sem medir tudo? Use os casos:</p>
+                
+                <div class="example-box">
+                    <span class="step-label">Caso 1: AA (Ângulo-Ângulo)</span>
+                    <p style="font-size:0.9rem;">Basta que <strong>dois ângulos</strong> sejam iguais. O terceiro será automaticamente igual.</p>
+                </div>
+
+                <div class="example-box">
+                    <span class="step-label">Caso 2: LLL (Lado-Lado-Lado)</span>
+                    <p style="font-size:0.9rem;">Se os <strong>três lados</strong> são proporcionais (ex: todos o dobro do outro), eles são semelhantes.</p>
+                </div>
+
+                <div class="example-box">
+                    <span class="step-label">Caso 3: LAL (Lado-Ângulo-Lado)</span>
+                    <p style="font-size:0.9rem;">Dois lados proporcionais e o <strong>ângulo entre eles</strong> igual.</p>
+                </div>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Descubra as medidas e casos.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Resultado</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente!</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES DETALHADO ---
+        const questions = [
+            // NÍVEL 1: CONCEITOS BÁSICOS
+            {
+                id: 1,
+                text: "Dois triângulos são semelhantes se tiverem:",
+                options: ["Mesmo tamanho e forma", "Mesma forma, tamanhos diferentes", "Mesmo tamanho, formas diferentes", "Áreas iguais"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Isso seria congruência (iguais).<br>
+                    <strong>(B) Correta:</strong> Semelhança preserva a forma (ângulos iguais) mas permite tamanhos diferentes (ampliação/redução).<br>
+                    <strong>(C) Incorreta:</strong> Formas diferentes nunca são semelhantes.<br>
+                    <strong>(D) Incorreta:</strong> Áreas podem ser diferentes.`
+            },
+            {
+                id: 2,
+                text: "Se dois triângulos são semelhantes, seus ângulos correspondentes são:",
+                options: ["Proporcionais", "Congruentes (Iguais)", "Diferentes", "Suplementares"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Os lados são proporcionais, não os ângulos.<br>
+                    <strong>(B) Correta:</strong> Para manter a forma, os ângulos internos devem ter exatamente a mesma medida.<br>
+                    <strong>(C) Incorreta:</strong> Se fossem diferentes, a forma mudaria.<br>
+                    <strong>(D) Incorreta:</strong> Soma 180º não é a regra aqui.`
+            },
+            {
+                id: 3,
+                text: "Se o triângulo A é o dobro do tamanho do triângulo B, a razão de semelhança é:",
+                options: ["1", "2", "0,5", "4"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Tamanhos iguais.<br>
+                    <strong>(B) Correta:</strong> Se os lados de A são 2 vezes os lados de B, a razão k = 2.<br>
+                    <strong>(C) Incorreta:</strong> Seria se B fosse o dobro de A.<br>
+                    <strong>(D) Incorreta:</strong> Seria quádruplo.`
+            },
+            // NÍVEL 2: CASOS DE SEMELHANÇA
+            {
+                id: 4,
+                text: "Você conhece dois ângulos de dois triângulos: 30° e 60°. Eles são semelhantes?",
+                visual: `
+                    <svg width="150" height="50" viewBox="0 0 150 50">
+                        <text x="75" y="30" text-anchor="middle" font-size="14" fill="#F97316">Caso AA</text>
+                    </svg>
+                `,
+                options: ["Sim, pelo caso AA", "Não, precisa dos lados", "Não, precisa do 3º ângulo", "Talvez"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Se dois ângulos são iguais, o terceiro obrigatoriamente também será (soma 180°). O caso AA garante a semelhança.<br>
+                    <strong>(B) Incorreta:</strong> Ângulos bastam.<br>
+                    <strong>(C) Incorreta:</strong> O 3º já é consequência.<br>
+                    <strong>(D) Incorreta:</strong> É certeza.`
+            },
+            {
+                id: 5,
+                text: "Triângulo 1 tem lados 2, 3, 4. Triângulo 2 tem lados 4, 6, 8. Eles são semelhantes?",
+                options: ["Sim, caso LLL", "Sim, caso AA", "Não são", "Sim, caso LAL"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> 4/2 = 2; 6/3 = 2; 8/4 = 2. Todos os lados são proporcionais (o dobro). Caso Lado-Lado-Lado.<br>
+                    <strong>(B) Incorreta:</strong> Não falamos de ângulos.<br>
+                    <strong>(C) Incorreta:</strong> São proporcionais.<br>
+                    <strong>(D) Incorreta:</strong> Não usamos ângulos.`
+            },
+            {
+                id: 6,
+                text: "Triângulo 1: Lados 5 e 10, ângulo entre eles 40°. Triângulo 2: Lados 2,5 e 5, ângulo entre eles 40°.",
+                options: ["Semelhantes (LAL)", "Semelhantes (AA)", "Não semelhantes", "Semelhantes (LLL)"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Temos dois lados proporcionais (metade) e o ângulo ENTRE eles é igual. Caso Lado-Ângulo-Lado.<br>
+                    <strong>(B) Incorreta:</strong> Só temos 1 ângulo.<br>
+                    <strong>(C) Incorreta:</strong> Cumprem a regra.<br>
+                    <strong>(D) Incorreta:</strong> Falta o 3º lado.`
+            },
+            // NÍVEL 3: CÁLCULOS COM TEOREMA FUNDAMENTAL
+            {
+                id: 7,
+                text: "No triângulo, uma reta paralela cortou a altura. Altura menor = 2, Altura maior = 6. Base menor = 3. Qual a Base Maior (x)?",
+                visual: `
+                    <svg width="150" height="80" viewBox="0 0 150 80">
+                        <polygon points="75,5 25,75 125,75" fill="none" stroke="#333"/>
+                        <line x1="45" y1="35" x2="105" y2="35" stroke="#F97316"/>
+                        <text x="85" y="30" font-size="10">3</text>
+                        <text x="85" y="70" font-size="10" font-weight="bold" fill="#0284C7">x</text>
+                    </svg>
+                `,
+                options: ["9", "6", "12", "4"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Razão de semelhança = Altura Maior / Altura Menor = 6/2 = 3. A base deve triplicar também: 3 · 3 = 9.<br>
+                    <strong>(B) Incorreta:</strong> Dobro.<br>
+                    <strong>(C) Incorreta:</strong> Quádruplo.<br>
+                    <strong>(D) Incorreta:</strong> Erro.`
+            },
+            {
+                id: 8,
+                text: "Calcule x: Triângulo pequeno (lados 2 e 3). Triângulo grande (lados 4 e x).",
+                options: ["6", "5", "8", "9"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Se o lado 2 virou 4 (dobrou), o lado 3 deve virar x. 3 · 2 = 6.<br>
+                    <strong>(B) Incorreta:</strong> 3+2.<br>
+                    <strong>(C) Incorreta:</strong> 4·2.<br>
+                    <strong>(D) Incorreta:</strong> 3·3.`
+            },
+            {
+                id: 9,
+                text: "O Teorema Fundamental diz que a reta paralela cria um triângulo...",
+                options: ["Semelhante ao original", "Congruente ao original", "Com área igual", "Equilátero"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> A reta paralela preserva os ângulos, criando um 'clone' menor ou maior (semelhante).<br>
+                    <strong>(B) Incorreta:</strong> Tamanhos diferentes.<br>
+                    <strong>(C) Incorreta:</strong> Área menor.<br>
+                    <strong>(D) Incorreta:</strong> Não muda o tipo.`
+            },
+            // NÍVEL 4: PROBLEMAS DE SOMBRA (CLÁSSICOS)
+            {
+                id: 10,
+                text: "Um prédio projeta uma sombra de 20m. No mesmo instante, um poste de 2m projeta sombra de 4m. Qual a altura do prédio?",
+                visual: `
+                    <svg width="150" height="50" viewBox="0 0 150 50">
+                        <rect x="10" y="10" width="10" height="30" fill="#333"/>
+                        <line x1="20" y1="40" x2="60" y2="40" stroke="#ccc"/> <text x="30" y="35" font-size="10">Sombra</text>
+                    </svg>
+                `,
+                options: ["10m", "40m", "5m", "8m"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Razão Poste: Altura/Sombra = 2/4 = 0,5 (Altura é metade da sombra). Prédio: h/20 = 0,5 -> h = 10m.<br>
+                    <strong>(B) Incorreta:</strong> Dobrou.<br>
+                    <strong>(C) Incorreta:</strong> 1/4.<br>
+                    <strong>(D) Incorreta:</strong> Erro.`
+            },
+            {
+                id: 11,
+                text: "Para medir a largura de um rio, usamos semelhança. Se a razão é 3 e o triângulo menor tem base 5m, qual a largura (base maior)?",
+                options: ["15m", "8m", "5/3m", "3m"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Base Maior = Razão · Base Menor. x = 3 · 5 = 15m.<br>
+                    <strong>(B) Incorreta:</strong> Somou.<br>
+                    <strong>(C) Incorreta:</strong> Dividiu.<br>
+                    <strong>(D) Incorreta:</strong> Usou a razão.`
+            },
+            {
+                id: 12,
+                text: "Se a razão de semelhança entre dois triângulos é k=2, o que acontece com o Perímetro?",
+                options: ["Dobra (x2)", "Quadruplica (x4)", "Fica igual", "Triplica"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> O perímetro é uma medida linear (soma dos lados). Se os lados dobram, o perímetro também dobra.<br>
+                    <strong>(B) Incorreta:</strong> Isso acontece com a ÁREA.<br>
+                    <strong>(C) Incorreta:</strong> Aumenta.<br>
+                    <strong>(D) Incorreta:</strong> Erro.`
+            },
+            // NÍVEL 5: DESAFIOS AVANÇADOS (ÁREA E K)
+            {
+                id: 13,
+                text: "Se a razão de semelhança é k=3, a razão entre as ÁREAS será:",
+                options: ["9 (k²)", "3 (k)", "6 (2k)", "27 (k³)"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> A razão entre as áreas é o quadrado da razão de semelhança (k²). 3² = 9. A área fica 9 vezes maior.<br>
+                    <strong>(B) Incorreta:</strong> Razão linear.<br>
+                    <strong>(C) Incorreta:</strong> Dobro.<br>
+                    <strong>(D) Incorreta:</strong> Volume.`
+            },
+            {
+                id: 14,
+                text: "Dois triângulos congruentes (iguais) são semelhantes?",
+                options: ["Sim, razão k=1", "Não, pois são iguais", "Talvez", "Apenas se forem retângulos"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Congruência é um caso especial de semelhança onde a razão é 1 (tamanho não muda).<br>
+                    <strong>(B) Incorreta:</strong> Igualdade é semelhança.<br>
+                    <strong>(C) Incorreta:</strong> Certeza.<br>
+                    <strong>(D) Incorreta:</strong> Qualquer tipo.`
+            },
+            {
+                id: 15,
+                text: "Um mapa tem escala 1:100. Um triângulo de área 2 cm² no mapa tem que área real?",
+                options: ["20.000 cm²", "200 cm²", "200.000 cm²", "2 m²"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> k = 100. k² = 10.000. Área Real = Área Mapa · k² = 2 · 10.000 = 20.000 cm² (ou 2 m²).<br>
+                    <strong>(B) Incorreta:</strong> Usou k linear.<br>
+                    <strong>(C) Incorreta:</strong> Erro zero.<br>
+                    <strong>(D) Incorreta:</strong> 2 m² = 20.000 cm². Resposta também válida, mas A está em cm².`
+            }
+        ];
+
+        // --- LÓGICA DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.90rem; line-height: 1.6;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; 
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#0284C7"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        function finishQuiz() {
+            score = 0;
+            let feedbackHTML = '<div style="text-align: left; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">';
+
+            userAnswers.forEach((ans, idx) => {
+                const q = questions[idx];
+                const isCorrect = (ans === q.correct);
+                if (isCorrect) score++;
+                
+                if (isCorrect) {
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: #F0FFF4; border-radius: 8px; border-left: 4px solid #48BB78;">
+                            <p style="font-size: 0.9rem;"><strong>Questão ${idx+1}:</strong> ✅ Acertou!</p>
+                        </div>`;
+                } else {
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 15px; background: #FFF5F5; border-radius: 8px; border-left: 4px solid #F56565;">
+                            <p style="font-weight: 700; color: #C53030;">Questão ${idx+1}: ${q.text}</p>
+                            <div style="font-size: 0.85rem; margin-top: 10px; color: #4A5568;">
+                                ${q.explanation}
+                            </div>
+                        </div>`;
+                }
+            });
+            feedbackHTML += '</div>';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            let actionButtonsHTML = "";
+
+            if (percent >= 80) {
+                stars = "⭐⭐⭐⭐⭐"; 
+                msg = "Parabéns! Você dominou o conteúdo.";
+                actionButtonsHTML = `
+                    <button onclick="window.location.href='9ano-matematica.html'" style="width: 100%; padding: 15px; background-color: #48BB78; color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;">
+                        Concluir Atividade
+                    </button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Voltar para o Assunto
+                    </button>
+                `;
+            } else {
+                stars = "💪 Estude mais"; 
+                msg = `Você fez ${percent}%. Precisa de 80% para passar.`;
+                actionButtonsHTML = `
+                    <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Exercícios</button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Revisar Explicação
+                    </button>
+                `;
+            }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+            
+            document.getElementById('review-container').innerHTML = feedbackHTML;
+            document.getElementById('action-buttons').innerHTML = actionButtonsHTML;
+
+            if (percent >= 80) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            document.getElementById('review-container').innerHTML = ""; 
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

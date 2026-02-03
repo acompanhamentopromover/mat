@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabelas com Classes - Masterclass</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #134E4A; /* Teal 900 */
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA TEAL (Organização/Agrupamento) */
+            --theme-color: #CCFBF1; 
+            --theme-active: #0D9488; 
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR (ERRO) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- LOGO --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #99F6E4; /* Teal 200 para inativo */
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-btn:hover {
+             color: #5EEAD4;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--theme-active);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO --- */
+        .section-view {
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: center; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+        .visual-svg { color: var(--theme-active); }
+        
+        /* Estilo para SVGs dentro das questões */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #CCFBF1;
+            border-radius: 12px;
+            border: 1px dashed var(--theme-active);
+        }
+
+        /* --- CARDS DE EXEMPLO DETALHADO --- */
+        .step-box {
+            background-color: #F0FDFA; 
+            border-left: 5px solid #0D9488;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .step-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #115E59;
+            margin-bottom: 10px;
+            display: block;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        .explanation-text {
+            font-size: 0.9rem;
+            color: #475569;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .highlight {
+            color: #0D9488;
+            font-weight: 700;
+            background-color: #99F6E4;
+            padding: 0 4px;
+            border-radius: 4px;
+        }
+        
+        /* Tabela Personalizada */
+        .class-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        .class-table th {
+            background-color: #0D9488;
+            color: white;
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #000;
+        }
+        .class-table td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: center;
+            background-color: white;
+        }
+        .class-table tr:nth-child(even) td {
+            background-color: #F0FDFA;
+        }
+
+        /* --- QUIZ MAPA --- */
+        .question-map {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-active);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        /* --- OPÇÕES --- */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK DETALHADO --- */
+        .feedback-box {
+            display: block; 
+            margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- TELA DE RESULTADO --- */
+        #viewResult {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+
+        .btn-retry {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--theme-active);
+            color: white;
+            border: 2px solid black;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px black;
+            transition: transform 0.1s;
+        }
+        
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- RODAPÉ FIXO --- */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            border-top: 2px solid var(--border-color);
+            padding: 15px 20px;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="8ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Tabelas com Intervalos de Classe</h1>
+            <p style="color: #555; margin-bottom: 20px;">Quando temos muitos dados diferentes (como a altura de 100 alunos), não dá para fazer uma tabela simples. Precisamos <strong>agrupar</strong> os valores em "faixas" ou "classes".</p>
+            
+            <div class="card-content">
+                <h3>1. O que é uma Classe?</h3>
+                <p class="explanation-text">É um intervalo numérico. Em vez de listar "1,60m", "1,61m", "1,62m"... criamos uma faixa.</p>
+                <div class="visual-row" style="margin:20px 0;">
+                    <div style="background:#F0FDFA; border:2px solid #0D9488; padding:10px; border-radius:8px; text-align:center;">
+                        <span style="font-weight:800; font-size:1.2rem;">160 ⊢ 165</span>
+                        <p style="font-size:0.8rem; margin-top:5px;">Significa: Do 160 (incluído) até o 165 (excluído)</p>
+                    </div>
+                </div>
+                <p class="explanation-text">O símbolo <strong>⊢</strong> indica que o número da esquerda entra na conta, mas o da direita fica para a próxima classe.</p>
+            </div>
+
+            <div class="card-content">
+                <h3>2. Como Construir (Passo a Passo)</h3>
+                
+                <div class="step-box">
+                    <span class="step-title">Exemplo: Notas de uma Turma</span>
+                    <p class="explanation-text">Dados brutos: 2, 8, 4, 6, 9, 3, 5, 7, 10, 5, 6, 8.</p>
+                    
+                    <p class="explanation-text"><strong>Passo 1: Amplitude Total ($AT$)</strong></p>
+                    <p class="explanation-text">Maior valor - Menor valor.</p>
+                    <div class="explanation-text" style="font-family:monospace; background:white; padding:5px;">AT = 10 - 2 = 8</div>
+                    
+                    <p class="explanation-text" style="margin-top:10px;"><strong>Passo 2: Escolher número de classes ($k$)</strong></p>
+                    <p class="explanation-text">Vamos dividir em <span class="highlight">4 classes</span> para ficar organizado.</p>
+                    
+                    <p class="explanation-text" style="margin-top:10px;"><strong>Passo 3: Tamanho da Classe ($h$)</strong></p>
+                    <p class="explanation-text">Dividimos a amplitude pelo nº de classes.</p>
+                    <div class="explanation-text" style="font-family:monospace; background:white; padding:5px;">h = 8 ÷ 4 = 2</div>
+                    <p class="explanation-text">Cada classe terá tamanho 2.</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>3. A Tabela Pronta</h3>
+                <p class="explanation-text">Começamos do menor valor (2) e vamos somando 2 (o tamanho da classe).</p>
+                
+                <table class="class-table">
+                    <thead>
+                        <tr>
+                            <th>Classes (Notas)</th>
+                            <th>Frequência ($f_i$)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2 ⊢ 4</td>
+                            <td>2 alunos (notas 2 e 3)</td>
+                        </tr>
+                        <tr>
+                            <td>4 ⊢ 6</td>
+                            <td>3 alunos (notas 4, 5, 5)</td>
+                        </tr>
+                        <tr>
+                            <td>6 ⊢ 8</td>
+                            <td>3 alunos (notas 6, 6, 7)</td>
+                        </tr>
+                        <tr>
+                            <td>8 ⊢ 10</td>
+                            <td>2 alunos (notas 8, 8, 9)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total</strong></td>
+                            <td><strong>10 alunos</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="explanation-text" style="margin-top:10px; font-size:0.8rem; color:#666;">*Nota 10 entraria numa classe extra ou ajustaríamos a última para 8 ⊢ 10,1.</p>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Entenda os intervalos.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Resultado</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente!</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (TABELAS COM CLASSES) ---
+        const questions = [
+            // NÍVEL 1: CONCEITOS BÁSICOS
+            {
+                id: 1,
+                text: "Para que serve uma tabela de distribuição de frequências com <strong>classes</strong>?",
+                options: ["Para organizar poucos dados", "Para agrupar uma grande quantidade de dados variáveis", "Para calcular a média aritmética", "Para desenhar gráficos de pizza"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Para poucos dados, usamos tabela simples.<br>
+                    <strong>(B) Correta:</strong> Quando os valores variam muito (ex: altura, salário), agrupá-los em faixas (classes) resume a informação.<br>
+                    <strong>(C) Incorreta:</strong> É um passo anterior.<br>
+                    <strong>(D) Incorreta:</strong> É uma tabela, não gráfico.`
+            },
+            {
+                id: 2,
+                text: "O que significa o símbolo <strong>⊢</strong> em um intervalo como 10 ⊢ 20?",
+                options: ["Inclui o 10 e o 20", "Exclui o 10 e inclui o 20", "Inclui o 10 e exclui o 20", "Exclui ambos"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Seria colchetes fechados.<br>
+                    <strong>(B) Incorreta:</strong> Seria ⊣.<br>
+                    <strong>(C) Correta:</strong> O traço vertical indica 'fechado' (inclui) no início e 'aberto' (exclui) no fim. O 20 entra na próxima classe.<br>
+                    <strong>(D) Incorreta:</strong> Seria parenteses.`
+            },
+            {
+                id: 3,
+                text: "O que é a <strong>Amplitude Total</strong> de um conjunto de dados?",
+                options: ["A soma de todos os valores", "O número de classes", "A diferença entre o Maior e o Menor valor", "O tamanho de cada intervalo"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Soma.<br>
+                    <strong>(B) Incorreta:</strong> Variável k.<br>
+                    <strong>(C) Correta:</strong> É o 'espaço total' que os dados ocupam. $A_T = Max - Min$.<br>
+                    <strong>(D) Incorreta:</strong> Amplitude da classe (h).`
+            },
+            // NÍVEL 2: LEITURA DE TABELA
+            {
+                id: 4,
+                text: "Em uma classe 5 ⊢ 10, o número 10 pertence a este grupo?",
+                options: ["Sim", "Não, pertence à próxima classe", "Depende do caso", "Pertence a ambas"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> O intervalo é aberto no fim.<br>
+                    <strong>(B) Correta:</strong> O 10 é o limite superior EXCLUSIVO. Ele será o início (limite inferior) da próxima classe (10 ⊢ 15).<br>
+                    <strong>(C) Incorreta:</strong> Regra padrão.<br>
+                    <strong>(D) Incorreta:</strong> Dados não se repetem.`
+            },
+            {
+                id: 5,
+                text: "Se a classe é 20 ⊢ 30, qual é a <strong>Amplitude da Classe (h)</strong>?",
+                options: ["20", "30", "10", "50"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Limite inferior.<br>
+                    <strong>(B) Incorreta:</strong> Limite superior.<br>
+                    <strong>(C) Correta:</strong> Amplitude = Limite Superior - Limite Inferior. $30 - 20 = 10$.<br>
+                    <strong>(D) Incorreta:</strong> Soma.`
+            },
+            {
+                id: 6,
+                text: "Tabela: Classe 0 ⊢ 2 (freq: 5) | Classe 2 ⊢ 4 (freq: 3). Quantos dados são menores que 4?",
+                options: ["3", "5", "8", "2"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Só a segunda classe.<br>
+                    <strong>(B) Incorreta:</strong> Só a primeira.<br>
+                    <strong>(C) Correta:</strong> Somamos as frequências das classes que vão até 4. $5 + 3 = 8$.<br>
+                    <strong>(D) Incorreta:</strong> Tamanho da classe.`
+            },
+            // NÍVEL 3: CÁLCULOS DE CONSTRUÇÃO
+            {
+                id: 7,
+                text: "Dados: Menor valor = 10, Maior valor = 50. Queremos 4 classes. Qual será o tamanho (h) de cada classe?",
+                options: ["5", "10", "40", "4"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Muito pequeno.<br>
+                    <strong>(B) Correta:</strong> Amplitude Total = 50 - 10 = 40. Tamanho da classe = $40 \div 4 = 10$.<br>
+                    <strong>(C) Incorreta:</strong> Amplitude total.<br>
+                    <strong>(D) Incorreta:</strong> Número de classes.`
+            },
+            {
+                id: 8,
+                text: "Se a primeira classe começa em 15 e a amplitude é 5, qual é o intervalo da primeira classe?",
+                options: ["15 ⊢ 20", "15 ⊢ 16", "10 ⊢ 15", "15 ⊢ 25"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Começa em 15 e soma 5. Intervalo vai de 15 até 20.<br>
+                    <strong>(B) Incorreta:</strong> Amplitude 1.<br>
+                    <strong>(C) Incorreta:</strong> Anterior.<br>
+                    <strong>(D) Incorreta:</strong> Amplitude 10.`
+            },
+            {
+                id: 9,
+                text: "Onde devo colocar o número 25? Na classe 20 ⊢ 25 ou na classe 25 ⊢ 30?",
+                options: ["Na 20 ⊢ 25", "Na 25 ⊢ 30", "Em qualquer uma", "Ignoro o número"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 25 é o limite aberto (excluído) aqui.<br>
+                    <strong>(B) Correta:</strong> O 25 é o limite fechado (incluído) no INÍCIO da classe.<br>
+                    <strong>(C) Incorreta:</strong> Geraria duplicidade.<br>
+                    <strong>(D) Incorreta:</strong> Dado perdido.`
+            },
+            // NÍVEL 4: PONTO MÉDIO
+            {
+                id: 10,
+                text: "O que é o <strong>Ponto Médio</strong> de uma classe?",
+                options: ["A frequência dividida por 2", "O valor exatamente no meio do intervalo", "A amplitude total", "O maior valor da classe"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Frequência média.<br>
+                    <strong>(B) Correta:</strong> É a média entre o limite inferior e superior. Usamos ele para representar a classe em cálculos.<br>
+                    <strong>(C) Incorreta:</strong> Tamanho.<br>
+                    <strong>(D) Incorreta:</strong> Limite superior.`
+            },
+            {
+                id: 11,
+                text: "Qual o ponto médio da classe 10 ⊢ 20?",
+                options: ["10", "20", "15", "30"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Início.<br>
+                    <strong>(B) Incorreta:</strong> Fim.<br>
+                    <strong>(C) Correta:</strong> $(10 + 20) \div 2 = 30 \div 2 = 15$.<br>
+                    <strong>(D) Incorreta:</strong> Soma.`
+            },
+            {
+                id: 12,
+                text: "Para calcular a média aproximada de uma tabela com classes, usamos:",
+                options: ["Os limites inferiores", "Os limites superiores", "Os Pontos Médios das classes", "Apenas a maior frequência"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Subestima.<br>
+                    <strong>(B) Incorreta:</strong> Superestima.<br>
+                    <strong>(C) Correta:</strong> Assumimos que todos os dados daquela classe estão concentrados no ponto médio.<br>
+                    <strong>(D) Incorreta:</strong> Moda bruta.`
+            },
+            // NÍVEL 5: ANÁLISE E FREQUÊNCIA RELATIVA
+            {
+                id: 13,
+                text: "Se uma classe tem frequência absoluta 10 e o total de dados é 50, qual a frequência relativa?",
+                options: ["10%", "20%", "50%", "5%"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Metade.<br>
+                    <strong>(B) Correta:</strong> $10 \div 50 = 0,2$. Multiplicando por 100% = 20%.<br>
+                    <strong>(C) Incorreta:</strong> Total.<br>
+                    <strong>(D) Incorreta:</strong> Baixo.`
+            },
+            {
+                id: 14,
+                text: "Amplitude Total = 20. Número de Classes = 5. Qual o tamanho de cada classe?",
+                options: ["2", "4", "5", "10"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 20/10.<br>
+                    <strong>(B) Correta:</strong> $20 \div 5 = 4$.<br>
+                    <strong>(C) Incorreta:</strong> 5 classes.<br>
+                    <strong>(D) Incorreta:</strong> Metade.`
+            },
+            {
+                id: 15,
+                text: "Qual o principal 'defeito' de agrupar dados em classes?",
+                options: ["Fica desorganizado", "Perdemos os valores exatos originais", "Fica mais difícil de ler", "Ocupa mais espaço"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Organiza.<br>
+                    <strong>(B) Correta:</strong> Ao dizer que '5 pessoas têm entre 10 e 20 anos', não sabemos mais se elas têm 11, 15 ou 19. Perdemos a precisão individual.<br>
+                    <strong>(C) Incorreta:</strong> Facilita a leitura.<br>
+                    <strong>(D) Incorreta:</strong> Resume espaço.`
+            }
+        ];
+
+        // --- ESTADO DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        // --- NAVEGAÇÃO ENTRE ABAS ---
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // --- RENDERIZAÇÃO DO QUIZ ---
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.90rem; line-height: 1.6;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            // Verifica se tem imagem visual na questão
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; // Já respondeu
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#0D9488"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        // --- LÓGICA DE FINALIZAÇÃO E FEEDBACK DETALHADO ---
+        function finishQuiz() {
+            score = 0;
+            let feedbackHTML = '<div style="text-align: left; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">';
+
+            userAnswers.forEach((ans, idx) => {
+                const q = questions[idx];
+                const isCorrect = (ans === q.correct);
+                
+                if (isCorrect) {
+                    score++;
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: #F0FFF4; border-radius: 8px; border-left: 4px solid #48BB78;">
+                            <p style="font-size: 0.9rem;"><strong>Questão ${idx+1}:</strong> ✅ Acertou!</p>
+                        </div>`;
+                } else {
+                    const userAnswerText = q.options[ans];
+                    const correctAnswerText = q.options[q.correct];
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 15px; background: #FFF5F5; border-radius: 8px; border-left: 4px solid #F56565;">
+                            <p style="font-weight: 700; color: #C53030;">Questão ${idx+1}: ${q.text}</p>
+                            <p style="font-size: 0.9rem; margin-top: 5px;">❌ <strong>Você marcou:</strong> ${userAnswerText}</p>
+                            <p style="font-size: 0.9rem;">🎯 <strong>Correto seria:</strong> ${correctAnswerText}</p>
+                            <div style="font-size: 0.85rem; margin-top: 10px; color: #4A5568; background: rgba(255,255,255,0.5); padding: 8px; border-radius: 4px;">
+                                ${q.explanation}
+                            </div>
+                        </div>`;
+                }
+            });
+            feedbackHTML += '</div>';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            let actionButtonsHTML = "";
+
+            // CRITÉRIO DE 80%
+            if (percent >= 80) {
+                stars = "⭐⭐⭐⭐⭐"; 
+                msg = "Parabéns! Você dominou o conteúdo.";
+                actionButtonsHTML = `
+                    <button onclick="window.location.href='8ano-matematica.html'" style="width: 100%; padding: 15px; background-color: #48BB78; color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;">
+                        Concluir Atividade
+                    </button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Voltar para o Assunto
+                    </button>
+                `;
+            } else {
+                stars = "💪 Estude mais"; 
+                msg = `Você fez ${percent}%. Precisa de 80% para passar.`;
+                actionButtonsHTML = `
+                    <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Exercícios</button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Revisar Explicação
+                    </button>
+                `;
+            }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+            
+            // Injeta o feedback detalhado
+            document.getElementById('review-container').innerHTML = feedbackHTML;
+            // Injeta os botões de ação corretos
+            document.getElementById('action-buttons').innerHTML = actionButtonsHTML;
+
+            if (percent >= 80) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            document.getElementById('review-container').innerHTML = ""; // Limpa feedback anterior
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluxogramas - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA AZUL LÓGICO (Processo) */
+            --theme-color: #E6FFFA; 
+            --theme-active: #319795; 
+            --theme-accent: #2C7A7B;
+            --theme-text-active: #FFFFFF;
+            
+            /* CORES DOS SÍMBOLOS DO FLUXOGRAMA */
+            --flow-start: #48BB78; /* Verde */
+            --flow-process: #4299E1; /* Azul */
+            --flow-decision: #ED8936; /* Laranja */
+            --flow-line: #2D3748;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .logo-header { width: 100%; max-width: 600px; display: flex; justify-content: center; padding: 20px 0 10px 0; }
+        .logo-img { max-height: 80px; width: auto; display: block; }
+        .container { width: 100%; max-width: 600px; padding: 20px; }
+
+        .top-nav { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-close { text-decoration: none; color: var(--text-color); font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
+
+        .toggle-container { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 50px; padding: 4px; display: flex; margin-bottom: 25px; box-shadow: 3px 3px 0px var(--border-color); }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 40px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; color: #888; cursor: pointer; transition: all 0.3s ease; }
+        .toggle-btn.active { background-color: var(--theme-active); color: var(--theme-text-active); box-shadow: 0px 2px 5px rgba(0,0,0,0.1); }
+
+        .section-view { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .card-content { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: 4px 4px 0px var(--border-color); margin-bottom: 20px; }
+        
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: center; gap: 15px; justify-content: space-between; flex-wrap: wrap; }
+        .visual-svg { color: var(--theme-active); flex-shrink: 0; }
+        .question-visual { display: flex; justify-content: center; margin: 15px 0; padding: 15px; background-color: #E6FFFA; border-radius: 12px; border: 1px dashed var(--theme-active); }
+
+        .example-box { background-color: #E6FFFA; border-left: 5px solid #319795; padding: 15px; margin: 15px 0; border-radius: 8px; }
+        .example-tag { font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: #234E52; margin-bottom: 5px; display: block; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 5px; margin-bottom: 20px; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 40px; height: 40px; border: 2px solid #ccc; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; color: #888; background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { border-color: var(--border-color); background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); transform: scale(1.05); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 16px; background-color: var(--white); border: 2px solid #ccc; border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; position: relative; }
+        .opt-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #ccc; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; flex-shrink: 0; }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; }
+
+        .feedback-box { display: block; margin-top: 20px; background-color: #EDF2F7; border: 2px solid #2D3748; border-radius: 12px; padding: 20px; animation: slideUp 0.3s ease-out; }
+        .feedback-title { font-weight: 800; text-transform: uppercase; font-size: 0.85rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+
+        #viewResult { text-align: center; display: none; animation: fadeIn 0.5s; }
+        .result-card { background: white; border: 2px solid black; border-radius: 20px; padding: 30px; box-shadow: 6px 6px 0px black; margin-bottom: 30px; }
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+        .btn-retry { width: 100%; padding: 15px; background-color: var(--theme-active); color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s; }
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 2px solid var(--border-color); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100; }
+        .nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 700; border: 2px solid var(--border-color); cursor: pointer; }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="6ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Fluxogramas</h1>
+            <p style="color: #555; margin-bottom: 20px;">O fluxograma é um mapa com "setinhas" que mostra os passos para resolver um problema.</p>
+            
+            <div class="card-content">
+                <h3>🚦 Os Símbolos Mágicos</h3>
+                <p>Cada forma geométrica tem um significado especial. Não pode misturar!</p>
+                
+                <div class="visual-row" style="margin-top:20px; align-items: flex-start;">
+                    <div style="text-align:center; flex:1; min-width:80px;">
+                        <svg class="visual-svg" width="80" height="40" viewBox="0 0 80 40" fill="none">
+                            <rect x="2" y="2" width="76" height="36" rx="18" fill="#48BB78" stroke="#2D3748" stroke-width="2"/>
+                            <text x="40" y="25" font-size="10" font-weight="bold" fill="white" text-anchor="middle">Início/Fim</text>
+                        </svg>
+                        <p style="font-size:0.8rem; margin-top:5px;"><strong>Começo/Fim</strong></p>
+                        <p style="font-size:0.7rem;">Cantos redondos</p>
+                    </div>
+
+                    <div style="text-align:center; flex:1; min-width:80px;">
+                        <svg class="visual-svg" width="80" height="40" viewBox="0 0 80 40" fill="none">
+                            <rect x="2" y="2" width="76" height="36" fill="#4299E1" stroke="#2D3748" stroke-width="2"/>
+                            <text x="40" y="25" font-size="10" font-weight="bold" fill="white" text-anchor="middle">Ação</text>
+                        </svg>
+                        <p style="font-size:0.8rem; margin-top:5px;"><strong>Processo</strong></p>
+                        <p style="font-size:0.7rem;">Retângulo (fazer algo)</p>
+                    </div>
+
+                    <div style="text-align:center; flex:1; min-width:80px;">
+                        <svg class="visual-svg" width="80" height="40" viewBox="0 0 80 40" fill="none">
+                            <path d="M40 2 L78 20 L40 38 L2 20 Z" fill="#ED8936" stroke="#2D3748" stroke-width="2"/>
+                            <text x="40" y="24" font-size="10" font-weight="bold" fill="white" text-anchor="middle">?</text>
+                        </svg>
+                        <p style="font-size:0.8rem; margin-top:5px;"><strong>Decisão</strong></p>
+                        <p style="font-size:0.7rem;">Losango (Sim ou Não)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>🗺️ Exemplo Prático</h3>
+                <p><strong>Problema:</strong> O abajur não liga.</p>
+                <div class="visual-row" style="justify-content: center; margin-top:10px;">
+                    <svg class="visual-svg" width="200" height="220" viewBox="0 0 200 220" fill="none">
+                        <defs>
+                            <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#2D3748" />
+                            </marker>
+                        </defs>
+
+                        <rect x="50" y="10" width="100" height="30" rx="15" fill="#48BB78" stroke="#2D3748" stroke-width="2"/>
+                        <text x="100" y="30" font-size="10" font-weight="bold" fill="white" text-anchor="middle">Início</text>
+                        <line x1="100" y1="40" x2="100" y2="60" stroke="#2D3748" stroke-width="2" marker-end="url(#arrow)"/>
+
+                        <path d="M100 60 L140 85 L100 110 L60 85 Z" fill="#ED8936" stroke="#2D3748" stroke-width="2"/>
+                        <text x="100" y="82" font-size="8" font-weight="bold" fill="white" text-anchor="middle">Está</text>
+                        <text x="100" y="92" font-size="8" font-weight="bold" fill="white" text-anchor="middle">ligado?</text>
+
+                        <text x="145" y="80" font-size="8" fill="#2D3748">Não</text>
+                        <line x1="140" y1="85" x2="160" y2="85" stroke="#2D3748" stroke-width="2"/>
+                        <line x1="160" y1="85" x2="160" y2="130" stroke="#2D3748" stroke-width="2"/>
+                        <line x1="160" y1="130" x2="140" y2="130" stroke="#2D3748" stroke-width="2" marker-end="url(#arrow)"/>
+                        <rect x="60" y="115" width="80" height="30" fill="#4299E1" stroke="#2D3748" stroke-width="2"/>
+                        <text x="100" y="135" font-size="10" font-weight="bold" fill="white" text-anchor="middle">Ligar Tomada</text>
+
+                        <text x="80" y="110" font-size="8" fill="#2D3748">Sim</text>
+                        <line x1="100" y1="110" x2="100" y2="160" stroke="#2D3748" stroke-width="2" marker-end="url(#arrow)"/>
+                        <rect x="60" y="160" width="80" height="30" fill="#4299E1" stroke="#2D3748" stroke-width="2"/>
+                        <text x="100" y="180" font-size="10" font-weight="bold" fill="white" text-anchor="middle">Trocar Lâmpada</text>
+                    </svg>
+                </div>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Siga as setas e descubra o caminho.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Simulado Finalizado!</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente! Você pensa de forma muito lógica.</p>
+            </div>
+            <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Simulado</button>
+            <button onclick="setMode('explanation')" style="margin-top:15px; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                ⬅ Voltar para o Assunto
+            </button>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (FLUXOGRAMAS) ---
+        const questions = [
+            // NÍVEL 1: IDENTIFICAR SÍMBOLOS
+            {
+                id: 1,
+                text: "Para que serve um <strong>Fluxograma</strong>?",
+                options: ["Para desenhar paisagens", "Para mostrar os passos de um processo", "Para fazer contas de multiplicar", "Para escrever um poema", "Para colorir"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Fluxogramas são representações gráficas de um passo-a-passo (algoritmo) para resolver problemas.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Eles não são artísticos, são lógicos.</div>`
+            },
+            {
+                id: 2,
+                text: "Qual é o símbolo usado para marcar o <strong>Início</strong> e o <strong>Fim</strong>?",
+                visual: `
+                    <svg width="150" height="50" viewBox="0 0 150 50" style="margin:0 auto; display:block;">
+                        <rect x="10" y="10" width="30" height="30" fill="#4299E1" /> <path d="M60 10 L80 25 L60 40 L40 25 Z" fill="#ED8936" /> <rect x="90" y="10" width="50" height="30" rx="15" fill="#48BB78" /> <text x="25" y="45" font-size="10">A</text>
+                        <text x="60" y="45" font-size="10">B</text>
+                        <text x="115" y="45" font-size="10">C</text>
+                    </svg>
+                `,
+                options: ["Figura A (Quadrado)", "Figura B (Losango)", "Figura C (Arredondado)", "Nenhuma", "Todas"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A forma arredondada (cápsula) é exclusiva para indicar onde começa e onde termina o fluxo.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Quadrado/Retângulo é ação. Losango é decisão.</div>`
+            },
+            {
+                id: 3,
+                text: "O losango (diamante) no fluxograma representa:",
+                visual: `
+                    <svg width="60" height="40" viewBox="0 0 60 40" style="margin:0 auto; display:block;">
+                        <path d="M30 2 L58 20 L30 38 L2 20 Z" fill="#ED8936" stroke="#2D3748" stroke-width="2"/>
+                        <text x="30" y="24" font-size="12" fill="white" font-weight="bold" text-anchor="middle">?</text>
+                    </svg>
+                `,
+                options: ["Uma Ação", "Um Erro", "Uma Decisão (Sim/Não)", "O Fim", "Um Desenho"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> O losango é uma bifurcação. É onde fazemos uma pergunta (ex: 'Está chovendo?') e o caminho se divide.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Ação é retângulo.</div>`
+            },
+            // NÍVEL 2: LÓGICA SEQUENCIAL
+            {
+                id: 4,
+                text: "Qual é a ordem lógica para escovar os dentes?",
+                options: ["Escovar -> Por pasta -> Enxaguar", "Por pasta -> Escovar -> Enxaguar", "Enxaguar -> Por pasta -> Escovar", "Por pasta -> Enxaguar -> Escovar", "Escovar -> Enxaguar -> Por pasta"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Primeiro você prepara a escova (pasta), depois realiza a ação (escovar) e por fim limpa (enxaguar).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Não dá para escovar sem pasta ou enxaguar antes de sujar.</div>`
+            },
+            {
+                id: 5,
+                text: "O que as setas indicam no fluxograma?",
+                options: ["A direção do fluxo (próximo passo)", "Decoração", "Onde parar", "O que apagar", "Nada"],
+                correct: 0,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> As setas são o guia. Elas mostram para onde você deve ir depois de terminar a etapa atual.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Sem setas, não saberíamos a ordem.</div>`
+            },
+            {
+                id: 6,
+                text: "Em um fluxograma, a etapa 'Calçar Sapatos' deve vir:",
+                options: ["Antes de 'Calçar Meias'", "Depois de 'Calçar Meias'", "Tanto faz", "No início de tudo", "No fim do dia"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A lógica física exige que as meias sejam colocadas antes dos sapatos.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Tentar por a meia depois do sapato não funciona!</div>`
+            },
+            // NÍVEL 3: SEGUINDO O FLUXO (VISUAL)
+            {
+                id: 7,
+                text: "Siga o fluxo: Início ➝ Saldo > 10? ➝ (SIM) ➝ Comprar Doce. Se o Saldo for 5, o que acontece?",
+                visual: `
+                    <svg width="200" height="100" viewBox="0 0 200 100" style="margin:0 auto; display:block;">
+                        <defs><marker id="arrow2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#2D3748" /></marker></defs>
+                        <path d="M20 50 L50 20 L80 50 L50 80 Z" fill="#ED8936" stroke="#2D3748" stroke-width="2"/>
+                        <text x="50" y="55" font-size="8" fill="white" text-anchor="middle">Saldo > 10?</text>
+                        
+                        <line x1="80" y1="50" x2="120" y2="20" stroke="#2D3748" stroke-width="2" marker-end="url(#arrow2)"/>
+                        <text x="100" y="30" font-size="8">SIM</text>
+                        <rect x="120" y="10" width="60" height="20" fill="#4299E1"/>
+                        <text x="150" y="22" font-size="8" fill="white" text-anchor="middle">Comprar</text>
+
+                        <line x1="80" y1="50" x2="120" y2="80" stroke="#2D3748" stroke-width="2" marker-end="url(#arrow2)"/>
+                        <text x="100" y="70" font-size="8">NÃO</text>
+                        <rect x="120" y="70" width="60" height="20" fill="#4299E1"/>
+                        <text x="150" y="82" font-size="8" fill="white" text-anchor="middle">Economizar</text>
+                    </svg>
+                `,
+                options: ["Comprar Doce", "Economizar", "Ganhar dinheiro", "O fluxo para", "Volta ao início"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A pergunta é 'Saldo > 10?'. Se o saldo é 5, a resposta é <strong>NÃO</strong> (5 não é maior que 10). Seguindo a seta do NÃO, chegamos em 'Economizar'.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Comprar só acontece se a resposta for SIM.</div>`
+            },
+            {
+                id: 8,
+                text: "No fluxograma abaixo, qual o resultado final se começarmos com o número 3?",
+                visual: `
+                    <svg width="240" height="60" viewBox="0 0 240 60" style="margin:0 auto; display:block;">
+                        <defs><marker id="arrow3" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#2D3748" /></marker></defs>
+                        <rect x="10" y="15" width="50" height="30" fill="#4299E1"/><text x="35" y="35" font-size="10" fill="white" text-anchor="middle">Número</text>
+                        <line x1="60" y1="30" x2="80" y2="30" stroke="#2D3748" stroke-width="2" marker-end="url(#arrow3)"/>
+                        <rect x="80" y="15" width="50" height="30" fill="#4299E1"/><text x="105" y="35" font-size="10" fill="white" text-anchor="middle">Soma 2</text>
+                        <line x1="130" y1="30" x2="150" y2="30" stroke="#2D3748" stroke-width="2" marker-end="url(#arrow3)"/>
+                        <rect x="150" y="15" width="50" height="30" fill="#4299E1"/><text x="175" y="35" font-size="10" fill="white" text-anchor="middle">Dobra</text>
+                        <line x1="200" y1="30" x2="220" y2="30" stroke="#2D3748" stroke-width="2" marker-end="url(#arrow3)"/>
+                        <text x="230" y="35" font-size="12" font-weight="bold">?</text>
+                    </svg>
+                `,
+                options: ["5", "6", "8", "10", "12"],
+                correct: 3,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> 1º passo: Número 3. 2º passo: Soma 2 (3+2=5). 3º passo: Dobra (5x2=10). Resultado final: <strong>10</strong>.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Se dobrar primeiro (3x2=6) e somar depois (6+2=8), a ordem estaria errada.</div>`
+            },
+            {
+                id: 9,
+                text: "O que acontece em um 'Loop' (ciclo) no fluxograma?",
+                options: ["O fluxo para imediatamente", "O fluxo repete os passos várias vezes", "O fluxo apaga tudo", "O fluxo pula para o fim", "O computador desliga"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Um loop é quando a seta volta para uma etapa anterior, fazendo você repetir a ação até que uma condição mude.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Loop é repetição, não parada.</div>`
+            },
+            // NÍVEL 4: ALGORITMOS SIMPLES
+            {
+                id: 10,
+                text: "Qual a melhor pergunta para a caixa de decisão de um alarme?",
+                visual: `
+                    <svg width="100" height="80" viewBox="0 0 100 80" style="margin:0 auto; display:block;">
+                        <path d="M50 10 L90 40 L50 70 L10 40 Z" fill="#ED8936" stroke="#2D3748" stroke-width="2"/>
+                        <text x="50" y="45" font-size="10" fill="white" font-weight="bold" text-anchor="middle">???</text>
+                        <text x="90" y="25" font-size="8">SIM (Tocar)</text>
+                        <text x="90" y="65" font-size="8">NÃO (Quieto)</text>
+                    </svg>
+                `,
+                options: ["Está chovendo?", "É hora de acordar?", "Estou com fome?", "O celular está ligado?", "Que dia é hoje?"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A função do alarme é tocar na hora certa. A pergunta lógica é: 'Já chegou a hora programada?'.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Chuva ou fome não ativam despertador.</div>`
+            },
+            {
+                id: 11,
+                text: "Analise: Lâmpada Apagada ➝ [Decisão: Queimou?] ➝ SIM ➝ [Ação: ?]",
+                options: ["Comprar nova", "Trocar lâmpada", "Acender interruptor", "Dormir", "Chamar eletricista"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Se a lâmpada queimou (SIM), a ação lógica para resolver é <strong>Trocar a lâmpada</strong>.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Acender interruptor não resolve se ela está queimada.</div>`
+            },
+            {
+                id: 12,
+                text: "Se um fluxograma não tiver o bloco 'FIM', o que acontece?",
+                options: ["Ele fica infinito (nunca termina)", "Ele funciona melhor", "Ele apaga", "Ele vira um desenho", "Nada"],
+                correct: 0,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Todo processo precisa de um ponto de parada. Sem o 'Fim', o algoritmo ficaria rodando para sempre ou incompleto.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> É um erro de lógica, não uma melhoria.</div>`
+            },
+            // NÍVEL 5: DEPURAÇÃO (ACHAR ERRO)
+            {
+                id: 13,
+                text: "Encontre o erro no fluxo de atravessar a rua:",
+                visual: `
+                    <div style="font-size:0.8rem; border:1px solid #ccc; padding:5px; background:white;">
+                    1. Olhar para os lados<br>
+                    2. Atravessar correndo<br>
+                    3. Esperar o sinal verde
+                    </div>
+                `,
+                options: ["A ordem está certa", "Deve-se atravessar ANTES de olhar", "Deve-se esperar o sinal verde ANTES de atravessar", "Não precisa olhar", "Correr é sempre bom"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A segurança vem primeiro! O passo 3 (Esperar sinal/verificar) deve acontecer antes do passo 2 (Atravessar).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> A ordem atual é perigosa.</div>`
+            },
+            {
+                id: 14,
+                text: "Em um jogo, se Pontos > 100, você ganha. Se Pontos = 90, o que acontece?",
+                options: ["Você ganha", "Você perde (ou continua tentando)", "O jogo trava", "Você ganha bônus", "Empate"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A condição é ser MAIOR que 100. Como 90 não é maior que 100, a resposta é NÃO (você não ganha ainda).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 90 < 100.</div>`
+            },
+            {
+                id: 15,
+                text: "Qual forma geométrica representa uma 'Ação' ou 'Processo'?",
+                options: ["Círculo", "Triângulo", "Retângulo", "Losango", "Estrela"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> O <strong>Retângulo</strong> é o padrão universal para indicar que algo está sendo feito (calculado, escrito, movido).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Círculo é conector. Losango é decisão.</div>`
+            }
+        ];
+
+        // --- ESTADO DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        // --- NAVEGAÇÃO ENTRE ABAS ---
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // --- RENDERIZAÇÃO DO QUIZ ---
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.95rem; line-height: 1.5;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            // Verifica se tem imagem visual na questão
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; // Já respondeu
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#276749"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        function finishQuiz() {
+            score = 0;
+            userAnswers.forEach((ans, idx) => {
+                if (ans === questions[idx].correct) score++;
+            });
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            if (percent === 100) { stars = "⭐⭐⭐⭐⭐"; msg = "Perfeito! Você é um mestre!"; }
+            else if (percent >= 80) { stars = "⭐⭐⭐⭐"; msg = "Muito bom! Quase gabaritou."; }
+            else if (percent >= 60) { stars = "⭐⭐⭐"; msg = "Bom trabalho. Continue praticando."; }
+            else if (percent >= 40) { stars = "⭐⭐"; msg = "Você pode melhorar. Revise a explicação."; }
+            else { stars = "⭐"; msg = "Não desista! Leia a explicação e tente de novo."; }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+
+            if (percent >= 60) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráficos e Tabelas - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA CYAN DADOS (Informação) */
+            --theme-color: #E0FCFF; 
+            --theme-active: #0BC5EA; 
+            --theme-dark: #0987A0;
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .logo-header { width: 100%; max-width: 600px; display: flex; justify-content: center; padding: 20px 0 10px 0; }
+        .logo-img { max-height: 80px; width: auto; display: block; }
+        .container { width: 100%; max-width: 600px; padding: 20px; }
+
+        .top-nav { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-close { text-decoration: none; color: var(--text-color); font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
+
+        .toggle-container { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 50px; padding: 4px; display: flex; margin-bottom: 25px; box-shadow: 3px 3px 0px var(--border-color); }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 40px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; color: #888; cursor: pointer; transition: all 0.3s ease; }
+        .toggle-btn.active { background-color: var(--theme-active); color: var(--theme-text-active); box-shadow: 0px 2px 5px rgba(0,0,0,0.1); }
+
+        .section-view { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .card-content { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: 4px 4px 0px var(--border-color); margin-bottom: 20px; }
+        
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: center; gap: 15px; justify-content: space-between; flex-wrap: wrap; }
+        .visual-svg { color: var(--theme-active); flex-shrink: 0; }
+        
+        /* Estilo para SVGs dentro das questões */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #E0FCFF;
+            border-radius: 12px;
+            border: 1px dashed var(--theme-dark);
+        }
+
+        .example-box { background-color: #E0FCFF; border-left: 5px solid #0BC5EA; padding: 15px; margin: 15px 0; border-radius: 8px; }
+        .example-tag { font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: #0987A0; margin-bottom: 5px; display: block; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 5px; margin-bottom: 20px; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 40px; height: 40px; border: 2px solid #ccc; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; color: #888; background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { border-color: var(--border-color); background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); transform: scale(1.05); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 16px; background-color: var(--white); border: 2px solid #ccc; border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; position: relative; }
+        .opt-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #ccc; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; flex-shrink: 0; }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; }
+
+        .feedback-box { display: block; margin-top: 20px; background-color: #EDF2F7; border: 2px solid #2D3748; border-radius: 12px; padding: 20px; animation: slideUp 0.3s ease-out; }
+        .feedback-title { font-weight: 800; text-transform: uppercase; font-size: 0.85rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+
+        #viewResult { text-align: center; display: none; animation: fadeIn 0.5s; }
+        .result-card { background: white; border: 2px solid black; border-radius: 20px; padding: 30px; box-shadow: 6px 6px 0px black; margin-bottom: 30px; }
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+        .btn-retry { width: 100%; padding: 15px; background-color: var(--theme-active); color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s; }
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 2px solid var(--border-color); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100; }
+        .nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 700; border: 2px solid var(--border-color); cursor: pointer; }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="6ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Leitura de Gráficos</h1>
+            <p style="color: #555; margin-bottom: 20px;">Gráficos transformam números em imagens para facilitar o entendimento.</p>
+            
+            <div class="card-content">
+                <h3>📊 Gráfico de Colunas</h3>
+                <div class="visual-row">
+                    <div>
+                        <p>As barras ficam em <strong>pé (Vertical)</strong>. Serve para comparar quantidades.</p>
+                        <p style="font-size:0.9rem; margin-top:5px;">Ex: Votos da eleição.</p>
+                    </div>
+                    <svg class="visual-svg" width="100" height="80" viewBox="0 0 100 80" fill="none" stroke="none">
+                        <line x1="10" y1="10" x2="10" y2="70" stroke="#2D3748" stroke-width="2"/> <line x1="10" y1="70" x2="90" y2="70" stroke="#2D3748" stroke-width="2"/> <rect x="20" y="30" width="15" height="40" fill="#0BC5EA"/>
+                        <rect x="45" y="10" width="15" height="60" fill="#0BC5EA"/>
+                        <rect x="70" y="50" width="15" height="20" fill="#0BC5EA"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>📈 Gráfico de Linhas</h3>
+                <div class="visual-row">
+                    <div>
+                        <p>Mostra como algo muda <strong>ao longo do tempo</strong>.</p>
+                        <p style="font-size:0.9rem; margin-top:5px;">Ex: Temperatura durante a semana.</p>
+                    </div>
+                    <svg class="visual-svg" width="100" height="80" viewBox="0 0 100 80" fill="none" stroke="none">
+                        <line x1="10" y1="10" x2="10" y2="70" stroke="#2D3748" stroke-width="2"/>
+                        <line x1="10" y1="70" x2="90" y2="70" stroke="#2D3748" stroke-width="2"/>
+                        
+                        <polyline points="10,60 30,40 50,50 70,20 90,30" fill="none" stroke="#0BC5EA" stroke-width="3"/>
+                        <circle cx="30" cy="40" r="3" fill="#0987A0"/>
+                        <circle cx="50" cy="50" r="3" fill="#0987A0"/>
+                        <circle cx="70" cy="20" r="3" fill="#0987A0"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>📋 Tabelas</h3>
+                <p>Organizam os dados em <strong>Linhas e Colunas</strong>.</p>
+                <div class="question-visual" style="padding:10px;">
+                    <table style="width:100%; font-size:0.8rem; border-collapse: collapse;">
+                        <tr style="background:#0BC5EA; color:white;">
+                            <th style="padding:5px;">Fruta</th>
+                            <th style="padding:5px;">Votos</th>
+                        </tr>
+                        <tr style="border-bottom:1px solid #ccc;">
+                            <td style="padding:5px; text-align:center;">Maçã</td>
+                            <td style="padding:5px; text-align:center;">10</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:5px; text-align:center;">Banana</td>
+                            <td style="padding:5px; text-align:center;">15</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Analise os gráficos e responda.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Simulado Finalizado!</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente! Você sabe interpretar dados como ninguém.</p>
+            </div>
+            <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Simulado</button>
+            <button onclick="setMode('explanation')" style="margin-top:15px; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                ⬅ Voltar para o Assunto
+            </button>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (GRÁFICOS E TABELAS) ---
+        const questions = [
+            // NÍVEL 1: CONCEITOS BÁSICOS
+            {
+                id: 1,
+                text: "Para que serve o <strong>Título</strong> de um gráfico?",
+                options: ["Para deixar bonito", "Para informar o assunto do gráfico", "Para mostrar a data", "Para assinar o nome", "Não serve para nada"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> O título é a primeira coisa que lemos. Ele diz sobre O QUE são aqueles dados (ex: 'Frutas Preferidas').</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> A função principal é informativa, não estética.</div>`
+            },
+            {
+                id: 2,
+                text: "Em um gráfico de colunas, o eixo horizontal (deitado) geralmente mostra:",
+                options: ["As quantidades", "As categorias (nomes)", "O título", "A fonte", "As cores"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> No eixo horizontal (X) ficam as opções (ex: Maçã, Banana). As quantidades ficam no eixo vertical (Y).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Quantidades (números) costumam ficar na vertical em gráficos de colunas.</div>`
+            },
+            {
+                id: 3,
+                text: "Qual gráfico é melhor para mostrar o crescimento de uma planta dia após dia?",
+                options: ["Gráfico de Pizza", "Gráfico de Linhas", "Tabela", "Mapa", "Gráfico de Barras"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Gráficos de <strong>Linha</strong> são ideais para mostrar evolução ou mudança ao longo do tempo.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Pizza é para partes de um todo. Barras é para comparação entre itens diferentes.</div>`
+            },
+            // NÍVEL 2: LEITURA DE GRÁFICO DE COLUNAS
+            {
+                id: 4,
+                text: "Observe o gráfico de 'Livros Lidos'. Quantos livros a <strong>Ana</strong> leu?",
+                visual: `
+                    <svg width="200" height="150" viewBox="0 0 200 150" fill="none" stroke="none">
+                        <line x1="30" y1="10" x2="30" y2="120" stroke="#2D3748" stroke-width="2"/>
+                        <line x1="30" y1="120" x2="190" y2="120" stroke="#2D3748" stroke-width="2"/>
+                        <line x1="30" y1="80" x2="190" y2="80" stroke="#ccc" stroke-dasharray="4 4"/>
+                        <text x="5" y="85" font-size="10" fill="#2D3748">4</text>
+                        <line x1="30" y1="40" x2="190" y2="40" stroke="#ccc" stroke-dasharray="4 4"/>
+                        <text x="5" y="45" font-size="10" fill="#2D3748">8</text>
+                        <rect x="40" y="40" width="30" height="80" fill="#0BC5EA"/> <text x="45" y="135" font-size="10" fill="#2D3748">Ana</text>
+                        
+                        <rect x="90" y="70" width="30" height="50" fill="#0BC5EA"/> <text x="95" y="135" font-size="10" fill="#2D3748">Bia</text>
+                        
+                        <rect x="140" y="90" width="30" height="30" fill="#0BC5EA"/> <text x="145" y="135" font-size="10" fill="#2D3748">Leo</text>
+                    </svg>
+                `,
+                options: ["4", "5", "8", "10", "3"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A coluna da Ana sobe até a linha marcada com o número <strong>8</strong>.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 5 seria a Bia (aprox). 3 seria o Leo.</div>`
+            },
+            {
+                id: 5,
+                text: "No mesmo gráfico, quem leu <strong>menos</strong> livros?",
+                visual: `
+                    <svg width="200" height="150" viewBox="0 0 200 150" fill="none" stroke="none">
+                        <line x1="30" y1="10" x2="30" y2="120" stroke="#2D3748" stroke-width="2"/>
+                        <line x1="30" y1="120" x2="190" y2="120" stroke="#2D3748" stroke-width="2"/>
+                        <line x1="30" y1="80" x2="190" y2="80" stroke="#ccc" stroke-dasharray="4 4"/>
+                        <text x="5" y="85" font-size="10" fill="#2D3748">4</text>
+                        <line x1="30" y1="40" x2="190" y2="40" stroke="#ccc" stroke-dasharray="4 4"/>
+                        <text x="5" y="45" font-size="10" fill="#2D3748">8</text>
+                        <rect x="40" y="40" width="30" height="80" fill="#0BC5EA"/> <text x="45" y="135" font-size="10" fill="#2D3748">Ana</text>
+                        <rect x="90" y="70" width="30" height="50" fill="#0BC5EA"/> <text x="95" y="135" font-size="10" fill="#2D3748">Bia</text>
+                        <rect x="140" y="90" width="30" height="30" fill="#0BC5EA"/> <text x="145" y="135" font-size="10" fill="#2D3748">Leo</text>
+                    </svg>
+                `,
+                options: ["Ana", "Bia", "Leo", "Todos leram igual", "Ninguém"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A coluna do <strong>Leo</strong> é a mais baixa de todas (apenas 3 livros).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Ana tem a coluna mais alta.</div>`
+            },
+            {
+                id: 6,
+                text: "Quantos livros Ana e Leo leram <strong>juntos</strong>?",
+                visual: `
+                    <svg width="200" height="150" viewBox="0 0 200 150" fill="none" stroke="none">
+                        <line x1="30" y1="10" x2="30" y2="120" stroke="#2D3748" stroke-width="2"/>
+                        <line x1="30" y1="120" x2="190" y2="120" stroke="#2D3748" stroke-width="2"/>
+                        <line x1="30" y1="80" x2="190" y2="80" stroke="#ccc" stroke-dasharray="4 4"/>
+                        <text x="5" y="85" font-size="10" fill="#2D3748">4</text>
+                        <line x1="30" y1="40" x2="190" y2="40" stroke="#ccc" stroke-dasharray="4 4"/>
+                        <text x="5" y="45" font-size="10" fill="#2D3748">8</text>
+                        <rect x="40" y="40" width="30" height="80" fill="#0BC5EA"/> 
+                        <text x="45" y="135" font-size="10" fill="#2D3748">Ana</text>
+                        <rect x="90" y="70" width="30" height="50" fill="#0BC5EA"/> 
+                        <text x="95" y="135" font-size="10" fill="#2D3748">Bia</text>
+                        <rect x="140" y="90" width="30" height="30" fill="#0BC5EA"/> 
+                        <text x="145" y="135" font-size="10" fill="#2D3748">Leo</text>
+                    </svg>
+                `,
+                options: ["8", "10", "11", "12", "15"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Ana leu 8. Leo leu 3. Soma: 8 + 3 = 11.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Verifique a altura das colunas com atenção.</div>`
+            },
+            // NÍVEL 3: LEITURA DE TABELA
+            {
+                id: 7,
+                text: "Observe a tabela de preços. Qual item é o mais <strong>caro</strong>?",
+                visual: `
+                    <table style="width:100%; border-collapse:collapse; font-size:0.9rem; background:white;">
+                        <tr style="background:#0BC5EA; color:white;"><th style="padding:5px;">Item</th><th>Preço</th></tr>
+                        <tr><td style="padding:5px; border:1px solid #ccc;">Lápis</td><td style="border:1px solid #ccc; text-align:center;">R$ 2,00</td></tr>
+                        <tr><td style="padding:5px; border:1px solid #ccc;">Caderno</td><td style="border:1px solid #ccc; text-align:center;">R$ 15,00</td></tr>
+                        <tr><td style="padding:5px; border:1px solid #ccc;">Borracha</td><td style="border:1px solid #ccc; text-align:center;">R$ 3,00</td></tr>
+                    </table>
+                `,
+                options: ["Lápis", "Borracha", "Caderno", "Todos iguais", "Nenhum"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> O valor R$ 15,00 (Caderno) é o maior número da coluna 'Preço'.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Lápis é o mais barato (R$ 2,00).</div>`
+            },
+            {
+                id: 8,
+                text: "Se eu comprar um Lápis e uma Borracha, quanto vou gastar?",
+                visual: `
+                    <table style="width:100%; border-collapse:collapse; font-size:0.9rem; background:white;">
+                        <tr style="background:#0BC5EA; color:white;"><th style="padding:5px;">Item</th><th>Preço</th></tr>
+                        <tr><td style="padding:5px; border:1px solid #ccc;">Lápis</td><td style="border:1px solid #ccc; text-align:center;">R$ 2,00</td></tr>
+                        <tr><td style="padding:5px; border:1px solid #ccc;">Caderno</td><td style="border:1px solid #ccc; text-align:center;">R$ 15,00</td></tr>
+                        <tr><td style="padding:5px; border:1px solid #ccc;">Borracha</td><td style="border:1px solid #ccc; text-align:center;">R$ 3,00</td></tr>
+                    </table>
+                `,
+                options: ["R$ 4,00", "R$ 5,00", "R$ 6,00", "R$ 18,00", "R$ 10,00"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Lápis (2,00) + Borracha (3,00) = R$ 5,00.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> R$ 18,00 seria Caderno + Borracha.</div>`
+            },
+            {
+                id: 9,
+                text: "Quantos reais o Caderno custa a mais que a Borracha?",
+                visual: `
+                    <table style="width:100%; border-collapse:collapse; font-size:0.9rem; background:white;">
+                        <tr style="background:#0BC5EA; color:white;"><th style="padding:5px;">Item</th><th>Preço</th></tr>
+                        <tr><td style="padding:5px; border:1px solid #ccc;">Lápis</td><td style="border:1px solid #ccc; text-align:center;">R$ 2,00</td></tr>
+                        <tr><td style="padding:5px; border:1px solid #ccc;">Caderno</td><td style="border:1px solid #ccc; text-align:center;">R$ 15,00</td></tr>
+                        <tr><td style="padding:5px; border:1px solid #ccc;">Borracha</td><td style="border:1px solid #ccc; text-align:center;">R$ 3,00</td></tr>
+                    </table>
+                `,
+                options: ["R$ 10,00", "R$ 13,00", "R$ 12,00", "R$ 15,00", "R$ 18,00"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> É uma subtração (diferença). 15,00 - 3,00 = R$ 12,00.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 18 seria a soma. 13 seria Caderno - Lápis.</div>`
+            },
+            // NÍVEL 4: GRÁFICO DE BARRAS (HORIZONTAL)
+            {
+                id: 10,
+                text: "Este gráfico mostra os 'Animais Preferidos'. Qual animal teve <strong>20 votos</strong>?",
+                visual: `
+                    <svg width="200" height="120" viewBox="0 0 200 120" fill="none" stroke="none">
+                        <text x="5" y="30" font-size="10" fill="#2D3748">Gato</text>
+                        <rect x="40" y="20" width="120" height="15" fill="#0BC5EA"/>
+                        <text x="165" y="30" font-size="10" fill="#2D3748">30</text>
+                        
+                        <text x="5" y="60" font-size="10" fill="#2D3748">Cão</text>
+                        <rect x="40" y="50" width="80" height="15" fill="#0BC5EA"/>
+                        <text x="125" y="60" font-size="10" fill="#2D3748">20</text>
+                        
+                        <text x="5" y="90" font-size="10" fill="#2D3748">Peixe</text>
+                        <rect x="40" y="80" width="40" height="15" fill="#0BC5EA"/>
+                        <text x="85" y="90" font-size="10" fill="#2D3748">10</text>
+                    </svg>
+                `,
+                options: ["Gato", "Cão", "Peixe", "Todos", "Nenhum"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A barra do 'Cão' vai até o número 20 ou tem o rótulo 20 na frente.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Gato teve 30. Peixe teve 10.</div>`
+            },
+            {
+                id: 11,
+                text: "Quantos votos o Gato teve a mais que o Peixe?",
+                visual: `
+                    <svg width="200" height="120" viewBox="0 0 200 120" fill="none" stroke="none">
+                        <text x="5" y="30" font-size="10" fill="#2D3748">Gato</text>
+                        <rect x="40" y="20" width="120" height="15" fill="#0BC5EA"/>
+                        <text x="165" y="30" font-size="10" fill="#2D3748">30</text>
+                        <text x="5" y="60" font-size="10" fill="#2D3748">Cão</text>
+                        <rect x="40" y="50" width="80" height="15" fill="#0BC5EA"/>
+                        <text x="125" y="60" font-size="10" fill="#2D3748">20</text>
+                        <text x="5" y="90" font-size="10" fill="#2D3748">Peixe</text>
+                        <rect x="40" y="80" width="40" height="15" fill="#0BC5EA"/>
+                        <text x="85" y="90" font-size="10" fill="#2D3748">10</text>
+                    </svg>
+                `,
+                options: ["10", "20", "30", "40", "5"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Gato (30) - Peixe (10) = 20 votos de diferença.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 10 é o total do peixe. 30 é o total do gato.</div>`
+            },
+            {
+                id: 12,
+                text: "Qual foi o total de votos da pesquisa?",
+                visual: `
+                    <svg width="200" height="120" viewBox="0 0 200 120" fill="none" stroke="none">
+                        <text x="5" y="30" font-size="10" fill="#2D3748">Gato</text>
+                        <rect x="40" y="20" width="120" height="15" fill="#0BC5EA"/>
+                        <text x="165" y="30" font-size="10" fill="#2D3748">30</text>
+                        <text x="5" y="60" font-size="10" fill="#2D3748">Cão</text>
+                        <rect x="40" y="50" width="80" height="15" fill="#0BC5EA"/>
+                        <text x="125" y="60" font-size="10" fill="#2D3748">20</text>
+                        <text x="5" y="90" font-size="10" fill="#2D3748">Peixe</text>
+                        <rect x="40" y="80" width="40" height="15" fill="#0BC5EA"/>
+                        <text x="85" y="90" font-size="10" fill="#2D3748">10</text>
+                    </svg>
+                `,
+                options: ["30", "50", "60", "70", "40"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Soma tudo: 30 (Gato) + 20 (Cão) + 10 (Peixe) = 60 votos.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Erro de soma.</div>`
+            },
+            // NÍVEL 5: GRÁFICO DE LINHAS (TENDÊNCIA)
+            {
+                id: 13,
+                text: "Este gráfico mostra a temperatura durante 3 dias. Em qual dia fez mais calor?",
+                visual: `
+                    <svg width="200" height="100" viewBox="0 0 200 100" fill="none" stroke="none">
+                        <line x1="30" y1="10" x2="30" y2="80" stroke="#ccc"/>
+                        <line x1="30" y1="80" x2="190" y2="80" stroke="#ccc"/>
+                        
+                        <polyline points="40,60 90,20 140,50" fill="none" stroke="#0BC5EA" stroke-width="3"/>
+                        
+                        <circle cx="40" cy="60" r="3" fill="#0987A0"/> <text x="40" y="95" font-size="10" text-anchor="middle" fill="#2D3748">Dia 1</text>
+                        
+                        <circle cx="90" cy="20" r="3" fill="#E53E3E"/> <text x="90" y="95" font-size="10" text-anchor="middle" fill="#2D3748">Dia 2</text>
+                        
+                        <circle cx="140" cy="50" r="3" fill="#0987A0"/> <text x="140" y="95" font-size="10" text-anchor="middle" fill="#2D3748">Dia 3</text>
+                    </svg>
+                `,
+                options: ["Dia 1", "Dia 2", "Dia 3", "Foi igual", "Não dá para saber"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> O ponto mais alto do gráfico está no <strong>Dia 2</strong>. Quanto mais alto o ponto, maior a temperatura.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Dia 1 está baixo. Dia 3 caiu um pouco.</div>`
+            },
+            {
+                id: 14,
+                text: "O que aconteceu com a temperatura do Dia 2 para o Dia 3?",
+                visual: `
+                    <svg width="200" height="100" viewBox="0 0 200 100" fill="none" stroke="none">
+                        <polyline points="40,60 90,20 140,50" fill="none" stroke="#0BC5EA" stroke-width="3"/>
+                        <circle cx="90" cy="20" r="3" fill="#E53E3E"/>
+                        <circle cx="140" cy="50" r="3" fill="#0987A0"/>
+                        <text x="90" y="95" font-size="10" text-anchor="middle" fill="#2D3748">Dia 2</text>
+                        <text x="140" y="95" font-size="10" text-anchor="middle" fill="#2D3748">Dia 3</text>
+                    </svg>
+                `,
+                options: ["Subiu", "Desceu", "Ficou igual", "Zerou", "Dobrou"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A linha inclinou para <strong>baixo</strong>. Isso significa que a temperatura caiu (diminuiu).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Se subisse, a linha iria para o alto.</div>`
+            },
+            {
+                id: 15,
+                text: "Se no Dia 1 estava 20°C e no Dia 2 foi para 30°C, quanto aumentou?",
+                visual: `
+                    <svg width="200" height="100" viewBox="0 0 200 100" fill="none" stroke="none">
+                        <text x="40" y="50" font-size="10" text-anchor="middle" fill="#2D3748">20°</text>
+                        <text x="90" y="15" font-size="10" text-anchor="middle" fill="#2D3748">30°</text>
+                        <polyline points="40,60 90,20 140,50" fill="none" stroke="#0BC5EA" stroke-width="3"/>
+                        <circle cx="40" cy="60" r="3" fill="#0987A0"/>
+                        <circle cx="90" cy="20" r="3" fill="#E53E3E"/>
+                    </svg>
+                `,
+                options: ["5°C", "10°C", "20°C", "30°C", "50°C"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> 30 - 20 = 10. A temperatura aumentou 10 graus.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 50 seria a soma. 5 seria metade.</div>`
+            }
+        ];
+
+        // --- ESTADO DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        // --- NAVEGAÇÃO ENTRE ABAS ---
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // --- RENDERIZAÇÃO DO QUIZ ---
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.95rem; line-height: 1.5;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            // Verifica se tem imagem visual na questão
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; // Já respondeu
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#276749"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        function finishQuiz() {
+            score = 0;
+            userAnswers.forEach((ans, idx) => {
+                if (ans === questions[idx].correct) score++;
+            });
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            if (percent === 100) { stars = "⭐⭐⭐⭐⭐"; msg = "Perfeito! Você é um mestre!"; }
+            else if (percent >= 80) { stars = "⭐⭐⭐⭐"; msg = "Muito bom! Quase gabaritou."; }
+            else if (percent >= 60) { stars = "⭐⭐⭐"; msg = "Bom trabalho. Continue praticando."; }
+            else if (percent >= 40) { stars = "⭐⭐"; msg = "Você pode melhorar. Revise a explicação."; }
+            else { stars = "⭐"; msg = "Não desista! Leia a explicação e tente de novo."; }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+
+            if (percent >= 60) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

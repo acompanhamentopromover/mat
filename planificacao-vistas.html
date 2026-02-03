@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planificação e Vistas - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA AZUL ÍNDIGO (Blueprint/Projeto) */
+            --theme-color: #C3DAFE; 
+            --theme-active: #4C51BF; 
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR (ERRO) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- LOGO --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--theme-active);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO --- */
+        .section-view {
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: center; gap: 15px; justify-content: space-between; }
+        .visual-svg { color: var(--theme-active); flex-shrink: 0; }
+        /* Estilo para SVGs dentro das questões */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #EBF4FF;
+            border-radius: 12px;
+            border: 1px dashed var(--theme-active);
+        }
+
+        .example-box {
+            background-color: #EBF4FF; /* Índigo muito claro */
+            border-left: 5px solid #4C51BF;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .example-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #3C366B;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* --- QUIZ MAPA --- */
+        .question-map {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-active);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        /* --- OPÇÕES --- */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK DETALHADO --- */
+        .feedback-box {
+            display: block; 
+            margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- TELA DE RESULTADO --- */
+        #viewResult {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+
+        .btn-retry {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--theme-active);
+            color: white;
+            border: 2px solid black;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px black;
+            transition: transform 0.1s;
+        }
+        
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- RODAPÉ FIXO --- */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            border-top: 2px solid var(--border-color);
+            padding: 15px 20px;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="6ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Planificação e Vistas</h1>
+            <p style="color: #555; margin-bottom: 20px;">Vamos aprender a "desembrulhar" objetos 3D e a olhar para eles de diferentes ângulos.</p>
+            
+            <div class="card-content">
+                <h3>📦 Planificação (Desmontar)</h3>
+                <p>Imagine que um sólido geométrico é uma caixa de papelão. A <strong>planificação</strong> é quando abrimos essa caixa e a deixamos totalmente reta no chão.</p>
+                
+                <div class="visual-row example-box" style="flex-direction: column; align-items: center; text-align: center;">
+                    <div style="margin-bottom: 10px;">
+                        <span class="example-tag">Exemplo: O Cubo</span>
+                        <p style="font-size:0.9rem;">Se abrirmos um cubo, ele vira uma figura plana formada por 6 quadrados.</p>
+                    </div>
+                    <svg class="visual-svg" width="200" height="100" viewBox="0 0 200 100" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <g transform="translate(20, 30) scale(0.6)">
+                             <path d="M25 25 H75 V75 H25 Z" fill="rgba(76, 81, 191, 0.2)"/>
+                             <path d="M25 25 L40 10 H90 V60 L75 75"/>
+                             <path d="M90 10 L75 25"/>
+                             <path d="M90 60 L40 60 L25 75"/>
+                        </g>
+                        <path d="M80 50 H120 M115 45 L120 50 L115 55" stroke="#4C51BF" stroke-width="3"/>
+                        <g transform="translate(130, 10) scale(0.8)">
+                            <rect x="25" y="0" width="25" height="25" fill="rgba(76, 81, 191, 0.2)"/>
+                            <rect x="25" y="25" width="25" height="25" fill="rgba(76, 81, 191, 0.2)"/>
+                            <rect x="25" y="50" width="25" height="25" fill="rgba(76, 81, 191, 0.2)"/>
+                            <rect x="25" y="75" width="25" height="25" fill="rgba(76, 81, 191, 0.2)"/>
+                            <rect x="0" y="25" width="25" height="25" fill="rgba(76, 81, 191, 0.2)"/>
+                            <rect x="50" y="25" width="25" height="25" fill="rgba(76, 81, 191, 0.2)"/>
+                        </g>
+                    </svg>
+                    <p style="font-size:0.8rem; color:#4C51BF; margin-top:5px;">Objeto 3D ➝ Figura Plana 2D</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>👀 Vistas (Olhar de Frente, Cima e Lado)</h3>
+                <p>É como tirar uma foto de um objeto estando exatamente na frente, em cima ou ao lado dele, vendo tudo reto.</p>
+                
+                <div class="visual-row example-box" style="flex-direction: column; align-items: center;">
+                    <div style="margin-bottom: 15px; text-align: center;">
+                        <span class="example-tag">Exemplo: Uma "Escadinha"</span>
+                    </div>
+                    
+                    <svg class="visual-svg" width="240" height="180" viewBox="0 0 240 180" fill="none" stroke="currentColor" stroke-width="2">
+                        <g transform="translate(20, 60) scale(0.7)">
+                            <path d="M0 60 H60 V30 H30 V0 H0 Z" fill="rgba(76, 81, 191, 0.3)"/> <path d="M0 0 L20 -20 H50 L30 0 Z" fill="rgba(76, 81, 191, 0.1)"/> <path d="M30 30 L50 10 H80 L60 30 Z" fill="rgba(76, 81, 191, 0.1)"/> <path d="M60 60 L80 40 V10 L60 30 Z" fill="rgba(76, 81, 191, 0.2)"/> <path d="M30 30 V60" stroke-dasharray="4 4"/> </g>
+                        
+                        <text x="15" y="130" font-size="10" fill="#4C51BF">Frente ➝</text>
+                        <text x="50" y="35" font-size="10" fill="#4C51BF">Try ⬇</text>
+                        
+                        <g transform="translate(130, 120)">
+                             <rect x="0" y="0" width="20" height="20" fill="rgba(76, 81, 191, 0.3)"/>
+                             <rect x="20" y="0" width="20" height="20" fill="rgba(76, 81, 191, 0.3)"/>
+                             <rect x="0" y="-20" width="20" height="20" fill="rgba(76, 81, 191, 0.3)"/>
+                             <text x="5" y="35" font-size="10">V. Frente</text>
+                        </g>
+
+                        <g transform="translate(130, 60)">
+                             <rect x="0" y="0" width="20" height="20" fill="rgba(76, 81, 191, 0.1)"/>
+                             <rect x="20" y="0" width="20" height="20" fill="rgba(76, 81, 191, 0.1)"/>
+                             <rect x="0" y="20" width="20" height="20" fill="rgba(76, 81, 191, 0.1)"/>
+                             <text x="5" y="-5" font-size="10">V. Cima</text>
+                        </g>
+                         
+                         <line x1="100" y1="20" x2="100" y2="160" stroke="#ccc" stroke-dasharray="4 4"/>
+                    </svg>
+                </div>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Use sua imaginação espacial. Observe as imagens!</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Simulado Finalizado!</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente! Você tem uma ótima visão espacial.</p>
+            </div>
+            <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Simulado</button>
+            <button onclick="setMode('explanation')" style="margin-top:15px; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                ⬅ Voltar para o Assunto
+            </button>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (PLANIFICAÇÃO E VISTAS) ---
+        const questions = [
+            // NÍVEL 1: CONCEITOS BÁSICOS
+            {
+                id: 1,
+                text: "O que significa fazer a <strong>planificação</strong> de um sólido geométrico?",
+                options: ["Desenhar suas vistas", "Desmontar e 'esticar' suas faces em um plano", "Calcular seu volume", "Cortar ele ao meio", "Pintar suas faces"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Planificar é transformar um objeto 3D em uma figura 2D, como se abríssemos uma caixa de papelão e a deixássemos reta no chão.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Vistas são outra coisa (olhar de frente/cima).</div>`
+            },
+            {
+                id: 2,
+                text: "Como chamamos a vista de um objeto quando olhamos para ele exatamente <strong>de cima</strong> para baixo?",
+                options: ["Vista Frontal", "Vista Lateral", "Vista Superior (ou Planta)", "Vista Inferior", "Perspectiva"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Olhar de cima é a Vista Superior, também muito usada em arquitetura como "Planta Baixa".</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Frontal é de frente. Lateral é de lado.</div>`
+            },
+            {
+                id: 3,
+                text: "Se a planificação de um sólido é formada por 6 quadrados iguais, que sólido é esse?",
+                options: ["Pirâmide", "Cilindro", "Cubo", "Paralelepípedo", "Cone"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> O Cubo (dado) é o único sólido formado por exatamente 6 faces quadradas idênticas.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Pirâmide tem triângulos. Cilindro tem círculos.</div>`
+            },
+            // NÍVEL 2: IDENTIFICAR PLANIFICAÇÕES (COM VISUAL)
+            {
+                id: 4,
+                text: "Observe a planificação abaixo. A qual sólido ela pertence?",
+                visual: `
+                    <svg width="120" height="80" viewBox="0 0 120 80" fill="none" stroke="#4C51BF" stroke-width="2">
+                        <rect x="30" y="20" width="60" height="40" fill="rgba(76, 81, 191, 0.2)"/> <circle cx="15" cy="40" r="15" fill="rgba(76, 81, 191, 0.2)"/> <circle cx="105" cy="40" r="15" fill="rgba(76, 81, 191, 0.2)"/> </svg>
+                `,
+                options: ["Cone", "Cilindro", "Prisma", "Esfera", "Pirâmide"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Temos um retângulo grande (o corpo da lata aberto) e dois círculos (as tampas de cima e de baixo). Isso forma um <strong>Cilindro</strong>.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> O cone teria um formato de "leque" e apenas um círculo.</div>`
+            },
+            {
+                id: 5,
+                text: "Esta planificação, com um quadrado no centro e 4 triângulos em volta, forma qual sólido?",
+                visual: `
+                    <svg width="100" height="100" viewBox="0 0 100 100" fill="none" stroke="#4C51BF" stroke-width="2">
+                        <rect x="35" y="35" width="30" height="30" fill="rgba(76, 81, 191, 0.2)"/> <path d="M35 35 L50 5 L65 35 Z" /> <path d="M35 65 L50 95 L65 65 Z" /> <path d="M35 35 L5 50 L35 65 Z" /> <path d="M65 35 L95 50 L65 65 Z" /> </svg>
+                `,
+                options: ["Prisma Quadrangular", "Cubo", "Pirâmide de base Triangular", "Pirâmide de base Quadrada", "Tetraedro"],
+                correct: 3,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Há uma base quadrada e 4 triângulos que vão se fechar formando uma ponta. É uma <strong>Pirâmide de base Quadrada</strong>.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Prisma teria 2 bases. Tetraedro teria 4 faces triangulares no total.</div>`
+            },
+            {
+                id: 6,
+                text: "Quantos quadrados formam a planificação de um Cubo?",
+                options: ["4", "5", "6", "7", "8"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> O cubo tem 6 faces (frente, trás, cima, baixo, esquerda, direita). Sua planificação deve ter <strong>6 quadrados</strong>.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Qualquer número diferente de 6 não fecha um cubo.</div>`
+            },
+            // NÍVEL 3: IDENTIFICAR VISTAS (COM VISUAL)
+            {
+                id: 7,
+                text: "Observe a peça feita de cubinhos. Se você olhar ela de <strong>FRENTE</strong> (onde aponta a seta), que formato você vê?",
+                visual: `
+                    <svg width="120" height="100" viewBox="0 0 120 100" fill="none" stroke="#4C51BF" stroke-width="2">
+                        <g transform="translate(40, 20) scale(0.8)">
+                            <path d="M0 60 H60 V30 H30 V0 H0 Z" fill="rgba(76, 81, 191, 0.4)"/> <path d="M60 60 L80 40 V10 L60 30 Z" fill="rgba(76, 81, 191, 0.2)"/> <path d="M0 0 L20 -20 H50 L30 0 Z" fill="rgba(76, 81, 191, 0.1)"/> <path d="M30 30 L50 10 H80 L60 30 Z" fill="rgba(76, 81, 191, 0.1)"/> </g>
+                        <path d="M20 80 L50 80 L45 75 M50 80 L45 85" stroke="#E53E3E" stroke-width="3"/>
+                        <text x="5" y="95" fill="#E53E3E" font-size="10" font-weight="bold">FRENTE</text>
+                    </svg>
+                `,
+                options: ["Um quadrado sozinho", "Uma linha reta", "Uma forma de 'L'", "Três quadrados em linha", "Um retângulo"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Olhando de frente, você vê a "parede" frontal da peça, que tem o formato da letra <strong>L</strong>.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Você só veria quadrados em linha se olhasse de lado.</div>`
+            },
+            {
+                id: 8,
+                text: "Se você olhar uma <strong>Lata de Refrigerante</strong> (cilindro) exatamente de <strong>CIMA</strong>, que figura plana você vê?",
+                visual: `
+                    <svg width="60" height="80" viewBox="0 0 60 80" fill="none" stroke="#4C51BF" stroke-width="2" style="margin:0 auto; display:block;">
+                        <ellipse cx="30" cy="15" rx="25" ry="10" fill="rgba(76, 81, 191, 0.4)"/>
+                        <path d="M5 15 V65" />
+                        <path d="M55 15 V65" />
+                        <path d="M5 65 C 5 75, 55 75, 55 65" fill="rgba(76, 81, 191, 0.2)"/>
+                        <path d="M30 -5 L30 10 L25 5 M30 10 L35 5" stroke="#E53E3E" stroke-width="3"/>
+                    </svg>
+                `,
+                options: ["Um quadrado", "Um retângulo", "Um círculo", "Um triângulo", "Uma linha"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A vista superior de um cilindro é a sua tampa, que é um <strong>Círculo</strong>.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Se olhasse de frente, veria um retângulo.</div>`
+            },
+            {
+                id: 9,
+                text: "E se você olhar um <strong>Cone</strong> (chapéu de festa) exatamente de <strong>FRENTE</strong>, o que você vê?",
+                visual: `
+                     <svg width="60" height="80" viewBox="0 0 60 80" fill="none" stroke="#4C51BF" stroke-width="2" style="margin:0 auto; display:block;">
+                        <ellipse cx="30" cy="70" rx="25" ry="10" fill="rgba(76, 81, 191, 0.2)"/>
+                        <path d="M5 70 L30 5 L55 70" fill="rgba(76, 81, 191, 0.4)"/>
+                        <path d="M-10 40 L10 40 L5 35 M10 40 L5 45" stroke="#E53E3E" stroke-width="3"/>
+                    </svg>
+                `,
+                options: ["Um círculo", "Um triângulo", "Um quadrado", "Um ponto", "Um trapézio"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A vista frontal de um cone é a sua silhueta, que forma um <strong>Triângulo</strong>.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Se olhasse de cima, veria um círculo com um ponto no meio.</div>`
+            },
+            // NÍVEL 4: RELACIONAR 3D E 2D
+            {
+                id: 10,
+                text: "Imagine um objeto cuja vista de <strong>Frente</strong> é um quadrado e a vista de <strong>Lado</strong> também é um quadrado idêntico. Que objeto pode ser?",
+                options: ["Uma esfera", "Um cilindro", "Um cubo", "Uma pirâmide", "Um cone"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> O <strong>Cubo</strong> parece um quadrado não importa se você olha de frente, de lado ou de cima.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Um cilindro teria vista frontal retangular.</div>`
+            },
+            {
+                id: 11,
+                text: "Ao planificar (abrir) a lateral de um <strong>Cilindro</strong>, que forma geométrica obtemos?",
+                visual: `
+                    <svg width="100" height="50" viewBox="0 0 100 50" fill="none" stroke="#4C51BF" stroke-width="2" style="margin:0 auto; display:block;">
+                        <path d="M10 10 V40" stroke-dasharray="4 4"/> <rect x="20" y="10" width="70" height="30" fill="rgba(76, 81, 191, 0.2)"/>
+                        <path d="M80 25 L10 25 L15 20 M10 25 L15 30" stroke="#E53E3E" transform="translate(5,0)"/> </svg>
+                `,
+                options: ["Um círculo", "Um triângulo", "Um retângulo", "Um quadrado", "Uma elipse"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Se você cortar o rótulo de uma lata e esticá-lo, ele vira um <strong>Retângulo</strong>.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Os círculos são as tampas, não a lateral.</div>`
+            },
+            {
+                id: 12,
+                text: "Um cone é planificado em um círculo (a base) e uma outra forma que parece um leque. Essa forma de leque é parte de qual figura?",
+                options: ["De um quadrado", "De um triângulo", "De um círculo maior (setor circular)", "De um retângulo", "De um pentágono"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A lateral do cone, quando aberta, parece uma fatia de pizza ou um leque, que matematicamente chamamos de <strong>setor circular</strong> (uma parte de um círculo).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Não é um triângulo perfeito porque a base é curva.</div>`
+            },
+            // NÍVEL 5: DESAFIOS DE VISUALIZAÇÃO
+            {
+                id: 13,
+                text: "Observe esta estrutura em forma de pódio. Qual das opções representa a sua vista de <strong>CIMA</strong>?",
+                visual: `
+                    <svg width="150" height="100" viewBox="0 0 150 100" fill="none" stroke="#4C51BF" stroke-width="2">
+                        <g transform="translate(30, 20) scale(0.6)">
+                             <path d="M50 50 H100 V100 H50 Z" fill="rgba(76, 81, 191, 0.4)"/> <path d="M100 20 H150 V100 H100 Z" fill="rgba(76, 81, 191, 0.3)"/> <path d="M0 70 H50 V100 H0 Z" fill="rgba(76, 81, 191, 0.5)"/> <path d="M50 50 L70 30 H120 L100 50 Z" fill="rgba(76, 81, 191, 0.2)"/> <path d="M100 20 L120 0 H170 L150 20 Z" fill="rgba(76, 81, 191, 0.1)"/> <path d="M0 70 L20 50 H70 L50 70 Z" fill="rgba(76, 81, 191, 0.3)"/> </g>
+                         <path d="M75 0 L75 15 L70 10 M75 15 L80 10" stroke="#E53E3E" stroke-width="3"/>
+                    </svg>
+                `,
+                options: ["Três quadrados em escada", "Três retângulos lado a lado", "Um retângulo grande", "Uma forma de 'L'", "Um quadrado só"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Olhando de cima, você não vê a altura dos degraus. Você vê apenas os topos dos três blocos alinhados lado a lado, formando <strong>três retângulos</strong> (ou quadrados, dependendo da profundidade).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> A diferença de altura só é visível de frente.</div>`
+            },
+            {
+                id: 14,
+                text: "A planificação abaixo (3 retângulos e 2 triângulos) forma um Prisma Triangular. Quantas <strong>FACES</strong> esse sólido terá quando montado?",
+                visual: `
+                    <svg width="120" height="100" viewBox="0 0 120 100" fill="none" stroke="#4C51BF" stroke-width="2">
+                        <rect x="40" y="10" width="40" height="80" fill="rgba(76, 81, 191, 0.2)"/> <rect x="0" y="10" width="40" height="80" fill="rgba(76, 81, 191, 0.2)"/> <rect x="80" y="10" width="40" height="80" fill="rgba(76, 81, 191, 0.2)"/> <path d="M40 10 L80 10 L60 -15 Z" fill="rgba(76, 81, 191, 0.3)"/> <path d="M40 90 L80 90 L60 115 Z" fill="rgba(76, 81, 191, 0.3)"/> </svg>
+                `,
+                options: ["4", "5", "6", "8", "3"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> É só contar as partes da planificação! São 3 retângulos + 2 triângulos = <strong>5 faces</strong> no total.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 6 faces seria um cubo ou paralelepípedo.</div>`
+            },
+            {
+                id: 15,
+                text: "Se eu olhar um livro fino em pé sobre a mesa, exatamente de CIMA, o que eu vejo?",
+                options: ["A capa do livro (um retângulo grande)", "Um quadrado", "Uma linha reta (ou um retângulo muito fino)", "A lombada do livro", "Nada"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Olhando de cima de um livro em pé, você vê apenas a sua espessura, que parece uma <strong>linha reta</strong> ou um retângulo bem fininho.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Você veria a capa se olhasse de lado. Veria a lombada se olhasse de frente.</div>`
+            }
+        ];
+
+        // --- ESTADO DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        // --- NAVEGAÇÃO ENTRE ABAS ---
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // --- RENDERIZAÇÃO DO QUIZ ---
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.95rem; line-height: 1.5;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            // Verifica se tem imagem visual na questão
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; // Já respondeu
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#276749"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        function finishQuiz() {
+            score = 0;
+            userAnswers.forEach((ans, idx) => {
+                if (ans === questions[idx].correct) score++;
+            });
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            if (percent === 100) { stars = "⭐⭐⭐⭐⭐"; msg = "Perfeito! Você é um mestre!"; }
+            else if (percent >= 80) { stars = "⭐⭐⭐⭐"; msg = "Muito bom! Quase gabaritou."; }
+            else if (percent >= 60) { stars = "⭐⭐⭐"; msg = "Bom trabalho. Continue praticando."; }
+            else if (percent >= 40) { stars = "⭐⭐"; msg = "Você pode melhorar. Revise a explicação."; }
+            else { stars = "⭐"; msg = "Não desista! Leia a explicação e tente de novo."; }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+
+            if (percent >= 60) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

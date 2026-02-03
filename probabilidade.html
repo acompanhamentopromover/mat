@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Probabilidade - Detalhado</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA VIOLETA (Previsão/Lógica) */
+            --theme-color: #EDE9FE; 
+            --theme-active: #7C3AED; 
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR (ERRO) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- LOGO --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--theme-active);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO --- */
+        .section-view {
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: center; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+        .visual-svg { color: var(--theme-active); }
+        
+        /* Estilo para SVGs dentro das questões */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #EDE9FE;
+            border-radius: 12px;
+            border: 1px dashed var(--theme-active);
+        }
+
+        /* --- CARDS DE EXEMPLO DETALHADO --- */
+        .step-box {
+            background-color: #F5F3FF; 
+            border-left: 5px solid #7C3AED;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .step-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #5B21B6;
+            margin-bottom: 10px;
+            display: block;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        .math-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-family: monospace;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .math-comment {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.8rem;
+            color: #555;
+            margin-left: 10px;
+            font-style: italic;
+            background: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .highlight {
+            color: #7C3AED;
+            font-weight: 700;
+            background-color: #DDD6FE;
+            padding: 0 4px;
+            border-radius: 4px;
+        }
+
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            text-align: center;
+            vertical-align: middle;
+            margin: 0 5px;
+        }
+        .fraction span:first-child { border-bottom: 1px solid #000; }
+
+        /* --- QUIZ MAPA --- */
+        .question-map {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-active);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        /* --- OPÇÕES --- */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK DETALHADO --- */
+        .feedback-box {
+            display: block; 
+            margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- TELA DE RESULTADO --- */
+        #viewResult {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+
+        .btn-retry {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--theme-active);
+            color: white;
+            border: 2px solid black;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px black;
+            transition: transform 0.1s;
+        }
+        
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- RODAPÉ FIXO --- */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            border-top: 2px solid var(--border-color);
+            padding: 15px 20px;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="8ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Probabilidade</h1>
+            <p style="color: #555; margin-bottom: 20px;">Probabilidade é a matemática que mede a "chance" de algo acontecer. Quanto mais próximo de 100%, maior a certeza.</p>
+            
+            
+
+[Image of probability formula]
+
+
+            <div class="card-content">
+                <h3>1. A Fórmula Mágica</h3>
+                <div style="display:flex; align-items:center; justify-content:center; gap:20px; margin:20px 0;">
+                    <div style="font-size:2.5rem; font-weight:800; color:#7C3AED;">P = </div>
+                    <div class="fraction" style="font-size:1.5rem;">
+                        <span style="color:#059669; font-weight:700;">O que eu quero</span>
+                        <span style="color:#555; font-weight:700;">Tudo que é possível</span>
+                    </div>
+                </div>
+                <p class="explanation-text" style="text-align:center;">Ou matematicamente: Casos Favoráveis / Espaço Amostral.</p>
+            </div>
+
+            <div class="card-content">
+                <h3>2. Exemplo: Jogando um Dado</h3>
+                
+                <div class="visual-row">
+                    <svg width="60" height="60" viewBox="0 0 60 60">
+                        <rect x="5" y="5" width="50" height="50" rx="10" ry="10" fill="white" stroke="#333" stroke-width="2"/>
+                        <circle cx="15" cy="15" r="4" fill="#333"/> <circle cx="45" cy="15" r="4" fill="#333"/>
+                        <circle cx="15" cy="30" r="4" fill="#333"/> <circle cx="45" cy="30" r="4" fill="#333"/>
+                        <circle cx="15" cy="45" r="4" fill="#333"/> <circle cx="45" cy="45" r="4" fill="#333"/>
+                    </svg>
+                </div>
+
+                <div class="step-box">
+                    <span class="step-title">Problema: Chance de sair um número PAR</span>
+                    
+                    <p class="explanation-text"><strong>1. Espaço Amostral (Tudo):</strong></p>
+                    <p class="explanation-text">O dado tem 6 faces: {1, 2, 3, 4, 5, 6}. Total = <span class="highlight">6</span>.</p>
+                    
+                    <p class="explanation-text"><strong>2. Favoráveis (O que eu quero):</strong></p>
+                    <p class="explanation-text">Os pares são: {2, 4, 6}. Total = <span class="highlight">3</span>.</p>
+                    
+                    <p class="explanation-text"><strong>3. Cálculo:</strong></p>
+                    <div class="math-row">P = 3 ÷ 6</div>
+                    <div class="math-row">Simplificando: 1/2</div>
+                    <div class="math-row">Decimal: 0,5</div>
+                    <div class="math-row">Porcentagem: <span class="highlight">50%</span></div>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>3. Exemplo: Urna com Bolas</h3>
+                <p class="explanation-text">Uma urna tem 3 bolas vermelhas e 2 azuis.</p>
+                
+                <div class="step-box">
+                    <span class="step-title">Chance de pegar uma bola AZUL</span>
+                    
+                    <p class="explanation-text"><strong>1. Total de Bolas:</strong></p>
+                    <div class="math-row">3 + 2 = <span class="highlight">5 bolas</span></div>
+                    
+                    <p class="explanation-text"><strong>2. Bolas Azuis (Favoráveis):</strong></p>
+                    <div class="math-row"><span class="highlight">2 bolas</span></div>
+                    
+                    <p class="explanation-text"><strong>3. Cálculo:</strong></p>
+                    <div class="math-row">P = 2/5</div>
+                    <div class="math-row">Para virar % multiplique por 100</div>
+                    <div class="math-row">(2 ÷ 5) x 100 = <span class="highlight">40%</span></div>
+                </div>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Calcule as chances.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Resultado</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente!</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (PROBABILIDADE) ---
+        const questions = [
+            // NÍVEL 1: CONCEITOS E MOEDAS
+            {
+                id: 1,
+                text: "O que representa a 'probabilidade' de um evento?",
+                options: ["A certeza absoluta que vai acontecer", "A medida da chance de acontecer", "O número de vezes que aconteceu no passado", "Sempre 50%"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Certeza absoluta é 100%, probabilidade cobre todo o intervalo de 0 a 100%.<br>
+                    <strong>(B) Correta:</strong> É o cálculo matemático que estima a possibilidade de um resultado ocorrer.<br>
+                    <strong>(C) Incorreta:</strong> Isso é estatística histórica.<br>
+                    <strong>(D) Incorreta:</strong> Depende do evento.`
+            },
+            {
+                id: 2,
+                text: "Ao lançar uma moeda honesta, qual a chance de sair 'Cara'?",
+                options: ["100%", "25%", "50%", "10%"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Não é certeza.<br>
+                    <strong>(B) Incorreta:</strong> Baixo.<br>
+                    <strong>(C) Correta:</strong> São 2 lados (Cara, Coroa). Eu quero 1 (Cara). P = 1/2 = 0,5 = 50%.<br>
+                    <strong>(D) Incorreta:</strong> Muito baixo.`
+            },
+            {
+                id: 3,
+                text: "Qual a probabilidade de tirar um número maior que 0 em um dado comum?",
+                options: ["0% (Impossível)", "50%", "100% (Evento Certo)", "10%"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> É possível.<br>
+                    <strong>(B) Incorreta:</strong> É mais que isso.<br>
+                    <strong>(C) Correta:</strong> Os números são {1,2,3,4,5,6}. Todos são maiores que 0. Quando todos os casos servem, é 100%.<br>
+                    <strong>(D) Incorreta:</strong> Errado.`
+            },
+            // NÍVEL 2: DADOS (ESPAÇO AMOSTRAL)
+            {
+                id: 4,
+                text: "No lançamento de um dado, qual a chance de sair o número 5?",
+                options: ["1/6", "5/6", "1/5", "50%"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Só existe um número '5' no dado. O total de lados é 6. Logo, 1 sobre 6 (1/6).<br>
+                    <strong>(B) Incorreta:</strong> Isso seria a chance de NÃO sair 5.<br>
+                    <strong>(C) Incorreta:</strong> Confundiu o número com a quantidade.<br>
+                    <strong>(D) Incorreta:</strong> Errado.`
+            },
+            {
+                id: 5,
+                text: "No dado, qual a probabilidade de sair um número ÍMPAR?",
+                options: ["10%", "30%", "50%", "60%"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Baixo.<br>
+                    <strong>(B) Incorreta:</strong> Baixo.<br>
+                    <strong>(C) Correta:</strong> Ímpares: {1, 3, 5}. São 3 números favoráveis em 6 totais. 3/6 = 1/2 = 50%.<br>
+                    <strong>(D) Incorreta:</strong> Alto.`
+            },
+            {
+                id: 6,
+                text: "Qual a chance de sair um número MAIOR que 4 no dado?",
+                options: ["2/6 (ou 1/3)", "4/6", "1/6", "5/6"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Maiores que 4 são {5, 6}. São 2 números. Total 6. P = 2/6, simplificando dá 1/3.<br>
+                    <strong>(B) Incorreta:</strong> Isso seria 'menor ou igual a 4'.<br>
+                    <strong>(C) Incorreta:</strong> Só considerou um número.<br>
+                    <strong>(D) Incorreta:</strong> Quase todos.`
+            },
+            // NÍVEL 3: URNAS E BOLAS
+            {
+                id: 7,
+                text: "Urna: 3 bolas verdes e 7 bolas pretas. Total de bolas?",
+                options: ["3", "7", "10", "4"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Só as verdes.<br>
+                    <strong>(B) Incorreta:</strong> Só as pretas.<br>
+                    <strong>(C) Correta:</strong> O Espaço Amostral é a soma de tudo: 3 + 7 = 10 bolas.<br>
+                    <strong>(D) Incorreta:</strong> Subtração?`
+            },
+            {
+                id: 8,
+                text: "Na urna anterior (3 verdes, 7 pretas), qual a chance de pegar uma VERDE?",
+                options: ["30%", "70%", "50%", "10%"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Favoráveis (Verdes) = 3. Total = 10. P = 3/10 = 0,3 = 30%.<br>
+                    <strong>(B) Incorreta:</strong> Chance das pretas.<br>
+                    <strong>(C) Incorreta:</strong> Não é igual.<br>
+                    <strong>(D) Incorreta:</strong> Baixo.`
+            },
+            {
+                id: 9,
+                text: "Uma caixa tem 5 bolas: 4 azuis e 1 vermelha. Chance de pegar a vermelha:",
+                options: ["4/5", "1/5", "1/4", "50%"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Chance da azul.<br>
+                    <strong>(B) Correta:</strong> Só tem 1 vermelha num total de 5. P = 1/5.<br>
+                    <strong>(C) Incorreta:</strong> Ignorou a própria vermelha no total.<br>
+                    <strong>(D) Incorreta:</strong> Errado.`
+            },
+            // NÍVEL 4: PORCENTAGENS E LÓGICA
+            {
+                id: 10,
+                text: "Se a chance de chover é 20%, qual a chance de NÃO chover?",
+                options: ["20%", "50%", "80%", "100%"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Igual.<br>
+                    <strong>(B) Incorreta:</strong> Meio a meio.<br>
+                    <strong>(C) Correta:</strong> A soma tem que dar 100%. 100% - 20% = 80%. (Evento Complementar).<br>
+                    <strong>(D) Incorreta:</strong> Certeza.`
+            },
+            {
+                id: 11,
+                text: "Sorteando uma letra da palavra AMOR, qual a chance de ser vogal?",
+                options: ["1/4", "2/4 (50%)", "3/4", "4/4"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Só considerou uma.<br>
+                    <strong>(B) Correta:</strong> Vogais: A, O (2 letras). Total: A, M, O, R (4 letras). P = 2/4 = 50%.<br>
+                    <strong>(C) Incorreta:</strong> Exagerado.<br>
+                    <strong>(D) Incorreta:</strong> Todas teriam que ser vogais.`
+            },
+            {
+                id: 12,
+                text: "Em um baralho, qual a chance de tirar um 'Ás' (são 4 Ás em 52 cartas)?",
+                options: ["4/52", "1/52", "13/52", "50%"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Favoráveis = 4. Total = 52. P = 4/52 (que simplifica para 1/13).<br>
+                    <strong>(B) Incorreta:</strong> Só um naipe.<br>
+                    <strong>(C) Incorreta:</strong> Chance de um naipe inteiro.<br>
+                    <strong>(D) Incorreta:</strong> Errado.`
+            },
+            // NÍVEL 5: DESAFIOS E "PELO MENOS"
+            {
+                id: 13,
+                text: "Lançando dois dados, qual a chance da soma ser 2 (1+1)?",
+                options: ["1/36", "2/36", "1/6", "1/12"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> O total de combinações é 6x6=36. Só existe UMA combinação que soma 2: (1, 1). Logo, 1/36.<br>
+                    <strong>(B) Incorreta:</strong> Considerou (1,1) duas vezes.<br>
+                    <strong>(C) Incorreta:</strong> Um dado.<br>
+                    <strong>(D) Incorreta:</strong> Erro.`
+            },
+            {
+                id: 14,
+                text: "Em uma prova de 10 questões, chutei tudo. Qual a chance de acertar todas? (Dificuldade ilustrativa)",
+                options: ["Muito alta", "50%", "Muito baixa", "100%"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Improvável.<br>
+                    <strong>(B) Incorreta:</strong> Não.<br>
+                    <strong>(C) Correta:</strong> A probabilidade é minúscula (se forem 4 alternativas, é (1/4) elevado a 10).<br>
+                    <strong>(D) Incorreta:</strong> Impossível garantir.`
+            },
+            {
+                id: 15,
+                text: "Probabilidade pode ser maior que 100%?",
+                options: ["Sim", "Não, o máximo é 1 (ou 100%)", "Depende do caso", "Só em jogos"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Não existe 'mais que certeza'.<br>
+                    <strong>(B) Correta:</strong> A probabilidade vai de 0 (impossível) até 1 (certeza total). Nunca passa disso.<br>
+                    <strong>(C) Incorreta:</strong> Nunca.<br>
+                    <strong>(D) Incorreta:</strong> Nunca.`
+            }
+        ];
+
+        // --- ESTADO DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        // --- NAVEGAÇÃO ENTRE ABAS ---
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // --- RENDERIZAÇÃO DO QUIZ ---
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.90rem; line-height: 1.6;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            // Verifica se tem imagem visual na questão
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; // Já respondeu
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#7C3AED"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        // --- LÓGICA DE FINALIZAÇÃO E FEEDBACK DETALHADO ---
+        function finishQuiz() {
+            score = 0;
+            let feedbackHTML = '<div style="text-align: left; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">';
+
+            userAnswers.forEach((ans, idx) => {
+                const q = questions[idx];
+                const isCorrect = (ans === q.correct);
+                
+                if (isCorrect) {
+                    score++;
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: #F0FFF4; border-radius: 8px; border-left: 4px solid #48BB78;">
+                            <p style="font-size: 0.9rem;"><strong>Questão ${idx+1}:</strong> ✅ Acertou!</p>
+                        </div>`;
+                } else {
+                    const userAnswerText = q.options[ans];
+                    const correctAnswerText = q.options[q.correct];
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 15px; background: #FFF5F5; border-radius: 8px; border-left: 4px solid #F56565;">
+                            <p style="font-weight: 700; color: #C53030;">Questão ${idx+1}: ${q.text}</p>
+                            <p style="font-size: 0.9rem; margin-top: 5px;">❌ <strong>Você marcou:</strong> ${userAnswerText}</p>
+                            <p style="font-size: 0.9rem;">🎯 <strong>Correto seria:</strong> ${correctAnswerText}</p>
+                            <div style="font-size: 0.85rem; margin-top: 10px; color: #4A5568; background: rgba(255,255,255,0.5); padding: 8px; border-radius: 4px;">
+                                ${q.explanation}
+                            </div>
+                        </div>`;
+                }
+            });
+            feedbackHTML += '</div>';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            let actionButtonsHTML = "";
+
+            // CRITÉRIO DE 80%
+            if (percent >= 80) {
+                stars = "⭐⭐⭐⭐⭐"; 
+                msg = "Parabéns! Você dominou o conteúdo.";
+                actionButtonsHTML = `
+                    <button onclick="window.location.href='8ano-matematica.html'" style="width: 100%; padding: 15px; background-color: #48BB78; color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;">
+                        Concluir Atividade
+                    </button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Voltar para o Assunto
+                    </button>
+                `;
+            } else {
+                stars = "💪 Estude mais"; 
+                msg = `Você fez ${percent}%. Precisa de 80% para passar.`;
+                actionButtonsHTML = `
+                    <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Exercícios</button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Revisar Explicação
+                    </button>
+                `;
+            }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+            
+            // Injeta o feedback detalhado
+            document.getElementById('review-container').innerHTML = feedbackHTML;
+            // Injeta os botões de ação corretos
+            document.getElementById('action-buttons').innerHTML = actionButtonsHTML;
+
+            if (percent >= 80) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            document.getElementById('review-container').innerHTML = ""; // Limpa feedback anterior
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

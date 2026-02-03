@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dízimas Periódicas - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA ESMERALDA (Repetição/Ciclo/Infinito) */
+            --theme-color: #ECFDF5; 
+            --theme-active: #059669; 
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR (ERRO) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- LOGO --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--theme-active);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO --- */
+        .section-view {
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: flex-end; gap: 10px; justify-content: space-around; flex-wrap: wrap; }
+        .visual-item { text-align: center; width: 30%; min-width: 80px; }
+        .visual-svg { color: var(--theme-active); margin-bottom: 5px; }
+        
+        /* Estilo para SVGs dentro das questões */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #ECFDF5;
+            border-radius: 12px;
+            border: 1px dashed var(--theme-active);
+        }
+
+        .example-box {
+            background-color: #F0FDF4; /* Verde muito claro */
+            border-left: 5px solid #059669;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .example-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #047857;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* --- QUIZ MAPA --- */
+        .question-map {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-active);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        /* --- OPÇÕES --- */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK DETALHADO --- */
+        .feedback-box {
+            display: block; 
+            margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- TELA DE RESULTADO --- */
+        #viewResult {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+
+        .btn-retry {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--theme-active);
+            color: white;
+            border: 2px solid black;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px black;
+            transition: transform 0.1s;
+        }
+        
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- RODAPÉ FIXO --- */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            border-top: 2px solid var(--border-color);
+            padding: 15px 20px;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="8ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Dízimas Periódicas</h1>
+            <p style="color: #555; margin-bottom: 20px;">Números decimais infinitos que repetem um padrão lógico. Vamos transformá-los em fração!</p>
+            
+            <div class="card-content">
+                <h3>🔄 O Ciclo Infinito</h3>
+                <p>Uma dízima periódica tem uma parte que se repete para sempre, chamada de <strong>período</strong>.</p>
+                <br>
+                <div class="visual-row">
+                    <div class="visual-item">
+                        <p style="font-size:1.5rem; font-weight:800; color:#059669;">0,333...</p>
+                        <p style="font-size:0.8rem;">Período: 3</p>
+                    </div>
+                    <div class="visual-item">
+                        <p style="font-size:1.5rem; font-weight:800; color:#059669;">1,2525...</p>
+                        <p style="font-size:0.8rem;">Período: 25</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>🍰 Fração Geratriz</h3>
+                <p>Como transformar dízima em fração? Existe um truque rápido:</p>
+                
+                <div class="example-box">
+                    <span class="example-tag">Dízima Simples</span>
+                    <p>O período vai no numerador. No denominador, coloque um <strong>9</strong> para cada algarismo do período.</p>
+                    <p style="font-weight:700; margin-top:5px;">0,777... = 7/9</p>
+                    <p style="font-weight:700; margin-top:5px;">0,1212... = 12/99</p>
+                </div>
+
+                <div class="example-box">
+                    <span class="example-tag">Dízima Composta</span>
+                    <p>Tem um intruso (anti-período) antes da repetição.</p>
+                    <p>0,2333... ➝ (23 - 2) / 90 ➝ 21/90</p>
+                    <p style="font-size:0.8rem;">(Tudo menos o intruso, sobre noves e zeros).</p>
+                </div>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Identifique o período e converta.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Resultado</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente!</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (DÍZIMAS PERIÓDICAS) ---
+        const questions = [
+            // NÍVEL 1: CONCEITO E IDENTIFICAÇÃO
+            {
+                id: 1,
+                text: "O que é o <strong>período</strong> de uma dízima periódica?",
+                options: ["A parte inteira do número", "A parte decimal que não se repete", "A parte decimal que se repete infinitamente", "O número total de casas decimais"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> A parte inteira vem antes da vírgula.<br>
+                    <strong>(B) Incorreta:</strong> Isso é o anti-período.<br>
+                    <strong>(C) Correta:</strong> Período é o algarismo ou grupo de algarismos que se repete para sempre.<br>
+                    <strong>(D) Incorreta:</strong> Dízimas têm infinitas casas.`
+            },
+            {
+                id: 2,
+                text: "Qual é o período da dízima <strong>0,454545...</strong>?",
+                options: ["4", "5", "45", "0,45"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> O 5 também repete.<br>
+                    <strong>(B) Incorreta:</strong> O 4 também repete.<br>
+                    <strong>(C) Correta:</strong> O bloco que se repete é '45'.<br>
+                    <strong>(D) Incorreta:</strong> Período é um número inteiro, não decimal.`
+            },
+            {
+                id: 3,
+                text: "Qual destes números é uma <strong>dízima periódica composta</strong>?",
+                options: ["0,333...", "0,1212...", "0,5888...", "1,111..."],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Simples (só o 3 repete logo após a vírgula).<br>
+                    <strong>(B) Incorreta:</strong> Simples (o 12 repete logo após a vírgula).<br>
+                    <strong>(C) Correta:</strong> Tem o '5' (intruso/anti-período) antes do '8' começar a repetir.<br>
+                    <strong>(D) Incorreta:</strong> Simples.`
+            },
+            // NÍVEL 2: DÍZIMAS SIMPLES
+            {
+                id: 4,
+                text: "Qual é a fração geratriz de <strong>0,444...</strong>?",
+                options: ["4/10", "4/9", "4/99", "4/90"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Isso é 0,4 (decimal exato).<br>
+                    <strong>(B) Correta:</strong> Dízima simples: Período (4) sobre tantos 9s quantos forem os algarismos do período (um 9). 4/9.<br>
+                    <strong>(C) Incorreta:</strong> Usaria 99 se fosse 0,0404...<br>
+                    <strong>(D) Incorreta:</strong> Usaria 90 se fosse composta.`
+            },
+            {
+                id: 5,
+                text: "A dízima <strong>0,999...</strong> é igual a:",
+                options: ["0,9", "1", "9/90", "Infinito"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 0,9 é menor.<br>
+                    <strong>(B) Correta:</strong> Fração geratriz 9/9, que é igual a 1. Matematicamente, 0,999... é exatamente 1.<br>
+                    <strong>(C) Incorreta:</strong> 9/90 = 0,1.<br>
+                    <strong>(D) Incorreta:</strong> É um número finito (racional).`
+            },
+            {
+                id: 6,
+                text: "Qual é a fração geratriz de <strong>0,121212...</strong>?",
+                options: ["12/100", "12/99", "12/90", "1/12"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Isso é 0,12.<br>
+                    <strong>(B) Correta:</strong> Período é 12 (dois dígitos). Colocamos dois noves no denominador: 12/99.<br>
+                    <strong>(C) Incorreta:</strong> 90 é para compostas.<br>
+                    <strong>(D) Incorreta:</strong> Fração aleatória.`
+            },
+            // NÍVEL 3: DÍZIMAS COMPOSTAS
+            {
+                id: 7,
+                text: "Converta a dízima composta <strong>0,2555...</strong> para fração:",
+                options: ["25/99", "23/90", "25/90", "23/99"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Seria 0,2525...<br>
+                    <strong>(B) Correta:</strong> (Tudo até o 1º período: 25) - (Intruso: 2) / (Um 9 pelo período 5 e um 0 pelo intruso 2). (25-2)/90 = 23/90.<br>
+                    <strong>(C) Incorreta:</strong> Esqueceu de subtrair o intruso.<br>
+                    <strong>(D) Incorreta:</strong> Denominador errado.`
+            },
+            {
+                id: 8,
+                text: "Qual a fração de <strong>0,1666...</strong>?",
+                options: ["16/99", "15/90", "16/90", "15/99"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Seria 0,1616...<br>
+                    <strong>(B) Correta:</strong> (16 - 1) / 90 = 15/90. Simplificando por 15 dá 1/6.<br>
+                    <strong>(C) Incorreta:</strong> Não subtraiu o anti-período.<br>
+                    <strong>(D) Incorreta:</strong> Denominador errado.`
+            },
+            {
+                id: 9,
+                text: "A dízima <strong>1,333...</strong> em fração é:",
+                options: ["13/10", "4/3", "13/9", "10/3"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 1,3 exato.<br>
+                    <strong>(B) Correta:</strong> Separe: 1 + 0,333... = 1 + 3/9 = 1 + 1/3 = 4/3.<br>
+                    <strong>(C) Incorreta:</strong> (13-1)/9 = 12/9 = 4/3. Mas a opção diz 13/9.<br>
+                    <strong>(D) Incorreta:</strong> 10/3 = 3,333...`
+            },
+            // NÍVEL 4: OPERAÇÕES COM DÍZIMAS
+            {
+                id: 10,
+                text: "Quanto é <strong>0,333... + 0,666...</strong>?",
+                options: ["0,999...", "1", "0,9", "Todas as anteriores estão erradas"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Visualmente parece certo, mas matematicamente é melhor simplificar.<br>
+                    <strong>(B) Correta:</strong> 1/3 + 2/3 = 3/3 = 1. (Lembrando que 0,999... = 1).<br>
+                    <strong>(C) Incorreta:</strong> Arredondamento impreciso.<br>
+                    <strong>(D) Incorreta:</strong> A opção B está certa.`
+            },
+            {
+                id: 11,
+                text: "Qual é o resultado de <strong>0,222... x 9</strong>?",
+                options: ["1,999...", "2", "1,8", "2,222..."],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Confuso.<br>
+                    <strong>(B) Correta:</strong> Transforme em fração: 2/9. Multiplique: (2/9) x 9 = 2.<br>
+                    <strong>(C) Incorreta:</strong> Se fosse 0,2 x 9.<br>
+                    <strong>(D) Incorreta:</strong> Erro de conta.`
+            },
+            {
+                id: 12,
+                text: "A representação <strong>0,$\overline{5}$</strong> significa:",
+                options: ["0,5", "0,05", "0,555...", "0,5050..."],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Decimal exato.<br>
+                    <strong>(B) Incorreta:</strong> Decimal exato.<br>
+                    <strong>(C) Correta:</strong> A barra sobre o número indica que aquele algarismo é o período que se repete infinitamente.<br>
+                    <strong>(D) Incorreta:</strong> O período seria 50.`
+            },
+            // NÍVEL 5: DESAFIOS E LÓGICA
+            {
+                id: 13,
+                text: "Qual fração gera a dízima <strong>0,027027...</strong>?",
+                options: ["27/100", "27/99", "27/999", "270/999"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 0,27.<br>
+                    <strong>(B) Incorreta:</strong> 0,2727...<br>
+                    <strong>(C) Correta:</strong> O período é '027' (3 algarismos). Colocamos três noves no denominador. 27/999 = 1/37.<br>
+                    <strong>(D) Incorreta:</strong> Período 270.`
+            },
+            {
+                id: 14,
+                text: "Calcule a raiz quadrada de <strong>0,444...</strong>:",
+                options: ["0,2", "0,222...", "0,666...", "0,4"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Raiz de 0,04.<br>
+                    <strong>(B) Incorreta:</strong> Raiz de 4/9 não é 2/9.<br>
+                    <strong>(C) Correta:</strong> Em fração: √(4/9) = √4 / √9 = 2/3. E 2/3 é igual a 0,666...<br>
+                    <strong>(D) Incorreta:</strong> Erro comum.`
+            },
+            {
+                id: 15,
+                text: "Se x = 0,222... e y = 0,555..., quanto é <strong>x + y</strong>?",
+                options: ["0,7", "0,888...", "0,777...", "7/10"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Arredondou.<br>
+                    <strong>(B) Incorreta:</strong> Soma errada.<br>
+                    <strong>(C) Correta:</strong> 2/9 + 5/9 = 7/9. E 7/9 é igual a 0,777...<br>
+                    <strong>(D) Incorreta:</strong> Isso é 0,7 exato.`
+            }
+        ];
+
+        // --- ESTADO DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        // --- NAVEGAÇÃO ENTRE ABAS ---
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // --- RENDERIZAÇÃO DO QUIZ ---
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.90rem; line-height: 1.6;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            // Verifica se tem imagem visual na questão
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; // Já respondeu
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#059669"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        // --- LÓGICA DE FINALIZAÇÃO E FEEDBACK DETALHADO ---
+        function finishQuiz() {
+            score = 0;
+            let feedbackHTML = '<div style="text-align: left; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">';
+
+            userAnswers.forEach((ans, idx) => {
+                const q = questions[idx];
+                const isCorrect = (ans === q.correct);
+                
+                if (isCorrect) {
+                    score++;
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: #F0FFF4; border-radius: 8px; border-left: 4px solid #48BB78;">
+                            <p style="font-size: 0.9rem;"><strong>Questão ${idx+1}:</strong> ✅ Acertou!</p>
+                        </div>`;
+                } else {
+                    const userAnswerText = q.options[ans];
+                    const correctAnswerText = q.options[q.correct];
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 15px; background: #FFF5F5; border-radius: 8px; border-left: 4px solid #F56565;">
+                            <p style="font-weight: 700; color: #C53030;">Questão ${idx+1}: ${q.text}</p>
+                            <p style="font-size: 0.9rem; margin-top: 5px;">❌ <strong>Você marcou:</strong> ${userAnswerText}</p>
+                            <p style="font-size: 0.9rem;">🎯 <strong>Correto seria:</strong> ${correctAnswerText}</p>
+                            <div style="font-size: 0.85rem; margin-top: 10px; color: #4A5568; background: rgba(255,255,255,0.5); padding: 8px; border-radius: 4px;">
+                                ${q.explanation}
+                            </div>
+                        </div>`;
+                }
+            });
+            feedbackHTML += '</div>';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            let actionButtonsHTML = "";
+
+            // CRITÉRIO DE 80%
+            if (percent >= 80) {
+                stars = "⭐⭐⭐⭐⭐"; 
+                msg = "Parabéns! Você dominou o conteúdo.";
+                actionButtonsHTML = `
+                    <button onclick="window.location.href='8ano-matematica.html'" style="width: 100%; padding: 15px; background-color: #48BB78; color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;">
+                        Concluir Atividade
+                    </button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Voltar para o Assunto
+                    </button>
+                `;
+            } else {
+                stars = "💪 Estude mais"; 
+                msg = `Você fez ${percent}%. Precisa de 80% para passar.`;
+                actionButtonsHTML = `
+                    <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Exercícios</button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Revisar Explicação
+                    </button>
+                `;
+            }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+            
+            // Injeta o feedback detalhado
+            document.getElementById('review-container').innerHTML = feedbackHTML;
+            // Injeta os botões de ação corretos
+            document.getElementById('action-buttons').innerHTML = actionButtonsHTML;
+
+            if (percent >= 80) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            document.getElementById('review-container').innerHTML = ""; // Limpa feedback anterior
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

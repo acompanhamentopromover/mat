@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triângulos e Quadriláteros - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA PINK (Formas Específicas) */
+            --theme-color: #FED7E2; 
+            --theme-active: #D53F8C; 
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR (ERRO) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- LOGO --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--theme-active);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO --- */
+        .section-view {
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: center; gap: 15px; justify-content: space-between; flex-wrap: wrap; }
+        .visual-item { flex: 1; min-width: 120px; text-align: center; }
+        .visual-svg { color: var(--theme-active); margin-bottom: 5px; }
+        
+        /* Estilo para SVGs dentro das questões */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #FFF5F7;
+            border-radius: 12px;
+            border: 1px dashed var(--theme-active);
+        }
+
+        .example-box {
+            background-color: #FFF5F7; /* Pink muito claro */
+            border-left: 5px solid #D53F8C;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .example-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #97266D;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* --- QUIZ MAPA --- */
+        .question-map {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-active);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        /* --- OPÇÕES --- */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK DETALHADO --- */
+        .feedback-box {
+            display: block; 
+            margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- TELA DE RESULTADO --- */
+        #viewResult {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+
+        .btn-retry {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--theme-active);
+            color: white;
+            border: 2px solid black;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px black;
+            transition: transform 0.1s;
+        }
+        
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- RODAPÉ FIXO --- */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            border-top: 2px solid var(--border-color);
+            padding: 15px 20px;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="6ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Triângulos e Quadriláteros</h1>
+            <p style="color: #555; margin-bottom: 20px;">Vamos aprender a classificar as figuras de 3 e 4 lados.</p>
+            
+            <div class="card-content">
+                <h3>🔺 Triângulos (3 Lados)</h3>
+                <p>Podemos classificá-los pelo tamanho dos seus lados:</p>
+                <br>
+                <div class="visual-row">
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+                            <path d="M50 10 L90 80 H10 Z" fill="rgba(213, 63, 140, 0.1)"/>
+                            <path d="M25 45 L35 45 M75 45 L65 45 M50 80 L50 70" stroke="#D53F8C" stroke-width="2"/>
+                        </svg>
+                        <p style="font-size:0.8rem; font-weight:700;">Equilátero</p>
+                        <p style="font-size:0.75rem;">3 lados iguais</p>
+                    </div>
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+                            <path d="M50 10 L80 90 H20 Z" fill="rgba(213, 63, 140, 0.1)"/>
+                            <path d="M30 50 L40 50 M70 50 L60 50" stroke="#D53F8C" stroke-width="2"/>
+                        </svg>
+                        <p style="font-size:0.8rem; font-weight:700;">Isósceles</p>
+                        <p style="font-size:0.75rem;">2 lados iguais</p>
+                    </div>
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+                            <path d="M30 10 L90 60 L10 90 Z" fill="rgba(213, 63, 140, 0.1)"/>
+                        </svg>
+                        <p style="font-size:0.8rem; font-weight:700;">Escaleno</p>
+                        <p style="font-size:0.75rem;">0 lados iguais</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>🔲 Quadriláteros (4 Lados)</h3>
+                <p>Existem tipos especiais com nomes próprios:</p>
+                <div class="visual-row" style="margin-top:15px; flex-wrap:wrap;">
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+                            <rect x="20" y="20" width="60" height="60" fill="rgba(213, 63, 140, 0.1)"/>
+                        </svg>
+                        <p style="font-size:0.8rem; font-weight:700;">Quadrado</p>
+                        <p style="font-size:0.7rem;">Lados e ângulos iguais</p>
+                    </div>
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+                            <rect x="10" y="30" width="80" height="40" fill="rgba(213, 63, 140, 0.1)"/>
+                        </svg>
+                        <p style="font-size:0.8rem; font-weight:700;">Retângulo</p>
+                        <p style="font-size:0.7rem;">4 ângulos retos</p>
+                    </div>
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+                            <path d="M30 30 H70 L90 70 H10 Z" fill="rgba(213, 63, 140, 0.1)"/>
+                        </svg>
+                        <p style="font-size:0.8rem; font-weight:700;">Trapézio</p>
+                        <p style="font-size:0.7rem;">1 par de lados paralelos</p>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Observe as formas e responda.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Simulado Finalizado!</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente! Você domina a geometria.</p>
+            </div>
+            <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Simulado</button>
+            <button onclick="setMode('explanation')" style="margin-top:15px; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                ⬅ Voltar para o Assunto
+            </button>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (TRIÂNGULOS E QUADRILÁTEROS) ---
+        const questions = [
+            // NÍVEL 1: IDENTIFICAÇÃO BÁSICA
+            {
+                id: 1,
+                text: "Quantos lados tem um <strong>Quadrilátero</strong>?",
+                options: ["3", "4", "5", "6", "8"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> O prefixo 'Quadri' vem de quatro. Toda figura com 4 lados é um quadrilátero.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 3 é triângulo. 5 é pentágono.</div>`
+            },
+            {
+                id: 2,
+                text: "Qual é o nome de um polígono com 3 lados?",
+                options: ["Quadrado", "Triângulo", "Círculo", "Pentágono", "Losango"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> 'Tri' significa três. Triângulo = 3 ângulos (e 3 lados).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Quadrado e Losango têm 4 lados.</div>`
+            },
+            {
+                id: 3,
+                text: "Observe a figura. Ela é um:",
+                visual: `
+                    <svg width="80" height="50" viewBox="0 0 80 50" fill="none" stroke="#D53F8C" stroke-width="3" style="margin:0 auto; display:block;">
+                        <rect x="5" y="5" width="70" height="40" fill="rgba(213, 63, 140, 0.1)"/>
+                    </svg>
+                `,
+                options: ["Quadrado", "Retângulo", "Triângulo", "Trapézio", "Círculo"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Tem 4 lados e 4 ângulos retos (cantos quadrados), mas os lados não são todos iguais (é alongado). É um <strong>Retângulo</strong>.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Quadrado tem todos os lados iguais.</div>`
+            },
+            // NÍVEL 2: CLASSIFICAÇÃO DE TRIÂNGULOS
+            {
+                id: 4,
+                text: "Este triângulo tem <strong>3 lados iguais</strong>. Ele é chamado de:",
+                visual: `
+                    <svg width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="#D53F8C" stroke-width="3" style="margin:0 auto; display:block;">
+                        <path d="M50 10 L90 80 H10 Z" fill="rgba(213, 63, 140, 0.1)"/>
+                        <path d="M25 45 L35 45 M75 45 L65 45 M50 80 L50 70" stroke="#D53F8C" stroke-width="2"/>
+                    </svg>
+                `,
+                options: ["Isósceles", "Escaleno", "Equilátero", "Retângulo", "Quadrado"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> 'Equi' significa igual. <strong>Equilátero</strong> = lados iguais.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Isósceles tem apenas 2 iguais. Escaleno tem todos diferentes.</div>`
+            },
+            {
+                id: 5,
+                text: "Um triângulo com <strong>todos os lados diferentes</strong> é:",
+                visual: `
+                    <svg width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="#D53F8C" stroke-width="3" style="margin:0 auto; display:block;">
+                        <path d="M20 10 L90 60 L10 90 Z" fill="rgba(213, 63, 140, 0.1)"/>
+                    </svg>
+                `,
+                options: ["Equilátero", "Isósceles", "Escaleno", "Regular", "Simétrico"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Quando não há nenhum lado igual ao outro, chamamos de <strong>Escaleno</strong>.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Isósceles teria 2 lados iguais.</div>`
+            },
+            {
+                id: 6,
+                text: "Este triângulo tem <strong>2 lados iguais</strong> (pernas) e um diferente (base). Ele é:",
+                visual: `
+                    <svg width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="#D53F8C" stroke-width="3" style="margin:0 auto; display:block;">
+                        <path d="M50 10 L80 90 H20 Z" fill="rgba(213, 63, 140, 0.1)"/>
+                        <path d="M30 50 L40 50 M70 50 L60 50" stroke="#D53F8C" stroke-width="2"/>
+                    </svg>
+                `,
+                options: ["Escaleno", "Isósceles", "Equilátero", "Reto", "Obtuso"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Dois lados iguais define o triângulo <strong>Isósceles</strong>.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Equilátero precisaria dos 3 iguais.</div>`
+            },
+            // NÍVEL 3: CLASSIFICAÇÃO DE QUADRILÁTEROS
+            {
+                id: 7,
+                text: "Qual figura tem 4 lados iguais e 4 ângulos retos (90°)?",
+                visual: `
+                    <svg width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="#D53F8C" stroke-width="3" style="margin:0 auto; display:block;">
+                        <rect x="20" y="20" width="60" height="60" fill="rgba(213, 63, 140, 0.1)"/>
+                    </svg>
+                `,
+                options: ["Retângulo", "Losango", "Quadrado", "Trapézio", "Paralelogramo"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> O <strong>Quadrado</strong> é o quadrilátero perfeito: lados iguais E ângulos iguais.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Retângulo tem lados diferentes. Losango pode ter ângulos tortos.</div>`
+            },
+            {
+                id: 8,
+                text: "Que figura é esta (parece um diamante/pipa e tem 4 lados iguais)?",
+                visual: `
+                    <svg width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="#D53F8C" stroke-width="3" style="margin:0 auto; display:block;">
+                        <path d="M50 10 L80 50 L50 90 L20 50 Z" fill="rgba(213, 63, 140, 0.1)"/>
+                    </svg>
+                `,
+                options: ["Quadrado", "Losango", "Trapézio", "Retângulo", "Triângulo"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Um quadrilátero com 4 lados iguais, mas que não tem necessariamente ângulos retos, é um <strong>Losango</strong>.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Trapézio tem lados diferentes.</div>`
+            },
+            {
+                id: 9,
+                text: "Observe este quadrilátero que tem apenas <strong>um par de lados paralelos</strong> (bases).",
+                visual: `
+                    <svg width="80" height="50" viewBox="0 0 100 60" fill="none" stroke="#D53F8C" stroke-width="3" style="margin:0 auto; display:block;">
+                        <path d="M30 10 H70 L90 50 H10 Z" fill="rgba(213, 63, 140, 0.1)"/>
+                    </svg>
+                `,
+                options: ["Paralelogramo", "Quadrado", "Trapézio", "Retângulo", "Losango"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> O <strong>Trapézio</strong> é caracterizado por ter apenas dois lados paralelos (o de cima e o de baixo na figura).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Paralelogramo tem 2 pares de lados paralelos.</div>`
+            },
+            // NÍVEL 4: PROPRIEDADES VISUAIS
+            {
+                id: 10,
+                text: "Qual figura tem lados opostos paralelos e iguais, mas ângulos inclinados (não retos)?",
+                visual: `
+                    <svg width="80" height="50" viewBox="0 0 100 60" fill="none" stroke="#D53F8C" stroke-width="3" style="margin:0 auto; display:block;">
+                        <path d="M20 10 H80 L60 50 H0 Z" fill="rgba(213, 63, 140, 0.1)"/>
+                    </svg>
+                `,
+                options: ["Retângulo", "Quadrado", "Trapézio", "Paralelogramo", "Triângulo"],
+                correct: 3,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> O <strong>Paralelogramo</strong> é como um retângulo que foi 'empurrado' e ficou torto.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Retângulo tem ângulos retos. Trapézio não tem 2 pares paralelos.</div>`
+            },
+            {
+                id: 11,
+                text: "Um triângulo retângulo possui obrigatóriamente:",
+                visual: `
+                    <svg width="60" height="60" viewBox="0 0 60 60" fill="none" stroke="#D53F8C" stroke-width="3" style="margin:0 auto; display:block;">
+                        <path d="M10 10 V50 H50 Z" fill="rgba(213, 63, 140, 0.1)"/>
+                        <rect x="10" y="40" width="10" height="10" stroke="none" fill="#D53F8C"/>
+                    </svg>
+                `,
+                options: ["Um ângulo reto (90°)", "3 lados iguais", "Nenhum ângulo reto", "2 lados paralelos", "4 lados"],
+                correct: 0,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> O nome já diz: Triângulo <strong>Retângulo</strong> tem um ângulo Reto (canto quadrado).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 3 lados iguais é equilátero.</div>`
+            },
+            {
+                id: 12,
+                text: "Todo quadrado também é um retângulo?",
+                options: ["Sim", "Não", "Depende do tamanho", "Só se for vermelho", "Impossível"],
+                correct: 0,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Sim! Para ser retângulo, precisa ter 4 ângulos retos. O quadrado tem isso. Ele é um retângulo especial (com lados iguais).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> O quadrado cumpre todas as regras do retângulo.</div>`
+            },
+            // NÍVEL 5: DESAFIOS E LÓGICA
+            {
+                id: 13,
+                text: "Quantos triângulos você vê nesta figura?",
+                visual: `
+                    <svg width="80" height="50" viewBox="0 0 80 50" fill="none" stroke="#D53F8C" stroke-width="2" style="margin:0 auto; display:block;">
+                        <path d="M5 45 L40 5 L75 45 Z" /> <line x1="40" y1="5" x2="40" y2="45" /> </svg>
+                `,
+                options: ["1", "2", "3", "4", "5"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Temos: 1 triângulo pequeno na esquerda, 1 triângulo pequeno na direita e 1 triângulo GRANDE formado pelos dois juntos. Total: <strong>3</strong>.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Muita gente esquece de contar o triângulo maior externo.</div>`
+            },
+            {
+                id: 14,
+                text: "A soma dos ângulos internos de qualquer triângulo é sempre:",
+                options: ["90 graus", "100 graus", "180 graus", "360 graus", "Depende do tamanho"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Se você cortar as 3 pontas de qualquer triângulo e juntá-las, elas formam uma meia-lua (180°). É uma regra universal.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> 360° é a soma dos quadriláteros.</div>`
+            },
+            {
+                id: 15,
+                text: "Qual quadrilátero NÃO tem nenhum par de lados paralelos?",
+                visual: `
+                    <svg width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="#D53F8C" stroke-width="3" style="margin:0 auto; display:block;">
+                        <path d="M10 50 L40 10 L90 30 L60 90 Z" fill="rgba(213, 63, 140, 0.1)"/>
+                    </svg>
+                `,
+                options: ["Quadrado", "Trapézio", "Trapezoide (ou quadrilátero qualquer)", "Paralelogramo", "Retângulo"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Um quadrilátero totalmente torto, sem nenhum lado paralelo ao outro, é chamado de <strong>Trapezoide</strong>.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Todos os outros têm pelo menos um par de linhas paralelas.</div>`
+            }
+        ];
+
+        // --- ESTADO DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        // --- NAVEGAÇÃO ENTRE ABAS ---
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // --- RENDERIZAÇÃO DO QUIZ ---
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.95rem; line-height: 1.5;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            // Verifica se tem imagem visual na questão
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; // Já respondeu
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#276749"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        function finishQuiz() {
+            score = 0;
+            userAnswers.forEach((ans, idx) => {
+                if (ans === questions[idx].correct) score++;
+            });
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            if (percent === 100) { stars = "⭐⭐⭐⭐⭐"; msg = "Perfeito! Você é um mestre!"; }
+            else if (percent >= 80) { stars = "⭐⭐⭐⭐"; msg = "Muito bom! Quase gabaritou."; }
+            else if (percent >= 60) { stars = "⭐⭐⭐"; msg = "Bom trabalho. Continue praticando."; }
+            else if (percent >= 40) { stars = "⭐⭐"; msg = "Você pode melhorar. Revise a explicação."; }
+            else { stars = "⭐"; msg = "Não desista! Leia a explicação e tente de novo."; }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+
+            if (percent >= 60) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

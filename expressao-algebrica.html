@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expressões Algébricas - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA ROXO PROFUNDO (Abstração/Álgebra) */
+            --theme-color: #E9D8FD; 
+            --theme-active: #6B46C1; 
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR (ERRO) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- LOGO --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--theme-active);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO --- */
+        .section-view {
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: flex-end; gap: 10px; justify-content: space-around; flex-wrap: wrap; }
+        .visual-item { text-align: center; width: 30%; min-width: 80px; }
+        .visual-svg { color: var(--theme-active); margin-bottom: 5px; }
+        
+        /* Estilo para SVGs dentro das questões */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #E9D8FD;
+            border-radius: 12px;
+            border: 1px dashed var(--theme-active);
+        }
+
+        .example-box {
+            background-color: #F3E8FF; /* Roxo muito claro */
+            border-left: 5px solid #6B46C1;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .example-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #553C9A;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* --- QUIZ MAPA --- */
+        .question-map {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-active);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        /* --- OPÇÕES --- */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK DETALHADO --- */
+        .feedback-box {
+            display: block; 
+            margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- TELA DE RESULTADO --- */
+        #viewResult {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+
+        .btn-retry {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--theme-active);
+            color: white;
+            border: 2px solid black;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px black;
+            transition: transform 0.1s;
+        }
+        
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- RODAPÉ FIXO --- */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            border-top: 2px solid var(--border-color);
+            padding: 15px 20px;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="8ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Expressões Algébricas</h1>
+            <p style="color: #555; margin-bottom: 20px;">É a linguagem secreta da matemática, onde letras representam números desconhecidos ou variáveis.</p>
+            
+            <div class="card-content">
+                <h3>🔤 Variáveis e Termos</h3>
+                <p>As letras (x, y, a...) são chamadas de <strong>variáveis</strong>.</p>
+                <p>O número que acompanha a letra é o <strong>coeficiente</strong>.</p>
+                <br>
+                <div class="visual-row" style="justify-content: center;">
+                    <div class="visual-item" style="font-size: 2rem; font-weight: 800; color: #6B46C1; border: 2px dashed #6B46C1; padding: 10px; border-radius: 10px;">
+                        5x²
+                    </div>
+                </div>
+                <p style="text-align:center; font-size:0.9rem; margin-top:5px;">Coeficiente: 5 | Parte Literal: x²</p>
+            </div>
+
+            <div class="card-content">
+                <h3>🍎 Simplificação</h3>
+                <p>Só podemos somar ou subtrair <strong>termos semelhantes</strong> (que têm a mesma parte literal).</p>
+                
+                <div class="example-box">
+                    <span class="example-tag">Exemplo</span>
+                    <p>3 maçãs + 2 maçãs = 5 maçãs</p>
+                    <p style="font-weight:700; margin-top:5px; color:#553C9A;">3x + 2x = 5x</p>
+                </div>
+
+                <div class="example-box">
+                    <span class="example-tag">Atenção!</span>
+                    <p>Não podemos somar 3x + 2y.</p>
+                    <p>Eles são diferentes (maçã com laranja).</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>🔢 Valor Numérico</h3>
+                <p>É quando trocamos a letra por um número específico para descobrir o valor final.</p>
+                <p><strong>Exemplo:</strong> Se x = 2, quanto vale 3x + 1?</p>
+                <p>3(2) + 1 = 6 + 1 = 7.</p>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Traduza e calcule as expressões.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Resultado</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente!</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (EXPRESSÕES ALGÉBRICAS - 8º ANO) ---
+        const questions = [
+            // NÍVEL 1: CONCEITOS E LINGUAGEM
+            {
+                id: 1,
+                text: "Em uma expressão algébrica, o que representa a letra (ex: x, y)?",
+                options: ["Um número fixo sempre igual a 1", "Uma variável ou incógnita (valor desconhecido)", "Um sinal de pontuação", "O resultado final"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> A letra pode assumir vários valores.<br>
+                    <strong>(B) Correta:</strong> As letras são chamadas de variáveis porque seu valor pode variar, ou incógnitas quando queremos descobrir seu valor.<br>
+                    <strong>(C) Incorreta:</strong> Não é pontuação.<br>
+                    <strong>(D) Incorreta:</strong> É parte do cálculo, não o fim.`
+            },
+            {
+                id: 2,
+                text: "Como escrevemos 'o dobro de um número menos 5' em linguagem algébrica?",
+                options: ["2 + x - 5", "2x - 5", "x² - 5", "5 - 2x"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 2 + x é 'dois mais um número'.<br>
+                    <strong>(B) Correta:</strong> 'Dobro' é multiplicar por 2 (2x). 'Menos 5' é subtrair 5. Logo, 2x - 5.<br>
+                    <strong>(C) Incorreta:</strong> x² é 'o quadrado de um número'.<br>
+                    <strong>(D) Incorreta:</strong> Inverteu a ordem da subtração.`
+            },
+            {
+                id: 3,
+                text: "No termo <strong>-5y²</strong>, qual é o coeficiente?",
+                options: ["y", "2", "-5", "5"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> y é a variável.<br>
+                    <strong>(B) Incorreta:</strong> 2 é o expoente.<br>
+                    <strong>(C) Correta:</strong> O coeficiente é o número que multiplica a letra, incluindo o sinal. Neste caso, -5.<br>
+                    <strong>(D) Incorreta:</strong> Esqueceu o sinal negativo.`
+            },
+            // NÍVEL 2: VALOR NUMÉRICO
+            {
+                id: 4,
+                text: "Qual o valor numérico de <strong>3x + 2</strong> para x = 4?",
+                options: ["14", "9", "6", "5"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Substitua x por 4: 3(4) + 2. Multiplicação primeiro: 12 + 2 = 14.<br>
+                    <strong>(B) Incorreta:</strong> Somou 3+4+2.<br>
+                    <strong>(C) Incorreta:</strong> Esqueceu de multiplicar.<br>
+                    <strong>(D) Incorreta:</strong> Erro de cálculo.`
+            },
+            {
+                id: 5,
+                text: "Calcule <strong>x² - 3x</strong> para x = -2 (Cuidado com o sinal!).",
+                options: ["-2", "10", "-10", "2"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Erro de sinal.<br>
+                    <strong>(B) Correta:</strong> (-2)² - 3(-2). (-2)² = 4. -3 vezes -2 = +6. Então 4 + 6 = 10.<br>
+                    <strong>(C) Incorreta:</strong> Errou o sinal do produto.<br>
+                    <strong>(D) Incorreta:</strong> Erro na potência.`
+            },
+            {
+                id: 6,
+                text: "Se a = 2 e b = 3, qual o valor de <strong>2a + 3b</strong>?",
+                options: ["5", "13", "12", "10"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Somou a e b.<br>
+                    <strong>(B) Correta:</strong> 2(2) + 3(3) = 4 + 9 = 13.<br>
+                    <strong>(C) Incorreta:</strong> Erro de cálculo.<br>
+                    <strong>(D) Incorreta:</strong> Erro de cálculo.`
+            },
+            // NÍVEL 3: SIMPLIFICAÇÃO E OPERAÇÕES
+            {
+                id: 7,
+                text: "Simplifique a expressão: <strong>2x + 5x - 3x</strong>",
+                options: ["4x", "7x", "4", "10x"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Como são termos semelhantes (todos têm x), operamos os coeficientes: 2 + 5 - 3 = 4. Resultado: 4x.<br>
+                    <strong>(B) Incorreta:</strong> 2+5=7, esqueceu do -3.<br>
+                    <strong>(C) Incorreta:</strong> O x não desaparece.<br>
+                    <strong>(D) Incorreta:</strong> Somou tudo.`
+            },
+            {
+                id: 8,
+                text: "Qual é o resultado da multiplicação <strong>(3x) . (2x)</strong>?",
+                options: ["6x", "5x²", "6x²", "5x"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Esqueceu de multiplicar o x por x.<br>
+                    <strong>(B) Incorreta:</strong> Somou os números.<br>
+                    <strong>(C) Correta:</strong> Multiplica número com número (3.2=6) e letra com letra (x.x=x²). Resultado: 6x².<br>
+                    <strong>(D) Incorreta:</strong> Somou.`
+            },
+            {
+                id: 9,
+                text: "Aplique a propriedade distributiva: <strong>2(x - 4)</strong>",
+                options: ["2x - 4", "2x - 8", "x - 8", "2x - 6"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Esqueceu de multiplicar o 4.<br>
+                    <strong>(B) Correta:</strong> O 2 multiplica quem está dentro: 2 vezes x = 2x. 2 vezes -4 = -8. Resultado: 2x - 8.<br>
+                    <strong>(C) Incorreta:</strong> Não multiplicou o x.<br>
+                    <strong>(D) Incorreta:</strong> Subtraiu 2 de 4.`
+            },
+            // NÍVEL 4: POLINÔMIOS E GEOMETRIA
+            {
+                id: 10,
+                text: "Quais termos são semelhantes na lista: <strong>3x, 4y, -2x, 5</strong>?",
+                options: ["3x e 5", "4y e 5", "3x e -2x", "Todos são diferentes"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Um tem letra, outro não.<br>
+                    <strong>(B) Incorreta:</strong> Letra vs número.<br>
+                    <strong>(C) Correta:</strong> Termos semelhantes são aqueles que têm a mesma parte literal (letra). 3x e -2x compartilham o 'x'.<br>
+                    <strong>(D) Incorreta:</strong> Existem semelhantes.`
+            },
+            {
+                id: 11,
+                text: "Qual expressão representa o perímetro de um retângulo com lados <strong>2x</strong> e <strong>x</strong>?",
+                options: ["3x", "6x", "2x²", "4x"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Somou apenas dois lados.<br>
+                    <strong>(B) Correta:</strong> Perímetro é a soma de TODOS os lados. 2x + 2x + x + x = 6x.<br>
+                    <strong>(C) Incorreta:</strong> Isso seria a área.<br>
+                    <strong>(D) Incorreta:</strong> Cálculo errado.`
+            },
+            {
+                id: 12,
+                text: "Qual expressão representa a <strong>Área</strong> de um quadrado de lado <strong>3x</strong>?",
+                options: ["9x²", "3x²", "6x", "12x"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Área = Lado x Lado. (3x) . (3x) = 9x².<br>
+                    <strong>(B) Incorreta:</strong> Esqueceu de elevar o 3 ao quadrado.<br>
+                    <strong>(C) Incorreta:</strong> Somou (3x+3x).<br>
+                    <strong>(D) Incorreta:</strong> Isso é o perímetro (3x.4).`
+            },
+            // NÍVEL 5: DESAFIOS E APLICAÇÕES
+            {
+                id: 13,
+                text: "Simplifique: <strong>3(a + b) + 2(a - b)</strong>",
+                options: ["5a + 5b", "5a + b", "5a - b", "6a"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Erro no sinal do b.<br>
+                    <strong>(B) Correta:</strong> Distributiva: 3a + 3b + 2a - 2b. Juntando semelhantes: (3a+2a) + (3b-2b) = 5a + b.<br>
+                    <strong>(C) Incorreta:</strong> Sinal errado.<br>
+                    <strong>(D) Incorreta:</strong> Cancelou o b incorretamente.`
+            },
+            {
+                id: 14,
+                text: "Um táxi cobra R$ 5,00 fixos mais R$ 2,00 por km rodado (x). Qual a fórmula do preço?",
+                options: ["5x + 2", "2x + 5", "7x", "10x"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> O valor fixo não multiplica x.<br>
+                    <strong>(B) Correta:</strong> O custo variável é 2 vezes a quilometragem (2x), somado ao valor fixo (5). P = 2x + 5.<br>
+                    <strong>(C) Incorreta:</strong> Somou 5+2.<br>
+                    <strong>(D) Incorreta:</strong> Multiplicou tudo.`
+            },
+            {
+                id: 15,
+                text: "Introdução aos Produtos Notáveis: Quanto é <strong>(x + 2)²</strong>? (Lembre que é (x+2).(x+2))",
+                options: ["x² + 4", "x² + 2x + 4", "x² + 4x + 4", "2x + 4"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Erro comum! Não basta elevar os termos.<br>
+                    <strong>(B) Incorreta:</strong> Faltou dobrar o termo do meio.<br>
+                    <strong>(C) Correta:</strong> (x+2)(x+2) = x² + 2x + 2x + 4 = x² + 4x + 4.<br>
+                    <strong>(D) Incorreta:</strong> Isso é soma.`
+            }
+        ];
+
+        // --- ESTADO DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        // --- NAVEGAÇÃO ENTRE ABAS ---
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // --- RENDERIZAÇÃO DO QUIZ ---
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.90rem; line-height: 1.6;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            // Verifica se tem imagem visual na questão
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; // Já respondeu
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#6B46C1"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        // --- LÓGICA DE FINALIZAÇÃO E FEEDBACK DETALHADO ---
+        function finishQuiz() {
+            score = 0;
+            let feedbackHTML = '<div style="text-align: left; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">';
+
+            userAnswers.forEach((ans, idx) => {
+                const q = questions[idx];
+                const isCorrect = (ans === q.correct);
+                
+                if (isCorrect) {
+                    score++;
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: #F0FFF4; border-radius: 8px; border-left: 4px solid #48BB78;">
+                            <p style="font-size: 0.9rem;"><strong>Questão ${idx+1}:</strong> ✅ Acertou!</p>
+                        </div>`;
+                } else {
+                    const userAnswerText = q.options[ans];
+                    const correctAnswerText = q.options[q.correct];
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 15px; background: #FFF5F5; border-radius: 8px; border-left: 4px solid #F56565;">
+                            <p style="font-weight: 700; color: #C53030;">Questão ${idx+1}: ${q.text}</p>
+                            <p style="font-size: 0.9rem; margin-top: 5px;">❌ <strong>Você marcou:</strong> ${userAnswerText}</p>
+                            <p style="font-size: 0.9rem;">🎯 <strong>Correto seria:</strong> ${correctAnswerText}</p>
+                            <div style="font-size: 0.85rem; margin-top: 10px; color: #4A5568; background: rgba(255,255,255,0.5); padding: 8px; border-radius: 4px;">
+                                ${q.explanation}
+                            </div>
+                        </div>`;
+                }
+            });
+            feedbackHTML += '</div>';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            let actionButtonsHTML = "";
+
+            // CRITÉRIO DE 80%
+            if (percent >= 80) {
+                stars = "⭐⭐⭐⭐⭐"; 
+                msg = "Parabéns! Você dominou o conteúdo.";
+                actionButtonsHTML = `
+                    <button onclick="window.location.href='8ano-matematica.html'" style="width: 100%; padding: 15px; background-color: #48BB78; color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;">
+                        Concluir Atividade
+                    </button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Voltar para o Assunto
+                    </button>
+                `;
+            } else {
+                stars = "💪 Estude mais"; 
+                msg = `Você fez ${percent}%. Precisa de 80% para passar.`;
+                actionButtonsHTML = `
+                    <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Exercícios</button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Revisar Explicação
+                    </button>
+                `;
+            }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+            
+            // Injeta o feedback detalhado
+            document.getElementById('review-container').innerHTML = feedbackHTML;
+            // Injeta os botões de ação corretos
+            document.getElementById('action-buttons').innerHTML = actionButtonsHTML;
+
+            if (percent >= 80) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            document.getElementById('review-container').innerHTML = ""; // Limpa feedback anterior
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>

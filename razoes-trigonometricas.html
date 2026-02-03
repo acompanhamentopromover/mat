@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trigonometria - 9º Ano</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #064E3B;
+            --border-color: #000000;
+            
+            /* CORES: ESMERALDA E VIOLETA */
+            --theme-light: #D1FAE5; 
+            --theme-medium: #6EE7B7;
+            --theme-dark: #059669; 
+            --theme-contrast: #7C3AED; 
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+        .logo-img { max-height: 80px; width: auto; display: block; }
+
+        .container { width: 100%; max-width: 600px; padding: 20px; }
+
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .toggle-btn.active {
+            background-color: var(--theme-contrast);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .section-view { display: none; animation: fadeIn 0.3s ease-in-out; }
+        
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .example-box {
+            background-color: #ECFDF5;
+            border-left: 5px solid var(--theme-dark);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .step-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--theme-dark);
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .math-block {
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: #333;
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #D1FAE5;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .visual-row { display: flex; align-items: center; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: var(--theme-light);
+            border-radius: 12px;
+            border: 1px dashed var(--theme-dark);
+        }
+
+        .question-map {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-contrast);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; }
+
+        .feedback-box {
+            display: block; margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+        .feedback-title { font-weight: 800; text-transform: uppercase; font-size: 0.85rem; margin-bottom: 10px; }
+
+        #viewResult { text-align: center; display: none; animation: fadeIn 0.5s; }
+        .result-card {
+            background: white; border: 2px solid black; border-radius: 20px;
+            padding: 30px; box-shadow: 6px 6px 0px black; margin-bottom: 30px;
+        }
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-contrast); line-height: 1; margin: 10px 0; }
+        .btn-retry {
+            width: 100%; padding: 15px; background-color: var(--theme-contrast); color: white;
+            border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700;
+            cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;
+        }
+
+        .quiz-footer {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background-color: var(--white); border-top: 2px solid var(--border-color);
+            padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100;
+        }
+        .nav-btn {
+            padding: 12px 24px; border-radius: 8px; font-weight: 700; border: 2px solid var(--border-color); cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-contrast); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        <nav class="top-nav">
+            <a href="9ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">9º ANO</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Razões Trigonométricas</h1>
+            <p style="color: #555; margin-bottom: 20px;">A trigonometria estuda a relação entre os <strong>lados</strong> e os <strong>ângulos</strong> de um triângulo retângulo.</p>
+            
+            <div class="card-content">
+                <h3>1. Quem é quem?</h3>
+                <p class="explanation-text">Tudo depende do ângulo que você escolher (vamos chamar de Alfa - α).</p>
+                <div class="visual-row">
+                    
+                    <svg width="200" height="120" viewBox="0 0 200 120">
+                        <polygon points="40,100 160,100 160,20" fill="none" stroke="#333" stroke-width="2"/>
+                        <rect x="150" y="90" width="10" height="10" fill="none" stroke="#333"/>
+                        <path d="M 60 100 A 20 20 0 0 0 54 85" fill="none" stroke="#7C3AED" stroke-width="2"/>
+                        <text x="65" y="90" font-size="14" fill="#7C3AED">α</text>
+                        
+                        <text x="100" y="115" font-size="10" font-weight="bold">Adjacente (Ao lado)</text>
+                        <text x="165" y="60" font-size="10" font-weight="bold">Oposto (Frente)</text>
+                        <text x="65" y="45" font-size="10" font-weight="bold" fill="#059669">Hipotenusa (Rampa)</text>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>2. As 3 Razões Principais</h3>
+                <p class="explanation-text">Um truque para decorar é o nome <strong>SOH-CAH-TOA</strong>:</p>
+                
+                <div class="example-box">
+                    <span class="step-label">SENO (SOH)</span>
+                    <div class="math-block">Sen = Oposto / Hipotenusa</div>
+                </div>
+
+                <div class="example-box">
+                    <span class="step-label">COSSENO (CAH)</span>
+                    <div class="math-block">Cos = Adjacente / Hipotenusa</div>
+                </div>
+
+                <div class="example-box">
+                    <span class="step-label">TANGENTE (TOA)</span>
+                    <div class="math-block">Tan = Oposto / Adjacente</div>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>3. Ângulos que você deve saber</h3>
+                <p class="explanation-text">Os ângulos de 30°, 45° e 60° aparecem em quase todas as provas.</p>
+                <table style="width:100%; border-collapse:collapse; font-size:0.8rem; text-align:center;">
+                    <tr style="background:var(--theme-dark); color:white;">
+                        <th style="padding:5px;">Razão</th>
+                        <th>30°</th>
+                        <th>45°</th>
+                        <th>60°</th>
+                    </tr>
+                    <tr>
+                        <td style="padding:5px; font-weight:bold;">Seno</td>
+                        <td>1/2</td>
+                        <td>√2/2</td>
+                        <td>√3/2</td>
+                    </tr>
+                    <tr style="background:#f9f9f9;">
+                        <td style="padding:5px; font-weight:bold;">Cosseno</td>
+                        <td>√3/2</td>
+                        <td>√2/2</td>
+                        <td>1/2</td>
+                    </tr>
+                </table>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Identifique a razão correta.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Resultado</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente!</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES ---
+        const questions = [
+            // NÍVEL 1: IDENTIFICAÇÃO
+            {
+                id: 1,
+                text: "Como chamamos o lado do triângulo que fica de frente (oposto) para o ângulo de 90°?",
+                options: ["Cateto Oposto", "Cateto Adjacente", "Hipotenusa", "Tangente"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Fica de frente para o ângulo agudo.<br>
+                    <strong>(B) Incorreta:</strong> Fica ao lado do ângulo agudo.<br>
+                    <strong>(C) Correta:</strong> A hipotenusa é sempre o maior lado e fica oposta ao ângulo reto.<br>
+                    <strong>(D) Incorreta:</strong> Tangente é uma razão.`
+            },
+            {
+                id: 2,
+                text: "A razão entre o <strong>Cateto Oposto</strong> e a <strong>Hipotenusa</strong> é o:",
+                options: ["Seno", "Cosseno", "Tangente", "Pitágoras"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Pelo macete SOH (Seno = Oposto / Hipotenusa).<br>
+                    <strong>(B) Incorreta:</strong> Cosseno usa o Adjacente (CAH).<br>
+                    <strong>(C) Incorreta:</strong> Tangente não usa hipotenusa (TOA).<br>
+                    <strong>(D) Incorreta:</strong> Pitágoras é uma relação entre lados.`
+            },
+            {
+                id: 3,
+                text: "Qual dessas razões NÃO utiliza a hipotenusa no cálculo?",
+                options: ["Seno", "Cosseno", "Tangente", "Todas utilizam"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Seno = Oposto / Hipotenusa.<br>
+                    <strong>(B) Incorreta:</strong> Cosseno = Adjacente / Hipotenusa.<br>
+                    <strong>(C) Correta:</strong> Tangente é a única que relaciona apenas os dois catetos (Oposto / Adjacente).<br>
+                    <strong>(D) Incorreta:</strong> A tangente é a exceção.`
+            },
+            // NÍVEL 2: APLICAÇÃO VISUAL
+            {
+                id: 4,
+                text: "Observe um triângulo onde o cateto oposto é 3 e a hipotenusa é 5. Qual o valor do Seno?",
+                visual: `
+                    <svg width="100" height="60" viewBox="0 0 100 60">
+                        <polygon points="20,50 80,50 80,10" fill="none" stroke="#333"/>
+                        <text x="85" y="35" font-size="10">3</text>
+                        <text x="45" y="25" font-size="10">5</text>
+                    </svg>
+                `,
+                options: ["0,6", "0,8", "1,6", "0,75"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Seno = Oposto / Hipotenusa = 3 / 5 = 0,6.<br>
+                    <strong>(B) Incorreta:</strong> Esse seria o cosseno (4/5).<br>
+                    <strong>(C) Incorreta:</strong> Inverteu a divisão.<br>
+                    <strong>(D) Incorreta:</strong> Essa seria a tangente (3/4).`
+            },
+            {
+                id: 5,
+                text: "Se o cosseno de um ângulo é 0,5 e a hipotenusa mede 10, quanto mede o cateto adjacente?",
+                options: ["20", "5", "10", "2"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Multiplicou errado.<br>
+                    <strong>(B) Correta:</strong> Cos = Adj / Hip -> 0,5 = x / 10 -> x = 10 · 0,5 = 5.<br>
+                    <strong>(C) Incorreta:</strong> Igual à hipotenusa?<br>
+                    <strong>(D) Incorreta:</strong> Dividiu.`
+            },
+            {
+                id: 6,
+                text: "Qual é o valor da tangente de 45°?",
+                options: ["1", "0", "0,5", "√2"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> No triângulo de 45°, os catetos são iguais. Logo, Oposto / Adjacente = 1.<br>
+                    <strong>(B) Incorreta:</strong> Nunca é zero em triângulos.<br>
+                    <strong>(C) Incorreta:</strong> Esse é o seno de 30°.<br>
+                    <strong>(D) Incorreta:</strong> Valor irracional.`
+            },
+            // NÍVEL 3: ÂNGULOS NOTÁVEIS
+            {
+                id: 7,
+                text: "Quanto vale o Seno de 30°?",
+                options: ["1/2 (0,5)", "√3/2", "√2/2", "1"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Valor fundamental da tabela trigonométrica.<br>
+                    <strong>(B) Incorreta:</strong> Esse é o cosseno de 30°.<br>
+                    <strong>(C) Incorreta:</strong> Esse é o seno de 45°.<br>
+                    <strong>(D) Incorreta:</strong> Seno de 90°.`
+            },
+            {
+                id: 8,
+                text: "Em um triângulo retângulo, se um ângulo agudo é 60°, o outro será:",
+                options: ["30°", "60°", "90°", "45°"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Os ângulos agudos devem somar 90°. 90 - 60 = 30.<br>
+                    <strong>(B) Incorreta:</strong> Seria isósceles?<br>
+                    <strong>(C) Incorreta:</strong> Esse é o reto.<br>
+                    <strong>(D) Incorreta:</strong> Soma passaria de 90.`
+            },
+            {
+                id: 9,
+                text: "O cosseno de 60° tem o mesmo valor que:",
+                options: ["Seno de 30°", "Seno de 60°", "Tangente de 60°", "Cosseno de 30°"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Ângulos complementares (que somam 90°) trocam seus valores de seno e cosseno.<br>
+                    <strong>(B) Incorreta:</strong> Seno de 60° é √3/2.<br>
+                    <strong>(C) Incorreta:</strong> Tangente é diferente.<br>
+                    <strong>(D) Incorreta:</strong> Cos 30° é √3/2.`
+            },
+            // NÍVEL 4: PROBLEMAS PRÁTICOS
+            {
+                id: 10,
+                text: "Uma rampa de 10m de comprimento forma 30° com o solo. Qual a altura alcançada?",
+                visual: `
+                    <svg width="150" height="60" viewBox="0 0 150 60">
+                        <line x1="20" y1="50" x2="120" y2="50" stroke="#ccc"/>
+                        <line x1="20" y1="50" x2="120" y2="10" stroke="#059669" stroke-width="2"/>
+                        <text x="50" y="30" font-size="10">10m</text>
+                        <text x="35" y="48" font-size="8">30°</text>
+                    </svg>
+                `,
+                options: ["5m", "10m", "8,6m", "20m"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Altura é o cateto oposto. Sen 30° = Alt / 10 -> 0,5 = Alt / 10 -> Alt = 5m.<br>
+                    <strong>(B) Incorreta:</strong> Mesma medida da rampa?<br>
+                    <strong>(C) Incorreta:</strong> Usou cosseno.<br>
+                    <strong>(D) Incorreta:</strong> Multiplicou.`
+            },
+            {
+                id: 11,
+                text: "Um avião decola sob um ângulo de 30°. Após percorrer 2000m (distância inclinada), qual sua altura?",
+                options: ["1000m", "1500m", "1732m", "2000m"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Sen 30° = h / 2000 -> 0,5 = h / 2000 -> h = 1000m.<br>
+                    <strong>(B) Incorreta:</strong> Erro de cálculo.<br>
+                    <strong>(C) Incorreta:</strong> Usou cosseno.<br>
+                    <strong>(D) Incorreta:</strong> Mesma distância.`
+            },
+            {
+                id: 12,
+                text: "Para calcular a largura de um rio sem atravessar, o método mais comum usa:",
+                options: ["Teorema de Tales", "Tangente", "Cosseno", "Área do círculo"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Tales usa paralelas.<br>
+                    <strong>(B) Correta:</strong> Medimos a distância na margem (adjacente) e o ângulo para um ponto do outro lado. Tan = Largura / Margem.<br>
+                    <strong>(C) Incorreta:</strong> Precisaria da distância na água.<br>
+                    <strong>(D) Incorreta:</strong> Nada a ver.`
+            },
+            // NÍVEL 5: DESAFIOS
+            {
+                id: 13,
+                text: "Qual é a relação correta entre tangente, seno e cosseno?",
+                options: ["Tan = Sen / Cos", "Tan = Cos / Sen", "Tan = Sen · Cos", "Tan = Sen + Cos"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Identidade fundamental: Divindindo (Op/Hip) por (Adj/Hip), corta-se a hipotenusa e sobra Op/Adj.<br>
+                    <strong>(B) Incorreta:</strong> Essa é a cotangente.<br>
+                    <strong>(C) Incorreta:</strong> Não é produto.<br>
+                    <strong>(D) Incorreta:</strong> Não é soma.`
+            },
+            {
+                id: 14,
+                text: "Se o seno de um ângulo é igual ao seu cosseno, qual é esse ângulo?",
+                options: ["30°", "45°", "60°", "90°"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> 0,5 ≠ 0,86.<br>
+                    <strong>(B) Correta:</strong> Apenas em 45° os dois catetos são iguais, logo seno e cosseno valem √2/2.<br>
+                    <strong>(C) Incorreta:</strong> 0,86 ≠ 0,5.<br>
+                    <strong>(D) Incorreta:</strong> 1 ≠ 0.`
+            },
+            {
+                id: 15,
+                text: "Em um triângulo retângulo com catetos 1 e 1, quanto vale a hipotenusa?",
+                options: ["√2", "1", "2", "0"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Pitágoras: 1² + 1² = h² -> h² = 2 -> h = √2.<br>
+                    <strong>(B) Incorreta:</strong> Hipotenusa é maior.<br>
+                    <strong>(C) Incorreta:</strong> Não é soma simples.<br>
+                    <strong>(D) Incorreta:</strong> Impossível.`
+            }
+        ];
+
+        // --- LÓGICA DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        function setMode(mode) {
+            const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+            views.forEach(v => document.getElementById(v).style.display = 'none');
+            document.getElementById('quizFooter').style.display = 'none';
+
+            if(mode === 'explanation') {
+                document.getElementById('viewExplanation').style.display = 'block';
+                document.getElementById('btnExp').classList.add('active');
+                document.getElementById('btnPrac').classList.remove('active');
+            } else if (mode === 'practice') {
+                document.getElementById('viewPractice').style.display = 'block';
+                document.getElementById('quizFooter').style.display = 'flex';
+                document.getElementById('btnExp').classList.remove('active');
+                document.getElementById('btnPrac').classList.add('active');
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                document.getElementById('viewResult').style.display = 'block';
+            }
+            window.scrollTo(0,0);
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D'];
+            const ans = userAnswers[currentQuestion];
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888;">QUESTÃO ${currentQuestion + 1}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${q.visual ? `<div class="question-visual">${q.visual}</div>` : ''}
+                <div class="options-list">
+                    ${q.options.map((opt, i) => {
+                        let cls = '';
+                        if (ans !== null) {
+                            if (i === q.correct) cls = 'correct';
+                            else if (i === ans) cls = 'wrong';
+                            else cls = 'disabled';
+                        }
+                        return `
+                            <div class="option-btn ${cls}" onclick="handleAnswer(${i})">
+                                <div class="opt-circle">${letters[i]}</div>
+                                <div>${opt}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                ${ans !== null ? `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${ans === q.correct ? '✅ Mandou bem!' : '❌ Ops, veja só:'}</div>
+                        <div style="font-size:0.9rem; line-height:1.6;">${q.explanation}</div>
+                    </div>
+                ` : ''}
+            `;
+            updateNav();
+        }
+
+        function handleAnswer(idx) {
+            if (userAnswers[currentQuestion] !== null) return;
+            userAnswers[currentQuestion] = idx;
+            if (idx === questions[currentQuestion].correct) {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+            renderQuestion();
+            renderMap();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = questions.map((q, i) => {
+                let cls = 'map-dot';
+                if (i === currentQuestion) cls += ' active';
+                if (userAnswers[i] !== null) {
+                    cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+                }
+                return `<div class="${cls}" onclick="goTo(${i})">${i+1}</div>`;
+            }).join('');
+        }
+
+        function goTo(i) { currentQuestion = i; renderQuestion(); renderMap(); }
+        function changeQuestion(d) {
+            let n = currentQuestion + d;
+            if (n >= 0 && n < questions.length) goTo(n);
+        }
+
+        function updateNav() {
+            document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+            const next = document.getElementById('btnNext');
+            if (currentQuestion === questions.length - 1) {
+                next.textContent = "Finalizar";
+                next.onclick = finish;
+            } else {
+                next.textContent = "Próxima";
+                next.onclick = () => changeQuestion(1);
+            }
+        }
+
+        function finish() {
+            let correct = userAnswers.filter((a, i) => a === questions[i].correct).length;
+            let percent = Math.round((correct / questions.length) * 100);
+            
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${questions.length}`;
+            document.getElementById('finalStars').textContent = percent >= 80 ? "⭐⭐⭐⭐⭐" : percent >= 50 ? "⭐⭐⭐" : "⭐";
+            document.getElementById('finalMessage').textContent = percent >= 80 ? "Você dominou a Trigonometria!" : "Vale a pena dar mais uma revisada.";
+            
+            document.getElementById('action-buttons').innerHTML = `
+                <button class="btn-retry" onclick="reset()">🔄 Tentar Novamente</button>
+            `;
+            setMode('result');
+        }
+
+        function reset() {
+            userAnswers = new Array(questions.length).fill(null);
+            currentQuestion = 0;
+            setMode('explanation');
+        }
+
+        setMode('explanation');
+    </script>
+</body>
+</html>

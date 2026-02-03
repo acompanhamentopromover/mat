@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matemática 8º Ano - Promover</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000;
+            --white: #FFF;
+
+            --num: #805AD5;
+            --alg: #D53F8C;
+            --geo: #38A169;
+            --med: #D69E2E;
+            --prob: #3182CE;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .badge {
+            padding: 8px 16px;
+            color: #fff;
+            font-weight: 700;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            align-self: flex-start;
+        }
+
+        .num { background: var(--num); }
+        .alg { background: var(--alg); }
+        .geo { background: var(--geo); }
+        .med { background: var(--med); }
+        .prob { background: var(--prob); }
+
+        .topic {
+            text-decoration: none;
+            color: var(--text-color);
+            background: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            box-shadow: 4px 4px 0 var(--border-color);
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Matemática 8º Ano</h1>
+    <p class="subtitle">Conteúdos completos conforme a BNCC</p>
+
+    <!-- 🔢 NÚMEROS -->
+    <div class="group">
+        <div class="badge num">🔢 Números</div>
+        <a href="potenciacao.html" class="topic">Potenciação ➜</a>
+        <a href="notacao-cientifica.html" class="topic">Notação Científica ➜</a>
+        <a href="radiciacao.html" class="topic">Radiciação e Potências Fracionárias ➜</a>
+        <a href="dizimas-periodicas.html" class="topic">Dízimas Periódicas ➜</a>
+        <a href="fracao-geratriz.html" class="topic">Fração Geratriz ➜</a>
+        <a href="porcentagem.html" class="topic">Porcentagem (aplicações) ➜</a>
+        <a href="principio-multiplicativo.html" class="topic">Princípio Multiplicativo da Contagem ➜</a>
+    </div>
+
+    <!-- 🧩 ÁLGEBRA -->
+    <div class="group">
+        <div class="badge alg">🧩 Álgebra</div>
+        <a href="expressao-algebrica.html" class="topic">Expressões Algébricas ➜</a>
+        <a href="equacao-1-grau.html" class="topic">Equações do 1º Grau ➜</a>
+        <a href="sistemas-equacoes.html" class="topic">Sistemas de Equações ➜</a>
+        <a href="funcao-afim.html" class="topic">Função Afim ➜</a>
+        <a href="grafico-funcao-afim.html" class="topic">Gráfico da Função Afim ➜</a>
+        <a href="sequencias-numericas.html" class="topic">Sequências Numéricas ➜</a>
+        <a href="variacao-grandezas.html" class="topic">Variação Direta, Inversa e Não Proporcional ➜</a>
+        <a href="equacao-ax2-b.html" class="topic">Equações do tipo ax² = b ➜</a>
+    </div>
+
+    <!-- 📐 GEOMETRIA -->
+    <div class="group">
+        <div class="badge geo">📐 Geometria</div>
+        <a href="congruencia-triangulos.html" class="topic">Congruência de Triângulos ➜</a>
+        <a href="construcoes-geometricas.html" class="topic">Construções Geométricas ➜</a>
+        <a href="mediatriz-bissetriz.html" class="topic">Mediatriz e Bissetriz ➜</a>
+        <a href="transformacoes-geometricas.html" class="topic">Transformações Geométricas ➜</a>
+        <a href="quadrilateros.html" class="topic">Quadriláteros ➜</a>
+        <a href="poligonos.html" class="topic">Polígonos ➜</a>
+    </div>
+
+    <!-- ⚖️ GRANDEZAS E MEDIDAS -->
+    <div class="group">
+        <div class="badge med">⚖️ Grandezas e Medidas</div>
+        <a href="area-figuras-planas.html" class="topic">Área de Figuras Planas ➜</a>
+        <a href="volume-prismas.html" class="topic">Volume de Prismas Retangulares ➜</a>
+        <a href="litro-dm3.html" class="topic">Relação Litro × dm³ ➜</a>
+    </div>
+
+    <!-- 🎲 PROBABILIDADE E ESTATÍSTICA -->
+    <div class="group">
+        <div class="badge prob">🎲 Probabilidade e Estatística</div>
+        <a href="probabilidade.html" class="topic">Probabilidade ➜</a>
+        <a href="media-moda-mediana.html" class="topic">Média, Moda e Mediana ➜</a>
+        <a href="amplitude.html" class="topic">Amplitude ➜</a>
+        <a href="medidas-dispersao.html" class="topic">Medidas de Dispersão ➜</a>
+        <a href="graficos-estatisticos.html" class="topic">Gráficos Estatísticos ➜</a>
+        <a href="tabelas-classes.html" class="topic">Tabelas com Classes ➜</a>
+        <a href="amostragem.html" class="topic">Pesquisa e Amostragem ➜</a>
+    </div>
+
+    <footer>
+        © 2026 Promover Educação
+    </footer>
+
+</div>
+
+</body>
+</html>

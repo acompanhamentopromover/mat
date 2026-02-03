@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Média, Moda e Mediana - Detalhado</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA AMARELO/OURO (Dados/Estatística) */
+            --theme-color: #FFFBEB; 
+            --theme-active: #D97706; 
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR (ERRO) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- LOGO --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--theme-active);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO --- */
+        .section-view {
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: center; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+        .visual-svg { color: var(--theme-active); }
+        
+        /* Estilo para SVGs dentro das questões */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #FFFBEB;
+            border-radius: 12px;
+            border: 1px dashed var(--theme-active);
+        }
+
+        /* --- CARDS DE EXEMPLO DETALHADO --- */
+        .step-box {
+            background-color: #FFFBEB; 
+            border-left: 5px solid #D97706;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .step-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #92400E;
+            margin-bottom: 10px;
+            display: block;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        .math-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-family: monospace;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .math-comment {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.8rem;
+            color: #555;
+            margin-left: 10px;
+            font-style: italic;
+            background: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .highlight {
+            color: #D97706;
+            font-weight: 700;
+            background-color: #FEF3C7;
+            padding: 0 4px;
+            border-radius: 4px;
+        }
+
+        /* --- QUIZ MAPA --- */
+        .question-map {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-active);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        /* --- OPÇÕES --- */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.8; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        
+        .option-btn.disabled { pointer-events: none; }
+
+        /* --- FEEDBACK DETALHADO --- */
+        .feedback-box {
+            display: block; 
+            margin-top: 20px;
+            background-color: #EDF2F7;
+            border: 2px solid #2D3748;
+            border-radius: 12px;
+            padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- TELA DE RESULTADO --- */
+        #viewResult {
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px black;
+            margin-bottom: 30px;
+        }
+
+        .stars-container { font-size: 3rem; margin: 10px 0; }
+        .score-text { font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
+        .percentage-big { font-size: 3.5rem; font-weight: 800; color: var(--theme-active); line-height: 1; margin: 10px 0; }
+
+        .btn-retry {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--theme-active);
+            color: white;
+            border: 2px solid black;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px black;
+            transition: transform 0.1s;
+        }
+        
+        .btn-retry:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+
+        /* --- RODAPÉ FIXO --- */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            border-top: 2px solid var(--border-color);
+            padding: 15px 20px;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+        .btn-next { background-color: var(--theme-active); color: white; box-shadow: 2px 2px 0px var(--border-color); }
+        .btn-prev { background-color: #f0f0f0; color: #555; }
+        .btn-prev:disabled { opacity: 0.5; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="8ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Média, Moda e Mediana</h1>
+            <p style="color: #555; margin-bottom: 20px;">São as medidas de "tendência central". Elas resumem uma lista enorme de dados em um único número representativo.</p>
+            
+            <div class="card-content">
+                <h3>1. Média (O Equilíbrio)</h3>
+                <p class="explanation-text">É como "dividir a conta" igualmente. Você soma tudo e divide pela quantidade de pessoas.</p>
+                
+                <div class="step-box">
+                    <span class="step-title">Exemplo: Notas 6, 8 e 10</span>
+                    
+                    <p class="explanation-text"><strong>Passo 1: Somar todos os valores.</strong></p>
+                    <div class="math-row">6 + 8 + 10 = 24</div>
+                    
+                    <p class="explanation-text"><strong>Passo 2: Contar quantos valores são.</strong></p>
+                    <div class="math-row">São 3 notas.</div>
+                    
+                    <p class="explanation-text"><strong>Passo 3: Dividir a soma pela quantidade.</strong></p>
+                    <div class="math-row">24 ÷ 3 = <span class="highlight">8</span></div>
+                    
+                    <p class="explanation-text">A média é 8.</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>2. Moda (O Popular)</h3>
+                <p class="explanation-text">A Moda é o número que está "na moda", ou seja, o que aparece <strong>mais vezes</strong>.</p>
+                
+                <div class="step-box">
+                    <span class="step-title">Exemplo: Lista de Sapatos</span>
+                    <p class="explanation-text">Números: 35, 36, 37, 36, 38, 36, 40.</p>
+                    
+                    <p class="explanation-text"><strong>Contagem:</strong></p>
+                    <div class="math-row">35: 1 vez</div>
+                    <div class="math-row">36: <span class="highlight">3 vezes</span> (Campeão!)</div>
+                    <div class="math-row">37: 1 vez</div>
+                    
+                    <p class="explanation-text">A Moda é <strong>36</strong>.</p>
+                    <p class="explanation-text" style="font-size:0.8rem; margin-top:5px;">Obs: Se dois números empatarem, temos duas modas (Bimodal).</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>3. Mediana (O Centro)</h3>
+                <p class="explanation-text">É o valor que fica exatamente no meio da lista. Mas atenção: a lista precisa estar <strong>ORDENADA</strong> (crescente ou decrescente).</p>
+                
+                <div class="step-box">
+                    <span class="step-title">Caso 1: Quantidade Ímpar</span>
+                    <p class="explanation-text">Lista: 5, 2, 9, 1, 8.</p>
+                    
+                    <p class="explanation-text"><strong>Passo 1: ORDENAR! (Crucial)</strong></p>
+                    <div class="math-row">1, 2, <span class="highlight">5</span>, 8, 9</div>
+                    
+                    <p class="explanation-text">O número 5 está bem no centro (tem 2 antes e 2 depois).</p>
+                    <p class="explanation-text">Mediana = <strong>5</strong>.</p>
+                </div>
+
+                <div class="step-box" style="margin-top:15px;">
+                    <span class="step-title">Caso 2: Quantidade Par</span>
+                    <p class="explanation-text">Lista Ordenada: 2, 4, 6, 8.</p>
+                    
+                    <p class="explanation-text">Não tem um único meio. Temos dois: o 4 e o 6.</p>
+                    <div class="math-row">2, <span class="highlight">4, 6</span>, 8</div>
+                    
+                    <p class="explanation-text"><strong>Solução:</strong> Fazemos a média dos dois.</p>
+                    <div class="math-row">(4 + 6) ÷ 2 = 10 ÷ 2 = <span class="highlight">5</span></div>
+                    <p class="explanation-text">Mediana = 5.</p>
+                </div>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Analise os dados.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Resultado</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 15 de 15</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente!</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (MÉDIA, MODA, MEDIANA) ---
+        const questions = [
+            // NÍVEL 1: CONCEITOS
+            {
+                id: 1,
+                text: "O que é a <strong>Moda</strong> em um conjunto de dados?",
+                options: ["O valor do meio", "O valor que mais se repete", "A soma dividida pelo total", "O maior valor"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Isso é a Mediana.<br>
+                    <strong>(B) Correta:</strong> Moda vem de 'estar na moda', ou seja, o que aparece com maior frequência.<br>
+                    <strong>(C) Incorreta:</strong> Isso é a Média.<br>
+                    <strong>(D) Incorreta:</strong> Isso é o Máximo.`
+            },
+            {
+                id: 2,
+                text: "Para calcular a <strong>Mediana</strong>, qual é o passo obrigatório antes de achar o meio?",
+                options: ["Somar tudo", "Colocar os números em ordem crescente ou decrescente", "Dividir pelo total", "Multiplicar os extremos"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Passo da média.<br>
+                    <strong>(B) Correta:</strong> Se não ordenar, o valor do meio será aleatório e errado. Ex: a mediana de 1, 9, 2 não é 9, é 2.<br>
+                    <strong>(C) Incorreta:</strong> Passo da média.<br>
+                    <strong>(D) Incorreta:</strong> Não existe essa regra.`
+            },
+            {
+                id: 3,
+                text: "Como calculamos a <strong>Média Aritmética</strong> simples?",
+                options: ["Soma dos valores ÷ Quantidade de valores", "Maior valor - Menor valor", "Valor do meio", "Produto dos valores"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> É a distribuição igualitária da soma total pelo número de participantes.<br>
+                    <strong>(B) Incorreta:</strong> Isso é a Amplitude.<br>
+                    <strong>(C) Incorreta:</strong> Mediana.<br>
+                    <strong>(D) Incorreta:</strong> Não se usa.`
+            },
+            // NÍVEL 2: CÁLCULOS SIMPLES
+            {
+                id: 4,
+                text: "Calcule a média das notas: 5, 7, 9.",
+                options: ["6", "7", "8", "21"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Baixo.<br>
+                    <strong>(B) Correta:</strong> Soma: 5 + 7 + 9 = 21. Divisão: 21 ÷ 3 = 7.<br>
+                    <strong>(C) Incorreta:</strong> Alto.<br>
+                    <strong>(D) Incorreta:</strong> Esqueceu de dividir.`
+            },
+            {
+                id: 5,
+                text: "Qual é a moda da lista: 2, 3, 5, 5, 5, 8, 9?",
+                options: ["5", "3", "8", "2"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> O número 5 aparece 3 vezes. Todos os outros aparecem apenas 1 vez.<br>
+                    <strong>(B) Incorreta:</strong> Aparece 1 vez.<br>
+                    <strong>(C) Incorreta:</strong> Aparece 1 vez.<br>
+                    <strong>(D) Incorreta:</strong> Aparece 1 vez.`
+            },
+            {
+                id: 6,
+                text: "Encontre a mediana de: 10, 20, 30, 40, 50.",
+                options: ["20", "30", "40", "150"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Não é o centro.<br>
+                    <strong>(B) Correta:</strong> Já estão ordenados. O termo central é o 30. Ficam 2 para a esquerda e 2 para a direita.<br>
+                    <strong>(C) Incorreta:</strong> Não é o centro.<br>
+                    <strong>(D) Incorreta:</strong> Soma.`
+            },
+            // NÍVEL 3: CÁLCULOS COM PEGADINHAS (ORDENAÇÃO)
+            {
+                id: 7,
+                text: "Qual a mediana de: 5, 1, 3?",
+                options: ["1", "5", "3", "4"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Pegou o menor, mas não o do meio.<br>
+                    <strong>(B) Incorreta:</strong> Pegou o primeiro da lista original (erro comum).<br>
+                    <strong>(C) Correta:</strong> 1º Ordenar: 1, 3, 5. 2º Achar o meio: 3.<br>
+                    <strong>(D) Incorreta:</strong> Calculou a média (9/3=3), que por acaso deu igual.`
+            },
+            {
+                id: 8,
+                text: "Calcule a mediana do conjunto par: 2, 4, 8, 10.",
+                options: ["4", "8", "6", "12"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Um dos meios.<br>
+                    <strong>(B) Incorreta:</strong> Um dos meios.<br>
+                    <strong>(C) Correta:</strong> Os meios são 4 e 8. A média entre eles é (4+8) ÷ 2 = 12 ÷ 2 = 6.<br>
+                    <strong>(D) Incorreta:</strong> A soma dos meios.`
+            },
+            {
+                id: 9,
+                text: "Lista: 1, 1, 2, 3. Qual a moda e a mediana?",
+                options: ["Moda 1, Mediana 1,5", "Moda 1, Mediana 2", "Moda 2, Mediana 1,5", "Moda 3, Mediana 2"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> Moda é 1 (repete). Mediana é média de 1 e 2 (meios): (1+2)/2 = 1,5.<br>
+                    <strong>(B) Incorreta:</strong> Mediana errada.<br>
+                    <strong>(C) Incorreta:</strong> Moda errada.<br>
+                    <strong>(D) Incorreta:</strong> Tudo errado.`
+            },
+            // NÍVEL 4: INTERPRETAÇÃO E ZEROS
+            {
+                id: 10,
+                text: "Notas: 0, 10, 10. Qual a média?",
+                options: ["10", "6,6", "20", "5"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Ignorou o zero.<br>
+                    <strong>(B) Correta:</strong> Soma: 0+10+10 = 20. Divisão por 3: 20 ÷ 3 ≈ 6,66.<br>
+                    <strong>(C) Incorreta:</strong> Soma.<br>
+                    <strong>(D) Incorreta:</strong> Calculou (0+10)/2?`
+            },
+            {
+                id: 11,
+                text: "Um conjunto pode ter duas modas (Bimodal)? Ex: 2, 2, 5, 5, 8.",
+                options: ["Não, escolhe o maior", "Sim, as modas são 2 e 5", "Sim, a moda é a média deles", "Não, não tem moda"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Não há hierarquia.<br>
+                    <strong>(B) Correta:</strong> Se dois números empatam na frequência máxima, ambos são a moda.<br>
+                    <strong>(C) Incorreta:</strong> Não se faz média de moda.<br>
+                    <strong>(D) Incorreta:</strong> Amodal é quando nenhum repete.`
+            },
+            {
+                id: 12,
+                text: "Se a média de 2 números é 10, qual é a soma deles?",
+                options: ["5", "10", "20", "100"],
+                correct: 2,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> Divisão.<br>
+                    <strong>(B) Incorreta:</strong> A média.<br>
+                    <strong>(C) Correta:</strong> Se Média = Soma / 2 = 10, então Soma = 10 x 2 = 20.<br>
+                    <strong>(D) Incorreta:</strong> Quadrado.`
+            },
+            // NÍVEL 5: DESAFIOS DE RACIOCÍNIO
+            {
+                id: 13,
+                text: "Tenho notas 5 e 7. Quanto preciso tirar na próxima para a média ser 7?",
+                options: ["7", "9", "10", "8"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> (5+7+7)/3 = 6,33.<br>
+                    <strong>(B) Correta:</strong> Quero média 7 em 3 provas. Total necessário = 7 x 3 = 21. Já tenho 5+7=12. Faltam 21 - 12 = 9.<br>
+                    <strong>(C) Incorreta:</strong> (5+7+10)/3 = 7,33.<br>
+                    <strong>(D) Incorreta:</strong> (5+7+8)/3 = 6,66.`
+            },
+            {
+                id: 14,
+                text: "Adicionar um número muito alto à lista (ex: 1000) afeta mais:",
+                options: ["A Média", "A Mediana", "A Moda", "Afeta todos igual"],
+                correct: 0,
+                explanation: `
+                    <strong>(A) Correta:</strong> A média é sensível a valores extremos (outliers) porque soma tudo. A mediana (meio) quase não muda.<br>
+                    <strong>(B) Incorreta:</strong> Mediana é robusta a extremos.<br>
+                    <strong>(C) Incorreta:</strong> Moda só muda se o 1000 se repetir muito.<br>
+                    <strong>(D) Incorreta:</strong> A média sofre mais.`
+            },
+            {
+                id: 15,
+                text: "Em um conjunto de dados onde todos os números são iguais (Ex: 5, 5, 5), a média, moda e mediana são:",
+                options: ["Diferentes", "Iguais (todas 5)", "Zero", "Indefinidas"],
+                correct: 1,
+                explanation: `
+                    <strong>(A) Incorreta:</strong> São iguais.<br>
+                    <strong>(B) Correta:</strong> Média (15/3=5), Moda (5 repete), Mediana (5 tá no meio).<br>
+                    <strong>(C) Incorreta:</strong> Não.<br>
+                    <strong>(D) Incorreta:</strong> Existem.`
+            }
+        ];
+
+        // --- ESTADO DO APP ---
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+
+        // --- NAVEGAÇÃO ENTRE ABAS ---
+        function setMode(mode) {
+            const expDiv = document.getElementById('viewExplanation');
+            const pracDiv = document.getElementById('viewPractice');
+            const resDiv = document.getElementById('viewResult');
+            const expBtn = document.getElementById('btnExp');
+            const pracBtn = document.getElementById('btnPrac');
+            const footer = document.getElementById('quizFooter');
+
+            expDiv.style.display = 'none';
+            pracDiv.style.display = 'none';
+            resDiv.style.display = 'none';
+            footer.style.display = 'none';
+
+            if(mode === 'explanation') {
+                expDiv.style.display = 'block';
+                expBtn.classList.add('active');
+                pracBtn.classList.remove('active');
+            } else if (mode === 'practice') {
+                pracDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.add('active');
+                footer.style.display = 'flex';
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                resDiv.style.display = 'block';
+                expBtn.classList.remove('active');
+                pracBtn.classList.remove('active');
+            }
+            window.scrollTo(0,0);
+        }
+
+        // --- RENDERIZAÇÃO DO QUIZ ---
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const userAnswer = userAnswers[currentQuestion]; 
+            const isAnswered = userAnswer !== null;
+
+            let optionsHTML = '';
+            q.options.forEach((opt, idx) => {
+                let statusClass = '';
+                if (isAnswered) {
+                    if (idx === q.correct) statusClass = 'correct'; 
+                    else if (idx === userAnswer) statusClass = 'wrong'; 
+                    else statusClass = 'disabled'; 
+                }
+
+                optionsHTML += `
+                    <div class="option-btn ${statusClass}" onclick="handleAnswer(${idx})">
+                        <div class="opt-circle">${letters[idx]}</div>
+                        <div style="flex: 1;">${opt}</div>
+                    </div>
+                `;
+            });
+
+            let feedbackHTML = '';
+            if (isAnswered) {
+                const feedbackTitle = userAnswer === q.correct 
+                    ? '<span style="color:#276749">✅ Resposta Correta!</span>' 
+                    : '<span style="color:#C53030">❌ Atenção!</span>';
+                
+                feedbackHTML = `
+                    <div class="feedback-box">
+                        <div class="feedback-title">${feedbackTitle}</div>
+                        <div style="font-size: 0.90rem; line-height: 1.6;">${q.explanation}</div>
+                    </div>
+                `;
+            }
+
+            // Verifica se tem imagem visual na questão
+            let visualHTML = '';
+            if (q.visual) {
+                visualHTML = `<div class="question-visual">${q.visual}</div>`;
+            }
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+                    <h2 style="font-size: 1.1rem; margin-top: 5px;">${q.text}</h2>
+                </div>
+                ${visualHTML}
+                <div class="options-list">
+                    ${optionsHTML}
+                </div>
+                ${feedbackHTML}
+            `;
+
+            updateNavButtons();
+            renderMap();
+        }
+
+        function handleAnswer(selectedIdx) {
+            if (userAnswers[currentQuestion] !== null) return; // Já respondeu
+
+            userAnswers[currentQuestion] = selectedIdx;
+            const isCorrect = (selectedIdx === questions[currentQuestion].correct);
+
+            if (isCorrect) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                document.body.classList.add('shake-effect');
+                setTimeout(() => document.body.classList.remove('shake-effect'), 500);
+            }
+
+            renderQuestion();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = '';
+            
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                let className = 'map-dot';
+                if (idx === currentQuestion) className += ' active';
+                
+                const ans = userAnswers[idx];
+                if (ans !== null) {
+                    if (ans === q.correct) className += ' answered-correct';
+                    else className += ' answered-wrong';
+                }
+
+                dot.className = className;
+                dot.textContent = idx + 1;
+                dot.onclick = () => { currentQuestion = idx; renderQuestion(); };
+                map.appendChild(dot);
+            });
+
+            const currentDot = map.children[currentQuestion];
+            if (currentDot) {
+                currentDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        function changeQuestion(dir) {
+            const next = currentQuestion + dir;
+            if (next >= 0 && next < questions.length) {
+                currentQuestion = next;
+                renderQuestion();
+            }
+        }
+
+        function updateNavButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            const btnNext = document.getElementById('btnNext');
+            
+            if (currentQuestion === questions.length - 1) {
+                btnNext.textContent = "Finalizar";
+                btnNext.onclick = finishQuiz;
+                btnNext.style.backgroundColor = "#D97706"; 
+            } else {
+                btnNext.textContent = "Próxima";
+                btnNext.onclick = () => changeQuestion(1);
+                btnNext.style.backgroundColor = ""; 
+            }
+        }
+
+        // --- LÓGICA DE FINALIZAÇÃO E FEEDBACK DETALHADO ---
+        function finishQuiz() {
+            score = 0;
+            let feedbackHTML = '<div style="text-align: left; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">';
+
+            userAnswers.forEach((ans, idx) => {
+                const q = questions[idx];
+                const isCorrect = (ans === q.correct);
+                
+                if (isCorrect) {
+                    score++;
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: #F0FFF4; border-radius: 8px; border-left: 4px solid #48BB78;">
+                            <p style="font-size: 0.9rem;"><strong>Questão ${idx+1}:</strong> ✅ Acertou!</p>
+                        </div>`;
+                } else {
+                    const userAnswerText = q.options[ans];
+                    const correctAnswerText = q.options[q.correct];
+                    feedbackHTML += `
+                        <div style="margin-bottom: 15px; padding: 15px; background: #FFF5F5; border-radius: 8px; border-left: 4px solid #F56565;">
+                            <p style="font-weight: 700; color: #C53030;">Questão ${idx+1}: ${q.text}</p>
+                            <p style="font-size: 0.9rem; margin-top: 5px;">❌ <strong>Você marcou:</strong> ${userAnswerText}</p>
+                            <p style="font-size: 0.9rem;">🎯 <strong>Correto seria:</strong> ${correctAnswerText}</p>
+                            <div style="font-size: 0.85rem; margin-top: 10px; color: #4A5568; background: rgba(255,255,255,0.5); padding: 8px; border-radius: 4px;">
+                                ${q.explanation}
+                            </div>
+                        </div>`;
+                }
+            });
+            feedbackHTML += '</div>';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+            
+            let stars = "";
+            let msg = "";
+            let actionButtonsHTML = "";
+
+            // CRITÉRIO DE 80%
+            if (percent >= 80) {
+                stars = "⭐⭐⭐⭐⭐"; 
+                msg = "Parabéns! Você dominou o conteúdo.";
+                actionButtonsHTML = `
+                    <button onclick="window.location.href='8ano-matematica.html'" style="width: 100%; padding: 15px; background-color: #48BB78; color: white; border: 2px solid black; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 0px black; transition: transform 0.1s;">
+                        Concluir Atividade
+                    </button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Voltar para o Assunto
+                    </button>
+                `;
+            } else {
+                stars = "💪 Estude mais"; 
+                msg = `Você fez ${percent}%. Precisa de 80% para passar.`;
+                actionButtonsHTML = `
+                    <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Exercícios</button>
+                    <button onclick="setMode('explanation')" style="margin-top:15px; width:100%; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                        ⬅ Revisar Explicação
+                    </button>
+                `;
+            }
+
+            document.getElementById('finalStars').textContent = stars;
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Você acertou ${score} de ${total}`;
+            document.getElementById('finalMessage').textContent = msg;
+            
+            // Injeta o feedback detalhado
+            document.getElementById('review-container').innerHTML = feedbackHTML;
+            // Injeta os botões de ação corretos
+            document.getElementById('action-buttons').innerHTML = actionButtonsHTML;
+
+            if (percent >= 80) {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            setMode('result');
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            document.getElementById('review-container').innerHTML = ""; // Limpa feedback anterior
+            setMode('explanation'); 
+        }
+
+        setMode('explanation');
+
+    </script>
+</body>
+</html>
