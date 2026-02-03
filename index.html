@@ -3,26 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matemática - Promover</title>
+    <title>Índice Geral - Matemática Promover</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
     <style>
-        /* --- ESTILO PROMOVER (Identidade Visual) --- */
+        /* --- VARIÁVEIS DE TEMA --- */
         :root {
             --bg-color: #F8F9FA;
             --text-color: #2D3748;
             --border-color: #000000;
             --white: #FFFFFF;
+
+            /* Cores das Categorias */
+            --color-num: #805AD5; /* Roxo */
+            --bg-num: #E9D8FD;
             
-            /* Cores das Seções */
-            --color-numbers: #E9D8FD; /* Roxo */
-            --color-algebra: #FED7E2; /* Rosa */
-            --color-geo: #C6F6D5;     /* Verde */
-            --color-measures: #FEFCBF;/* Amarelo */
-            --color-prob: #E0FCFF;    /* Azul Claro */
+            --color-alg: #D53F8C; /* Rosa */
+            --bg-alg: #FED7E2;
+            
+            --color-geo: #38A169; /* Verde */
+            --bg-geo: #C6F6D5;
+            
+            --color-med: #D69E2E; /* Amarelo */
+            --bg-med: #FEFCBF;
+            
+            --color-prob: #3182CE; /* Azul */
+            --bg-prob: #E0FCFF;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -35,50 +44,45 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
             padding-bottom: 80px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 600px;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
+            overflow-x: hidden;
         }
 
         /* --- HEADER --- */
         .logo-header {
-            text-align: center;
-            margin-bottom: 10px;
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
         }
-        
-        .logo-img {
-            max-height: 80px;
-            width: auto;
-            display: block;
-            margin: 0 auto 10px auto;
+        .logo-img { max-height: 80px; width: auto; display: block; }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
         }
 
         h1 {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
+            text-align: center;
             font-weight: 900;
-            color: var(--text-color);
+            margin-bottom: 5px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
         }
-
         .subtitle {
-            font-size: 0.95rem;
+            text-align: center;
             color: #555;
-            font-weight: 600;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
         }
 
-        /* --- BARRA DE PESQUISA (Estilo Pop) --- */
+        /* --- BARRA DE PESQUISA --- */
         .search-container {
             position: relative;
             width: 100%;
+            margin-bottom: 30px;
         }
 
         .search-input {
@@ -95,66 +99,59 @@
             outline: none;
             transition: all 0.2s ease;
         }
-
         .search-input:focus {
             transform: translate(2px, 2px);
             box-shadow: 2px 2px 0px var(--border-color);
         }
-
         .search-icon {
             position: absolute;
             left: 20px;
             top: 50%;
             transform: translateY(-50%);
             font-size: 1.2rem;
-            opacity: 0.7;
+            opacity: 0.6;
         }
 
-        /* --- SEÇÕES --- */
-        .content-group {
+        /* --- BADGES DE CATEGORIA --- */
+        .category-header {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
-            animation: fadeIn 0.5s ease;
+            align-items: center;
+            margin-top: 30px;
+            margin-bottom: 15px;
         }
-
-        .section-badge {
-            display: inline-block;
+        .badge {
             padding: 8px 16px;
-            background-color: var(--text-color);
-            color: var(--white);
-            font-size: 0.9rem;
+            color: white;
             font-weight: 700;
             border-radius: 8px;
             border: 2px solid var(--border-color);
-            box-shadow: 3px 3px 0px rgba(0,0,0,0.2);
             text-transform: uppercase;
-            align-self: flex-start;
-            margin-bottom: 5px;
+            font-size: 0.9rem;
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.2);
         }
+        .badge-num { background-color: var(--color-num); }
+        .badge-alg { background-color: var(--color-alg); }
+        .badge-geo { background-color: var(--color-geo); }
+        .badge-med { background-color: var(--color-med); }
+        .badge-prob { background-color: var(--color-prob); }
+        .badge-menus { background-color: #2D3748; }
 
-        /* Cores específicas para as badgets */
-        .badge-num { background-color: #805AD5; }
-        .badge-alg { background-color: #D53F8C; }
-        .badge-geo { background-color: #38A169; }
-        .badge-med { background-color: #D69E2E; }
-        .badge-prob { background-color: #3182CE; }
-
-        /* --- BOTÕES DOS TÓPICOS --- */
+        /* --- BOTÕES DOS TÓPICOS (CARACTERIZADOS) --- */
         .topic-btn {
             display: flex;
             align-items: center;
             justify-content: space-between;
             text-decoration: none;
             color: var(--text-color);
-            padding: 18px 20px;
-            border-radius: 16px;
+            padding: 16px 20px;
             background-color: var(--white);
             border: 2px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
             box-shadow: 4px 4px 0px var(--border-color);
             transition: all 0.1s ease;
-            font-weight: 600;
-            font-size: 1rem;
             position: relative;
             overflow: hidden;
         }
@@ -162,6 +159,7 @@
         .topic-btn:hover {
             transform: translate(-2px, -2px);
             box-shadow: 6px 6px 0px var(--border-color);
+            background-color: #FAFAFA;
         }
 
         .topic-btn:active {
@@ -169,25 +167,33 @@
             box-shadow: 2px 2px 0px var(--border-color);
         }
 
-        /* Indicação visual de cor na lateral do botão */
+        /* A Borda Lateral Colorida (Característica) */
         .topic-btn::before {
             content: '';
             position: absolute;
             left: 0;
             top: 0;
             bottom: 0;
-            width: 12px;
+            width: 10px;
             border-right: 2px solid var(--border-color);
         }
 
-        /* Cores das laterais */
-        .group-num .topic-btn::before { background-color: var(--color-numbers); }
-        .group-alg .topic-btn::before { background-color: var(--color-algebra); }
-        .group-geo .topic-btn::before { background-color: var(--color-geo); }
-        .group-med .topic-btn::before { background-color: var(--color-measures); }
-        .group-prob .topic-btn::before { background-color: var(--color-prob); }
+        /* Cores das laterais por categoria */
+        .btn-num::before { background-color: var(--bg-num); }
+        .btn-alg::before { background-color: var(--bg-alg); }
+        .btn-geo::before { background-color: var(--bg-geo); }
+        .btn-med::before { background-color: var(--bg-med); }
+        .btn-prob::before { background-color: var(--bg-prob); }
+        
+        /* Botões de Menu Principal (Estilo especial) */
+        .btn-menu-main {
+            background-color: #EDF2F7;
+            padding: 20px;
+        }
+        .btn-menu-main::before { background-color: #CBD5E0; width: 15px; }
 
-        .arrow { font-size: 1.2rem; font-weight: 900; }
+        .arrow { font-weight: 900; color: #CBD5E0; }
+        .topic-btn:hover .arrow { color: var(--text-color); }
 
         /* Mensagem de Não Encontrado */
         #no-results {
@@ -199,97 +205,165 @@
         }
 
         footer {
-            margin-top: 40px;
+            margin-top: 50px;
             font-size: 0.8rem;
             color: #888;
             text-align: center;
             font-weight: 600;
         }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
+    <div class="logo-header">
+        <img src="logo.png" alt="Logo Promover" class="logo-img">
+    </div>
+
     <div class="container">
-        
-        <header class="logo-header">
-            <img src="logo.png" alt="Logo Promover" class="logo-img"> 
-            <h1>Matemática - Promover</h1>
-            <p class="subtitle">O que vamos aprender hoje?</p>
-        </header>
+        <h1>Índice Geral</h1>
+        <p class="subtitle">Todos os conteúdos organizados por tema</p>
 
         <div class="search-container">
             <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar conteúdo... (ex: Equações do 2º Grau)">
+            <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar qualquer conteúdo...">
+        </div>
+
+        <div class="content-group">
+            <div class="category-header"><span class="badge badge-menus">📂 Menus por Ano</span></div>
+            <a href="6ano-matematica.html" class="topic-btn btn-menu-main">Matemática 6º Ano <span class="arrow">➜</span></a>
+            <a href="7ano-matematica.html" class="topic-btn btn-menu-main">Matemática 7º Ano <span class="arrow">➜</span></a>
+            <a href="8ano-matematica.html" class="topic-btn btn-menu-main">Matemática 8º Ano <span class="arrow">➜</span></a>
+            <a href="9ano-matematica.html" class="topic-btn btn-menu-main">Matemática 9º Ano <span class="arrow">➜</span></a>
+        </div>
+
+        <div class="content-group">
+            <div class="category-header"><span class="badge badge-num">🔢 Números & Operações</span></div>
+            <a href="numeros-inteiros.html" class="topic-btn btn-num">Números Inteiros <span class="arrow">➜</span></a>
+            <a href="numeros-racionais.html" class="topic-btn btn-num">Números Racionais <span class="arrow">➜</span></a>
+            <a href="numeros-irracionais.html" class="topic-btn btn-num">Números Irracionais <span class="arrow">➜</span></a>
+            <a href="numeros-decimais.html" class="topic-btn btn-num">Números Decimais <span class="arrow">➜</span></a>
+            <a href="numeros-sistema.html" class="topic-btn btn-num">Sistema de Numeração <span class="arrow">➜</span></a>
+            <a href="conjuntos-numericos.html" class="topic-btn btn-num">Conjuntos Numéricos <span class="arrow">➜</span></a>
+            <a href="operacoes-naturais.html" class="topic-btn btn-num">Operações com Naturais <span class="arrow">➜</span></a>
+            <a href="operacoes-inteiros.html" class="topic-btn btn-num">Operações com Inteiros <span class="arrow">➜</span></a>
+            <a href="operacoes-reais.html" class="topic-btn btn-num">Operações com Reais <span class="arrow">➜</span></a>
+            <a href="potenciacao.html" class="topic-btn btn-num">Potenciação <span class="arrow">➜</span></a>
+            <a href="potenciacao-raiz.html" class="topic-btn btn-num">Potenciação e Raiz <span class="arrow">➜</span></a>
+            <a href="potenciacao-raiz-inteiros.html" class="topic-btn btn-num">Potenciação e Raiz (Inteiros) <span class="arrow">➜</span></a>
+            <a href="potenciacao-expoentes-inteiros.html" class="topic-btn btn-num">Potenciação (Expoentes Inteiros) <span class="arrow">➜</span></a>
+            <a href="radiciacao.html" class="topic-btn btn-num">Radiciação <span class="arrow">➜</span></a>
+            <a href="radiciacao-propriedades.html" class="topic-btn btn-num">Propriedades da Radiciação <span class="arrow">➜</span></a>
+            <a href="notacao-cientifica.html" class="topic-btn btn-num">Notação Científica <span class="arrow">➜</span></a>
+            <a href="fracoes.html" class="topic-btn btn-num">Frações <span class="arrow">➜</span></a>
+            <a href="fracao-geratriz.html" class="topic-btn btn-num">Fração Geratriz <span class="arrow">➜</span></a>
+            <a href="dizimas-periodicas.html" class="topic-btn btn-num">Dízimas Periódicas <span class="arrow">➜</span></a>
+            <a href="mmc-mdc.html" class="topic-btn btn-num">MMC e MDC <span class="arrow">➜</span></a>
+            <a href="primos-compostos.html" class="topic-btn btn-num">Primos e Compostos <span class="arrow">➜</span></a>
+            <a href="fatores-primos.html" class="topic-btn btn-num">Fatores Primos <span class="arrow">➜</span></a>
+            <a href="criterios-divisibilidade.html" class="topic-btn btn-num">Critérios de Divisibilidade <span class="arrow">➜</span></a>
+            <a href="porcentagem.html" class="topic-btn btn-num">Porcentagem <span class="arrow">➜</span></a>
+            <a href="porcentagem-juros.html" class="topic-btn btn-num">Porcentagem e Juros <span class="arrow">➜</span></a>
+            <a href="porcentagem-aplicacoes.html" class="topic-btn btn-num">Porcentagem: Aplicações <span class="arrow">➜</span></a>
+            <a href="juros-simples-compostos.html" class="topic-btn btn-num">Juros Simples e Compostos <span class="arrow">➜</span></a>
+            <a href="principio-multiplicativo.html" class="topic-btn btn-num">Princípio Multiplicativo <span class="arrow">➜</span></a>
+        </div>
+
+        <div class="content-group">
+            <div class="category-header"><span class="badge badge-alg">🧩 Álgebra</span></div>
+            <a href="equacao-1-grau.html" class="topic-btn btn-alg">Equação do 1º Grau <span class="arrow">➜</span></a>
+            <a href="equacoes-1grau.html" class="topic-btn btn-alg">Equações do 1º Grau (Aprofundamento) <span class="arrow">➜</span></a>
+            <a href="equacoes-2grau.html" class="topic-btn btn-alg">Equações do 2º Grau <span class="arrow">➜</span></a>
+            <a href="equacao-ax2-b.html" class="topic-btn btn-alg">Equações ax² = b <span class="arrow">➜</span></a>
+            <a href="resolucao-equacoes.html" class="topic-btn btn-alg">Resolução de Equações <span class="arrow">➜</span></a>
+            <a href="sistemas-equacoes.html" class="topic-btn btn-alg">Sistemas de Equações <span class="arrow">➜</span></a>
+            <a href="expressao-algebrica.html" class="topic-btn btn-alg">Expressão Algébrica <span class="arrow">➜</span></a>
+            <a href="expressoes-algebricas.html" class="topic-btn btn-alg">Expressões Algébricas (Operações) <span class="arrow">➜</span></a>
+            <a href="expressoes-numericas.html" class="topic-btn btn-alg">Expressões Numéricas <span class="arrow">➜</span></a>
+            <a href="linguagem-algebrica.html" class="topic-btn btn-alg">Linguagem Algébrica <span class="arrow">➜</span></a>
+            <a href="linguagem-algebrica-7.html" class="topic-btn btn-alg">Linguagem Algébrica (7º Ano) <span class="arrow">➜</span></a>
+            <a href="fatoracao-expressoes.html" class="topic-btn btn-alg">Fatoração de Expressões <span class="arrow">➜</span></a>
+            <a href="funcao-afim.html" class="topic-btn btn-alg">Função Afim <span class="arrow">➜</span></a>
+            <a href="funcao-quadratica.html" class="topic-btn btn-alg">Função Quadrática <span class="arrow">➜</span></a>
+            <a href="grafico-funcao-afim.html" class="topic-btn btn-alg">Gráfico da Função Afim <span class="arrow">➜</span></a>
+            <a href="grafico-funcao-quadratica.html" class="topic-btn btn-alg">Gráfico da Função Quadrática <span class="arrow">➜</span></a>
+            <a href="sequencias-numericas.html" class="topic-btn btn-alg">Sequências Numéricas <span class="arrow">➜</span></a>
+            <a href="razao-proporcao.html" class="topic-btn btn-alg">Razão e Proporção <span class="arrow">➜</span></a>
+            <a href="razoes-proporcoes.html" class="topic-btn btn-alg">Razões e Proporções <span class="arrow">➜</span></a>
+            <a href="grandezas-proporcionais.html" class="topic-btn btn-alg">Grandezas Proporcionais <span class="arrow">➜</span></a>
+            <a href="variacao-grandezas.html" class="topic-btn btn-alg">Variação de Grandezas <span class="arrow">➜</span></a>
+            <a href="propriedades-igualdade.html" class="topic-btn btn-alg">Propriedades da Igualdade <span class="arrow">➜</span></a>
+        </div>
+
+        <div class="content-group">
+            <div class="category-header"><span class="badge badge-geo">📐 Geometria</span></div>
+            <a href="angulos.html" class="topic-btn btn-geo">Ângulos <span class="arrow">➜</span></a>
+            <a href="angulos-relacoes.html" class="topic-btn btn-geo">Ângulos e Relações <span class="arrow">➜</span></a>
+            <a href="triangulos-7.html" class="topic-btn btn-geo">Triângulos (7º Ano) <span class="arrow">➜</span></a>
+            <a href="triangulos-quadrilateros.html" class="topic-btn btn-geo">Triângulos e Quadriláteros <span class="arrow">➜</span></a>
+            <a href="semelhanca-triangulos.html" class="topic-btn btn-geo">Semelhança de Triângulos <span class="arrow">➜</span></a>
+            <a href="congruencia-triangulos.html" class="topic-btn btn-geo">Congruência de Triângulos <span class="arrow">➜</span></a>
+            <a href="teorema-pitagoras.html" class="topic-btn btn-geo">Teorema de Pitágoras <span class="arrow">➜</span></a>
+            <a href="teorema-tales.html" class="topic-btn btn-geo">Teorema de Tales <span class="arrow">➜</span></a>
+            <a href="relacoes-metricas.html" class="topic-btn btn-geo">Relações Métricas <span class="arrow">➜</span></a>
+            <a href="razoes-trigonometricas.html" class="topic-btn btn-geo">Razões Trigonométricas <span class="arrow">➜</span></a>
+            <a href="quadrilateros.html" class="topic-btn btn-geo">Quadriláteros <span class="arrow">➜</span></a>
+            <a href="poligonos.html" class="topic-btn btn-geo">Polígonos <span class="arrow">➜</span></a>
+            <a href="poligonos-regulares.html" class="topic-btn btn-geo">Polígonos Regulares <span class="arrow">➜</span></a>
+            <a href="circunferencia.html" class="topic-btn btn-geo">Circunferência <span class="arrow">➜</span></a>
+            <a href="circunferencia-circulo.html" class="topic-btn btn-geo">Circunferência e Círculo <span class="arrow">➜</span></a>
+            <a href="solidos-geometricos.html" class="topic-btn btn-geo">Sólidos Geométricos <span class="arrow">➜</span></a>
+            <a href="prismas-piramides.html" class="topic-btn btn-geo">Prismas e Pirâmides <span class="arrow">➜</span></a>
+            <a href="construcoes-geometricas.html" class="topic-btn btn-geo">Construções Geométricas <span class="arrow">➜</span></a>
+            <a href="transformacoes-geometricas.html" class="topic-btn btn-geo">Transformações Geométricas <span class="arrow">➜</span></a>
+            <a href="plano-cartesiano.html" class="topic-btn btn-geo">Plano Cartesiano <span class="arrow">➜</span></a>
+            <a href="retas.html" class="topic-btn btn-geo">Retas <span class="arrow">➜</span></a>
+            <a href="mediatriz-bissetriz.html" class="topic-btn btn-geo">Mediatriz e Bissetriz <span class="arrow">➜</span></a>
+            <a href="planificacao-vistas.html" class="topic-btn btn-geo">Planificação e Vistas <span class="arrow">➜</span></a>
+        </div>
+
+        <div class="content-group">
+            <div class="category-header"><span class="badge badge-med">⚖️ Grandezas e Medidas</span></div>
+            <a href="area-figuras-planas.html" class="topic-btn btn-med">Área de Figuras Planas <span class="arrow">➜</span></a>
+            <a href="area-quadrados.html" class="topic-btn btn-med">Área de Quadrados <span class="arrow">➜</span></a>
+            <a href="perimetro.html" class="topic-btn btn-med">Perímetro <span class="arrow">➜</span></a>
+            <a href="volume-blocos.html" class="topic-btn btn-med">Volume de Blocos <span class="arrow">➜</span></a>
+            <a href="volume-prismas.html" class="topic-btn btn-med">Volume de Prismas <span class="arrow">➜</span></a>
+            <a href="nocao-volume.html" class="topic-btn btn-med">Noção de Volume <span class="arrow">➜</span></a>
+            <a href="medidas-comprimento.html" class="topic-btn btn-med">Medidas de Comprimento <span class="arrow">➜</span></a>
+            <a href="medidas-tempo.html" class="topic-btn btn-med">Medidas de Tempo <span class="arrow">➜</span></a>
+            <a href="litro-dm3.html" class="topic-btn btn-med">Relação Litro e dm³ <span class="arrow">➜</span></a>
+            <a href="razoes-especiais.html" class="topic-btn btn-med">Razões Especiais (Velocidade/Densidade) <span class="arrow">➜</span></a>
+        </div>
+
+        <div class="content-group">
+            <div class="category-header"><span class="badge badge-prob">🎲 Probabilidade e Estatística</span></div>
+            <a href="probabilidade.html" class="topic-btn btn-prob">Probabilidade <span class="arrow">➜</span></a>
+            <a href="probabilidade-simples.html" class="topic-btn btn-prob">Probabilidade Simples <span class="arrow">➜</span></a>
+            <a href="probabilidade-frequencial.html" class="topic-btn btn-prob">Probabilidade Frequencial <span class="arrow">➜</span></a>
+            <a href="graficos-estatisticos.html" class="topic-btn btn-prob">Gráficos Estatísticos <span class="arrow">➜</span></a>
+            <a href="graficos-setores.html" class="topic-btn btn-prob">Gráficos de Setores <span class="arrow">➜</span></a>
+            <a href="leitura-graficos.html" class="topic-btn btn-prob">Leitura de Gráficos <span class="arrow">➜</span></a>
+            <a href="tabelas-dados.html" class="topic-btn btn-prob">Tabelas de Dados <span class="arrow">➜</span></a>
+            <a href="tabelas-classes.html" class="topic-btn btn-prob">Tabelas com Classes <span class="arrow">➜</span></a>
+            <a href="media-moda-mediana.html" class="topic-btn btn-prob">Média, Moda e Mediana <span class="arrow">➜</span></a>
+            <a href="medidas-dispersao.html" class="topic-btn btn-prob">Medidas de Dispersão <span class="arrow">➜</span></a>
+            <a href="amplitude.html" class="topic-btn btn-prob">Amplitude <span class="arrow">➜</span></a>
+            <a href="amostragem.html" class="topic-btn btn-prob">Amostragem <span class="arrow">➜</span></a>
+            <a href="fluxogramas.html" class="topic-btn btn-prob">Fluxogramas <span class="arrow">➜</span></a>
         </div>
 
         <div id="no-results">
-            <p>😕 Nenhum conteúdo encontrado.</p>
+            <p>😕 Nenhum tópico encontrado com esse nome.</p>
         </div>
 
-        <div class="content-group group-num">
-            <div class="section-badge badge-num">🔢 Números</div>
-            <a href="conjuntos-numericos.html" class="topic-btn">Conjuntos Numéricos (revisão e ampliação) <span class="arrow">➜</span></a>
-            <a href="potenciacao-expoentes-inteiros.html" class="topic-btn">Potenciação com expoentes inteiros e propriedades <span class="arrow">➜</span></a>
-            <a href="radiciacao-propriedades.html" class="topic-btn">Radiciação e propriedades <span class="arrow">➜</span></a>
-            <a href="notacao-cientifica.html" class="topic-btn">Notação científica (aprofundamento) <span class="arrow">➜</span></a>
-            <a href="numeros-irracionais.html" class="topic-btn">Números irracionais (√2, π, etc.) <span class="arrow">➜</span></a>
-            <a href="operacoes-reais.html" class="topic-btn">Operações com números reais <span class="arrow">➜</span></a>
-            <a href="porcentagem-aplicacoes.html" class="topic-btn">Porcentagem (aumentos, descontos, taxas sucessivas) <span class="arrow">➜</span></a>
-            <a href="juros-simples-compostos.html" class="topic-btn">Juros simples e introdução aos juros compostos <span class="arrow">➜</span></a>
-        </div>
-
-        <div class="content-group group-alg">
-            <div class="section-badge badge-alg">🧩 Álgebra</div>
-            <a href="expressoes-algebricas.html" class="topic-btn">Expressões algébricas (produtos notáveis) <span class="arrow">➜</span></a>
-            <a href="fatoracao-expressoes.html" class="topic-btn">Fatoração de expressões algébricas <span class="arrow">➜</span></a>
-            <a href="equacoes-2grau.html" class="topic-btn">Equações do 2º grau <span class="arrow">➜</span></a>
-            <a href="resolucao-equacoes.html" class="topic-btn">Resolução de equações do 2º grau <span class="arrow">➜</span></a>
-            <a href="funcao-quadratica.html" class="topic-btn">Função quadrática <span class="arrow">➜</span></a>
-            <a href="grafico-funcao-quadratica.html" class="topic-btn">Gráfico da função quadrática <span class="arrow">➜</span></a>
-            <a href="sistemas-equacoes.html" class="topic-btn">Sistemas de equações (revisão e aplicações) <span class="arrow">➜</span></a>
-            <a href="razoes-proporcoes.html" class="topic-btn">Razões e proporções (aplicações algébricas) <span class="arrow">➜</span></a>
-            <a href="sequencias-numericas.html" class="topic-btn">Sequências numéricas (progressões simples) <span class="arrow">➜</span></a>
-        </div>
-
-        <div class="content-group group-geo">
-            <div class="section-badge badge-geo">📐 Geometria</div>
-            <a href="teorema-tales.html" class="topic-btn">Teorema de Tales <span class="arrow">➜</span></a>
-            <a href="semelhanca-triangulos.html" class="topic-btn">Semelhança de Triângulos <span class="arrow">➜</span></a>
-            <a href="relacoes-metricas.html" class="topic-btn">Relações métricas no triângulo retângulo <span class="arrow">➜</span></a>
-            <a href="teorema-pitagoras.html" class="topic-btn">Teorema de Pitágoras <span class="arrow">➜</span></a>
-            <a href="razoes-trigonometricas.html" class="topic-btn">Razões trigonométricas no triângulo retângulo <span class="arrow">➜</span></a>
-            <a href="circunferencia-circulo.html" class="topic-btn">Circunferência e círculo <span class="arrow">➜</span></a>
-            <a href="angulos-centrais-inscritos.html" class="topic-btn">Ângulos centrais e inscritos <span class="arrow">➜</span></a>
-            <a href="poligonos-regulares.html" class="topic-btn">Polígonos regulares (revisão e aprofundamento) <span class="arrow">➜</span></a>
-        </div>
-
-        <div class="content-group group-med">
-            <div class="section-badge badge-med">⚖️ Grandezas e Medidas</div>
-            <a href="area-figuras-planas.html" class="topic-btn">Área de figuras planas (revisão e aplicações) <span class="arrow">➜</span></a>
-            <a href="area-circulo.html" class="topic-btn">Área do círculo <span class="arrow">➜</span></a>
-            <a href="volume-solidos.html" class="topic-btn">Volume de sólidos geométricos <span class="arrow">➜</span></a>
-            <a href="relacao-unidades-medida.html" class="topic-btn">Relação entre unidades de medida (escala, razão e conversões) <span class="arrow">➜</span></a>
-        </div>
-
-        <div class="content-group group-prob">
-            <div class="section-badge badge-prob">🎲 Probabilidade e Estatística</div>
-            <a href="probabilidade-eventos.html" class="topic-btn">Probabilidade (eventos simples e compostos) <span class="arrow">➜</span></a>
-            <a href="espaco-amostral.html" class="topic-btn">Espaço amostral <span class="arrow">➜</span></a>
-            <a href="analise-graficos.html" class="topic-btn">Análise e interpretação de gráficos estatísticos <span class="arrow">➜</span></a>
-            <a href="media-moda-mediana.html" class="topic-btn">Média, moda e mediana (revisão e aprofundamento) <span class="arrow">➜</span></a>
-            <a href="medidas-dispersao.html" class="topic-btn">Medidas de dispersão (amplitude, noções de variância) <span class="arrow">➜</span></a>
-            <a href="pesquisa-estatistica.html" class="topic-btn">Pesquisa estatística e análise de dados <span class="arrow">➜</span></a>
-        </div>
-
-        <footer>
-            © 2026 Promover Educação
-        </footer>
     </div>
 
+    <footer>
+        © 2026 Promover Educação
+    </footer>
+
     <script>
-        // Lógica de Pesquisa Simples e Rápida
+        // Lógica de Pesquisa Melhorada (Filtra Tópicos E Esconde Grupos Vazios)
         const searchInput = document.getElementById('searchInput');
         const contentGroups = document.querySelectorAll('.content-group');
         const noResultsMsg = document.getElementById('no-results');
@@ -312,16 +386,14 @@
                     }
                 });
 
-                // Se o grupo tem links visíveis, mostra o grupo todo (badge + links)
                 if (hasVisibleLink) {
-                    group.style.display = 'flex';
+                    group.style.display = 'block';
                     totalVisibleGroups++;
                 } else {
                     group.style.display = 'none';
                 }
             });
 
-            // Controle da mensagem "Não encontrado"
             if (totalVisibleGroups === 0) {
                 noResultsMsg.style.display = 'block';
             } else {
@@ -329,6 +401,5 @@
             }
         });
     </script>
-
 </body>
 </html>
