@@ -48,15 +48,21 @@
             overflow-x: hidden;
         }
 
-        /* --- HEADER --- */
+        /* --- HEADER (LOGO AUMENTADA) --- */
         .logo-header {
             width: 100%;
             max-width: 600px;
             display: flex;
             justify-content: center;
-            padding: 20px 0 10px 0;
+            /* Aumentei um pouco o padding para dar espaço à logo maior */
+            padding: 30px 0 20px 0; 
         }
-        .logo-img { max-height: 80px; width: auto; display: block; }
+        .logo-img {
+            /* AUMENTADO: De 80px para 130px para ficar bem visível */
+            max-height: 130px; 
+            width: auto;
+            display: block;
+        }
 
         .container {
             width: 100%;
@@ -363,7 +369,7 @@
     </footer>
 
     <script>
-        // Lógica de Pesquisa Melhorada (Filtra Tópicos E Esconde Grupos Vazios)
+        // Lógica de Pesquisa (Filtra Tópicos E Esconde Grupos Vazios)
         const searchInput = document.getElementById('searchInput');
         const contentGroups = document.querySelectorAll('.content-group');
         const noResultsMsg = document.getElementById('no-results');
