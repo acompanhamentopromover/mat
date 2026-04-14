@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geometria Básica - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE TEMA --- */
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #2D3748;
+            --border-color: #000000;
+            
+            /* CORES DA MATÉRIA: TEMA GREEN (Geometria) */
+            --theme-color: #C6F6D5; 
+            --theme-active: #22543D; 
+            --theme-text-active: #FFFFFF;
+            
+            /* FEEDBACK */
+            --correct-bg: #C6F6D5;
+            --correct-border: #276749;
+            --wrong-bg: #FED7D7;
+            --wrong-border: #C53030;
+            
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ANIMAÇÃO DE TREMOR (ERRO) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* --- LOGO --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* --- NAVEGAÇÃO --- */
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- TOGGLE --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--theme-active);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- CONTEÚDO --- */
+        .section-view {
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .card-content {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        /* ESTILO PARA AS ILUSTRAÇÕES VISUAIS */
+        .visual-row { display: flex; align-items: flex-end; gap: 10px; justify-content: space-around; flex-wrap: wrap; }
+        .visual-item { text-align: center; width: 30%; min-width: 80px; }
+        .visual-svg { color: var(--theme-active); margin-bottom: 5px; }
+        
+        /* Estilo para SVGs dentro das questões */
+        .question-visual {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #D6F5E8;
+            border-radius: 12px;
+            border: 1px dashed var(--theme-active);
+        }
+
+        .example-box {
+            background-color: #D6F5E8;
+            border-left: 5px solid #22543D;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .example-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #22543D;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* --- QUIZ MAPA --- */
+        .question-map {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+
+        .map-dot {
+            min-width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #888;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-dot.active {
+            border-color: var(--border-color);
+            background-color: var(--theme-active);
+            color: white;
+            box-shadow: 2px 2px 0px var(--border-color);
+            transform: scale(1.05);
+        }
+        
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        /* --- OPÇÕES --- */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .opt-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn:hover:not(.disabled) { border-color: #999; }
+        .option-btn.disabled { cursor: not-allowed; }
+
+        .option-text { display: flex; flex-direction: column; flex: 1; }
+        .option-text strong { font-size: 1rem; }
+        .option-text small { font-size: 0.8rem; color: #666; }
+
+        /* --- EXPLICAÇÃO --- */
+        .explanation-box {
+            background-color: #EDF2F7;
+            border-left: 4px solid var(--theme-active);
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #2D3748;
+        }
+
+        .explanation-box strong { color: #22543D; }
+
+        /* --- RESULTADO --- */
+        .result-card {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .stars-container {
+            font-size: 3rem;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .percentage-big {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--theme-active);
+            margin-bottom: 10px;
+        }
+
+        .score-text {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .btn-retry {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--theme-active);
+            color: white;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: 3px 3px 0px var(--border-color);
+            transition: all 0.2s;
+        }
+
+        .btn-retry:hover {
+            transform: translate(2px, 2px);
+        }
+
+        /* --- FOOTER --- */
+        .quiz-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 2px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            padding: 15px 20px;
+            justify-content: center;
+            box-shadow: 0px -4px 0px rgba(0,0,0,0.1);
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            background-color: white;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background-color: var(--theme-color);
+            transform: translate(1px, 1px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 500px) {
+            h1 { font-size: 1.3rem; }
+            .card-content { padding: 15px; }
+            .visual-row { gap: 8px; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        
+        <nav class="top-nav">
+            <a href="6ano-matematica.html" class="btn-close">⬅ Voltar</a>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #888;">MATEMÁTICA</span>
+        </nav>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Explicação</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Praticar</button>
+        </div>
+
+        <div id="viewExplanation" class="section-view" style="display: block;">
+            
+            <h1 style="font-size: 1.5rem; margin-bottom: 15px; line-height: 1.2;">Geometria Básica: Pontos, Retas e Ângulos</h1>
+            <p style="color: #555; margin-bottom: 20px;">Os conceitos fundamentais da geometria começam com os elementos mais simples: pontos, retas e ângulos.</p>
+            
+            <div class="card-content">
+                <h3>🔵 O Ponto</h3>
+                <p style="margin-top: 10px; margin-bottom: 10px;">Um ponto é a representação geométrica mais simples. Ele não tem dimensão – não tem comprimento, largura ou altura.</p>
+                <div class="visual-row">
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 100 100" fill="none">
+                            <circle cx="50" cy="50" r="5" fill="currentColor" />
+                            <text x="45" y="70" font-size="16" fill="#666">Ponto A</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="example-box">
+                    <p><strong>Exemplos reais:</strong> A ponta de um lápis, um grão de areia, uma estrela no céu (de muito longe).</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>📏 A Reta</h3>
+                <p style="margin-top: 10px; margin-bottom: 10px;">Uma reta é formada por infinitos pontos em linha, se estendendo infinitamente em ambas as direções. É uma linha sem curvas e sem fim.</p>
+                <div class="visual-row">
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+                            <line x1="10" y1="50" x2="90" y2="50" />
+                            <circle cx="10" cy="50" r="3" fill="currentColor" />
+                            <circle cx="90" cy="50" r="3" fill="currentColor" />
+                        </svg>
+                        <p style="font-weight:700;">Reta</p>
+                    </div>
+                    
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+                            <line x1="50" y1="10" x2="90" y2="90" />
+                            <circle cx="50" cy="10" r="0" />
+                            <polygon points="85,95 90,85 95,95" fill="currentColor" />
+                        </svg>
+                        <p style="font-weight:700;">Semirreta</p>
+                    </div>
+
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+                            <line x1="20" y1="50" x2="80" y2="50" />
+                            <circle cx="20" cy="50" r="3" fill="currentColor" />
+                            <circle cx="80" cy="50" r="3" fill="currentColor" />
+                        </svg>
+                        <p style="font-weight:700;">Segmento</p>
+                    </div>
+                </div>
+                <div class="example-box">
+                    <p><strong>Reta:</strong> Os fios de telefone (imaginando que se estendem infinitamente)</p>
+                    <p><strong>Semirreta:</strong> Um raio de luz que sai de uma fonte</p>
+                    <p><strong>Segmento:</strong> Uma corda esticada entre dois pontos</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3>∠ O Ângulo</h3>
+                <p style="margin-top: 10px; margin-bottom: 10px;">Um ângulo é a medida de rotação entre duas semirretas que compartilham o mesmo ponto inicial (vértice). Medimos em graus (°).</p>
+                <div class="visual-row">
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+                            <line x1="50" y1="50" x2="80" y2="50" />
+                            <line x1="50" y1="50" x2="65" y2="35" />
+                            <circle cx="60" cy="45" r="8" fill="none" stroke="currentColor" stroke-width="2" />
+                        </svg>
+                        <p style="font-weight:700;">45°</p>
+                    </div>
+                    
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+                            <line x1="50" y1="50" x2="80" y2="50" />
+                            <line x1="50" y1="50" x2="50" y2="20" />
+                            <rect x="50" y="50" width="8" height="8" />
+                        </svg>
+                        <p style="font-weight:700;">90° (Reto)</p>
+                    </div>
+
+                    <div class="visual-item">
+                        <svg class="visual-svg" width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+                            <line x1="50" y1="50" x2="80" y2="50" />
+                            <line x1="50" y1="50" x2="20" y2="50" />
+                        </svg>
+                        <p style="font-weight:700;">180° (Meia volta)</p>
+                    </div>
+                </div>
+                <div class="example-box">
+                    <p><strong>Ângulo Agudo:</strong> Menor que 90° (quando abrimos um pouco a tesoura)</p>
+                    <p><strong>Ângulo Reto:</strong> Exatamente 90° (o canto de uma parede)</p>
+                    <p><strong>Ângulo Obtuso:</strong> Entre 90° e 180° (quando abrimos mais a tesoura)</p>
+                    <p><strong>Ângulo Raso:</strong> Exatamente 180° (uma reta completa)</p>
+                </div>
+            </div>
+
+            <button onclick="setMode('practice')" style="width: 100%; padding: 15px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 20px;">
+                Ir para Exercícios ➜
+            </button>
+        </div>
+
+        <div id="viewPractice" class="section-view">
+            <div style="margin-bottom: 15px;">
+                <h2>Hora de Praticar!</h2>
+                <p style="color: #666; font-size: 0.9rem;">Teste seus conhecimentos sobre geometria básica.</p>
+            </div>
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <div id="viewResult">
+            <div class="result-card">
+                <h2>Simulado Finalizado!</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">100%</div>
+                <p class="score-text" id="finalScoreText">Você acertou 5 de 5</p>
+                <p style="color:#666; margin-top:10px; font-size:0.9rem;" id="finalMessage">Excelente! Você domina geometria básica!</p>
+            </div>
+            <button class="btn-retry" onclick="resetQuiz()">🔄 Refazer Simulado</button>
+            <button onclick="setMode('explanation')" style="margin-top:15px; border:none; background:none; color:#555; font-weight:600; cursor:pointer; font-size:1rem;">
+                ⬅ Voltar para o Assunto
+            </button>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- BANCO DE QUESTÕES (GEOMETRIA BÁSICA) ---
+        const questions = [
+            {
+                id: 1,
+                text: "O que é um <strong>ponto</strong> em geometria?",
+                visual: `
+                    <svg width="80" height="60" viewBox="0 0 100 80" fill="none" stroke="#22543D" stroke-width="2">
+                        <circle cx="50" cy="40" r="4" fill="#22543D" />
+                        <text x="45" y="65" font-size="14" fill="#666">Ponto A</text>
+                    </svg>
+                `,
+                options: ["Uma pequena marca com sentido", "Um local sem dimensão", "Uma linha curva", "Um espaço preenchido", "Um ângulo"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Um ponto é a representação geométrica fundamental que não possui dimensão (sem comprimento, altura ou largura).</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Um ponto é adimensional e não tem características como "sentido" ou forma.</div>`
+            },
+            {
+                id: 2,
+                text: "Qual é a diferença entre uma reta, uma semirreta e um segmento?",
+                visual: `
+                    <svg width="100" height="60" viewBox="0 0 120 80" fill="none" stroke="#22543D" stroke-width="2">
+                        <line x1="10" y1="15" x2="110" y2="15" />
+                        <circle cx="10" cy="15" r="2" fill="#22543D" />
+                        <circle cx="110" cy="15" r="2" fill="#22543D" />
+                        <text x="40" y="30" font-size="10" fill="#666">Reta</text>
+                    </svg>
+                `,
+                options: ["São a mesma coisa", "Reta é infinita, semirreta começa num ponto, segmento tem dois extremos", "Reta é curva, semirreta é reta, segmento é ponto", "Não existem diferenças significativas", "Reta é pequena, semirreta é média, segmento é grande"],
+                correct: 1,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> A reta se estende infinitamente, a semirreta começa em um ponto e vai até o infinito, e o segmento tem dois pontos extremos definidos.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> As diferenças não são sobre tamanho, mas sobre quantos extremos têm.</div>`
+            },
+            {
+                id: 3,
+                text: "Um ângulo de <strong>90 graus</strong> é chamado de:",
+                visual: `
+                    <svg width="60" height="60" viewBox="0 0 80 80" fill="none" stroke="#22543D" stroke-width="2">
+                        <line x1="40" y1="10" x2="40" y2="70" />
+                        <line x1="10" y1="40" x2="70" y2="40" />
+                        <rect x="40" y="40" width="8" height="8" />
+                    </svg>
+                `,
+                options: ["Agudo", "Obtuso", "Reto", "Raso", "Reflexo"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Por definição, um ângulo reto tem exatamente 90°.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Agudo é menor que 90°, obtuso é entre 90° e 180°, raso é 180°.</div>`
+            },
+            {
+                id: 4,
+                text: "Um ângulo de <strong>120 graus</strong> é classificado como:",
+                visual: `
+                    <svg width="80" height="60" viewBox="0 0 100 80" fill="none" stroke="#22543D" stroke-width="2">
+                        <line x1="50" y1="50" x2="80" y2="50" />
+                        <line x1="50" y1="50" x2="25" y2="25" />
+                        <circle cx="60" cy="42" r="12" fill="none" stroke="#22543D" stroke-width="1" />
+                    </svg>
+                `,
+                options: ["Agudo", "Reto", "Obtuso", "Raso", "Nulo"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Um ângulo obtuso está entre 90° e 180°. 120° se enquadra nessa faixa.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Agudo é menor que 90°, reto é 90°, raso é 180°.</div>`
+            },
+            {
+                id: 5,
+                text: "Qual elemento da geometria é representado por uma marca sem dimensão?",
+                visual: `
+                    <svg width="80" height="60" viewBox="0 0 100 80" fill="none" stroke="#22543D" stroke-width="2">
+                        <circle cx="20" cy="30" r="3" fill="#22543D" />
+                        <text x="15" y="50" font-size="12" fill="#666">Ponto</text>
+                    </svg>
+                `,
+                options: ["Reta", "Segmento", "Ponto", "Ângulo", "Plano"],
+                correct: 2,
+                explanation: `
+                    <div style="margin-bottom:10px;">✅ <strong>Por que está certo:</strong> Um ponto é um elemento geométrico fundamental que não possui dimensão.</div>
+                    <div>❌ <strong>Por que os outros estão errados:</strong> Retas e segmentos têm comprimento, ângulos têm amplitude, planos têm área.</div>`
+            }
+        ];
+
+        let currentQuestion = 0;
+        let answered = [];
+        let mode = 'explanation';
+
+        function setMode(newMode) {
+            mode = newMode;
+            document.querySelectorAll('.section-view').forEach(v => v.style.display = 'none');
+            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            
+            if (newMode === 'explanation') {
+                document.getElementById('viewExplanation').style.display = 'block';
+                document.getElementById('btnExp').classList.add('active');
+                document.getElementById('quizFooter').style.display = 'none';
+            } else if (newMode === 'practice') {
+                if (answered.length === 0) {
+                    renderQuiz();
+                }
+                document.getElementById('viewPractice').style.display = 'block';
+                document.getElementById('btnPrac').classList.add('active');
+                document.getElementById('quizFooter').style.display = 'flex';
+                updateQuestionMap();
+                showQuestion(currentQuestion);
+            }
+        }
+
+        function renderQuiz() {
+            const qMap = document.getElementById('qMap');
+            qMap.innerHTML = '';
+            questions.forEach((q, idx) => {
+                const dot = document.createElement('button');
+                dot.className = 'map-dot';
+                dot.textContent = idx + 1;
+                dot.onclick = () => showQuestion(idx);
+                qMap.appendChild(dot);
+            });
+            answered = new Array(questions.length).fill(null);
+            showQuestion(0);
+        }
+
+        function showQuestion(idx) {
+            if (idx < 0 || idx >= questions.length) return;
+            currentQuestion = idx;
+            const q = questions[idx];
+            const container = document.getElementById('quizContainer');
+            
+            container.innerHTML = `
+                <div class="card-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <span style="font-size: 0.85rem; color: #888;">Questão ${idx + 1} de ${questions.length}</span>
+                    </div>
+                    <h3 style="margin-bottom: 20px;">${q.text}</h3>
+                    ${q.visual ? `<div class="question-visual">${q.visual}</div>` : ''}
+                    <div id="optionsContainer" style="margin-top: 20px;"></div>
+                    ${answered[idx] !== null ? `<div class="explanation-box">${q.explanation}</div>` : ''}
+                </div>
+            `;
+
+            const optContainer = document.getElementById('optionsContainer');
+            q.options.forEach((opt, optIdx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `
+                    <div class="opt-circle">${String.fromCharCode(65 + optIdx)}</div>
+                    <div class="option-text"><strong>${opt}</strong></div>
+                `;
+                
+                if (answered[idx] !== null) {
+                    btn.classList.add('disabled');
+                    if (optIdx === q.correct) {
+                        btn.classList.add('correct');
+                    } else if (optIdx === answered[idx]) {
+                        btn.classList.add('wrong');
+                    }
+                } else {
+                    btn.onclick = () => answerQuestion(optIdx);
+                }
+                
+                optContainer.appendChild(btn);
+            });
+
+            updateButtons();
+            updateQuestionMap();
+        }
+
+        function answerQuestion(optIdx) {
+            const q = questions[currentQuestion];
+            answered[currentQuestion] = optIdx;
+            
+            if (optIdx !== q.correct) {
+                document.querySelector('#quizContainer .card-content').classList.add('shake-effect');
+            }
+            
+            showQuestion(currentQuestion);
+            
+            if (answered.every(a => a !== null)) {
+                setTimeout(() => showResult(), 500);
+            }
+        }
+
+        function changeQuestion(delta) {
+            showQuestion(currentQuestion + delta);
+        }
+
+        function updateButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            document.getElementById('btnNext').disabled = currentQuestion === questions.length - 1;
+        }
+
+        function updateQuestionMap() {
+            document.querySelectorAll('.map-dot').forEach((dot, idx) => {
+                dot.classList.remove('active', 'answered-correct', 'answered-wrong');
+                if (idx === currentQuestion) {
+                    dot.classList.add('active');
+                } else if (answered[idx] !== null) {
+                    if (answered[idx] === questions[idx].correct) {
+                        dot.classList.add('answered-correct');
+                    } else {
+                        dot.classList.add('answered-wrong');
+                    }
+                }
+            });
+        }
+
+        function showResult() {
+            const correct = answered.filter((a, idx) => a === questions[idx].correct).length;
+            const percent = Math.round((correct / questions.length) * 100);
+            
+            document.getElementById('finalPercent').textContent = percent + '%';
+            document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${questions.length}`;
+            
+            let stars = '';
+            if (percent === 100) stars = '⭐⭐⭐⭐⭐';
+            else if (percent >= 80) stars = '⭐⭐⭐⭐';
+            else if (percent >= 60) stars = '⭐⭐⭐';
+            else if (percent >= 40) stars = '⭐⭐';
+            else stars = '⭐';
+            
+            document.getElementById('finalStars').textContent = stars;
+            
+            let msg = '';
+            if (percent === 100) msg = 'Perfeito! Você é um mestre em geometria!';
+            else if (percent >= 80) msg = 'Excelente! Você compreendeu muito bem!';
+            else if (percent >= 60) msg = 'Bom! Você entendeu a maioria dos conceitos.';
+            else msg = 'Continue estudando para melhorar!';
+            
+            document.getElementById('finalMessage').textContent = msg;
+            
+            document.getElementById('viewPractice').style.display = 'none';
+            document.getElementById('quizFooter').style.display = 'none';
+            document.getElementById('viewResult').style.display = 'block';
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            answered = [];
+            renderQuiz();
+            setMode('practice');
+        }
+    </script>
+</body>
+</html>
