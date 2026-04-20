@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equação do 2º Grau Incompleta - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- ESTILO PROMOVER (Matemática - Azul & Laranja) --- */
+        :root {
+            --bg-color: #F0F9FF; /* Azul muito claro */
+            --text-color: #0C4A6E; /* Azul escuro */
+            --border-color: #000000;
+            --white: #FFFFFF;
+            
+            --theme-light: #BAE6FD; /* Azul Claro */
+            --theme-medium: #0EA5E9; /* Azul Céu */
+            --theme-dark: #0369A1; /* Azul Oceano */
+            --theme-contrast: #F97316; /* Laranja (Destaque) */
+            --theme-accent: #F59E0B; /* Âmbar */
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #BE123C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 100px;
+            background-image: linear-gradient(#bae6fd 1px, transparent 1px), linear-gradient(90deg, #bae6fd 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* ANIMAÇÕES */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .pulse-effect { animation: pulse 2s infinite; display: inline-block; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); color: var(--theme-contrast); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- HEADER --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .css-logo {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--white);
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            border: 3px solid var(--border-color);
+            padding: 8px 20px;
+            border-radius: 12px;
+            background: var(--theme-dark);
+            box-shadow: 4px 4px 0px var(--theme-contrast);
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--text-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: #334155;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+
+        /* --- NAVEGAÇÃO --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 10px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #64748B;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .toggle-btn.active {
+            background-color: var(--theme-dark);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .view-section { display: none; animation: fadeIn 0.4s ease; flex-direction: column; gap: 20px; }
+
+        /* --- BARRA DE PESQUISA --- */
+        .search-container { position: relative; width: 100%; }
+        .search-input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            background-color: var(--white);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            box-shadow: 4px 4px 0px var(--border-color);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .search-input:focus {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--theme-contrast);
+            border-color: var(--theme-dark);
+        }
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+        #no-results { text-align: center; color: var(--theme-dark); font-weight: 600; display: none; }
+
+        /* --- SEÇÕES DE CONTEÚDO (TEORIA) --- */
+        .content-group { display: flex; flex-direction: column; gap: 12px; }
+
+        .section-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: var(--theme-dark);
+            color: var(--white);
+            font-size: 0.9rem;
+            font-weight: 700;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+            align-self: flex-start;
+            margin-bottom: 5px;
+        }
+
+        .theory-box {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            border-radius: 16px;
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            box-shadow: 4px 4px 0px var(--border-color);
+            font-weight: 500;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            position: relative;
+            overflow: hidden;
+            gap: 15px;
+        }
+
+        .theory-box::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0; width: 10px;
+            background-color: var(--theme-contrast);
+            border-right: 2px solid var(--border-color);
+        }
+
+        .theory-box h3 { font-size: 1.2rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; display: flex; align-items: center; gap: 8px;}
+        
+        .visual-area {
+            background: #FAFAFA;
+            border: 2px dashed var(--theme-dark);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        svg { max-width: 100%; height: auto; }
+
+        .highlight-box {
+            background-color: #FEF3C7; 
+            border-left: 4px solid var(--theme-contrast);
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #78350F;
+        }
+
+        /* --- QUIZ UI --- */
+        .difficulty-badge {
+            display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800;
+            text-transform: uppercase; margin-bottom: 10px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1);
+        }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map {
+            display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px;
+            white-space: nowrap; -webkit-overflow-scrolling: touch; scroll-behavior: smooth;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot {
+            min-width: 35px; height: 35px; border: 2px solid var(--border-color); border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; font-weight: 800;
+            font-size: 0.8rem; color: #475569; background: white; cursor: pointer; transition: all 0.2s;
+        }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 2px 2px 0px var(--theme-contrast); transform: scale(1.1); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .option-btn {
+            display: flex; align-items: center; width: 100%; padding: 16px;
+            background-color: var(--white); border: 2px solid var(--border-color); border-radius: 12px;
+            margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease;
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 600; text-align: left;
+            color: var(--text-color);
+        }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .opt-circle {
+            width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border-color);
+            margin-right: 15px; display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 1rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark);
+        }
+        
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 2px 2px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box {
+            display: block; margin-top: 20px; background-color: #FAFAFA;
+            border: 2px dashed var(--theme-dark); border-radius: 12px; padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 0.95rem; margin-bottom: 10px; display:flex; align-items:center; gap:8px; color: var(--theme-dark); }
+        .feedback-item { margin-bottom: 8px; font-size: 0.85rem; padding-left: 10px; border-left: 3px solid #CBD5E1; line-height: 1.5; color: #334155; }
+        .feedback-item.correct-opt { border-left-color: var(--correct-border); font-weight: 700; color: var(--correct-border); background: var(--correct-bg); padding: 10px; border-radius: 0 6px 6px 0; }
+        .feedback-item.wrong-opt { border-left-color: var(--wrong-border); color: #7F1D1D; }
+
+        /* --- RESULTADO --- */
+        .result-card {
+            background: white; border: 3px solid var(--border-color); border-radius: 20px;
+            padding: 30px; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 30px; text-align: center;
+        }
+        .stars-container { font-size: 3.5rem; margin: 10px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 4.5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 10px 0; text-shadow: 3px 3px 0px var(--theme-contrast); }
+        
+        .btn-action {
+            width: 100%; padding: 18px; background-color: var(--theme-dark); color: white;
+            border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.1rem; font-weight: 900;
+            cursor: pointer; box-shadow: 4px 4px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 20px;
+        }
+        .btn-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+
+        .quiz-footer {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background-color: var(--bg-color); border-top: 3px solid var(--border-color);
+            padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100;
+        }
+        .nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 800; border: 2px solid var(--border-color); cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase;}
+        .btn-next { background-color: var(--theme-dark); color: white; }
+        .btn-prev { background-color: white; color: var(--text-color); }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">✖️²</span> PROMOVER</div>
+            <h1>Matemática 9º Ano</h1>
+            <p class="subtitle">Equações do 2º Grau Incompletas</p>
+        </header>
+
+        <!-- ABAS -->
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <!-- ================= MODO TEORIA ================= -->
+        <div id="viewExplanation" class="view-section" style="display: flex;">
+            
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar conceito... (ex: ax² + bx = 0)">
+            </div>
+            <div id="no-results"><p>😕 Nenhum conceito encontrado. Tenta outra palavra.</p></div>
+
+            <!-- TÓPICO 1: O QUE SÃO? -->
+            <div class="content-group">
+                <div class="section-badge">📐 1. Forma Geral</div>
+                <div class="theory-box search-target">
+                    <h3>A estrutura da equação</h3>
+                    <p>Toda equação do 2º grau pode ser escrita na forma <strong>ax² + bx + c = 0</strong>, com <strong>a ≠ 0</strong>. Ela é dita <strong>incompleta</strong> quando um dos coeficientes <strong>b</strong> ou <strong>c</strong> é igual a zero (ou ambos).</p>
+                    
+                    <div class="visual-area">
+                        <svg width="280" height="100" viewBox="0 0 280 100">
+                            <text x="20" y="40" font-size="20" font-weight="bold" fill="#0369A1">ax²</text>
+                            <text x="80" y="40" font-size="20" fill="#F97316">+</text>
+                            <text x="100" y="40" font-size="20" font-weight="bold" fill="#0369A1">bx</text>
+                            <text x="150" y="40" font-size="20" fill="#F97316">+</text>
+                            <text x="170" y="40" font-size="20" font-weight="bold" fill="#0369A1">c</text>
+                            <text x="210" y="40" font-size="20" fill="#000">= 0</text>
+                            <line x1="20" y1="55" x2="250" y2="55" stroke="#000" stroke-width="2"/>
+                            <text x="20" y="80" font-size="12" fill="#0C4A6E">Caso b = 0 → ax² + c = 0</text>
+                            <text x="20" y="95" font-size="12" fill="#0C4A6E">Caso c = 0 → ax² + bx = 0</text>
+                        </svg>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>a</strong> é o coeficiente do termo quadrático (nunca pode ser zero).</li>
+                        <li><strong>b</strong> é o coeficiente do termo linear.</li>
+                        <li><strong>c</strong> é o termo independente (constante).</li>
+                        <li><strong>Incompleta:</strong> quando b = 0 ou c = 0 (ou ambos).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- TÓPICO 2: TIPO ax² + bx = 0 -->
+            <div class="content-group">
+                <div class="section-badge">🔍 2. Tipo ax² + bx = 0 (falta c)</div>
+                <div class="theory-box search-target">
+                    <h3>Colocar em evidência</h3>
+                    <p>Quando a equação não tem termo independente (c = 0), a resolução é simples: colocamos <strong>x</strong> em evidência e usamos a regra do produto nulo.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="260" height="80" viewBox="0 0 260 80">
+                            <text x="20" y="30" font-size="18" font-weight="bold">x(ax + b) = 0</text>
+                            <text x="20" y="55" font-size="14">Então: x = 0  ou  ax + b = 0</text>
+                            <text x="20" y="75" font-size="14">Solução: {0 , -b/a}</text>
+                        </svg>
+                    </div>
+
+                    <div class="highlight-box">
+                        <strong>Exemplo:</strong> 3x² - 6x = 0 → 3x(x - 2) = 0 → x = 0 ou x = 2. S = {0, 2}.
+                    </div>
+                </div>
+            </div>
+
+            <!-- TÓPICO 3: TIPO ax² + c = 0 -->
+            <div class="content-group">
+                <div class="section-badge">⚡ 3. Tipo ax² + c = 0 (falta b)</div>
+                <div class="theory-box search-target">
+                    <h3>Isolar x² e raiz quadrada</h3>
+                    <p>Quando b = 0, isolamos x² e depois extraímos a raiz quadrada. Cuidado com o sinal!</p>
+                    
+                    <div class="visual-area">
+                        <svg width="260" height="100" viewBox="0 0 260 100">
+                            <text x="20" y="30" font-size="18" font-weight="bold">ax² + c = 0 → ax² = -c</text>
+                            <text x="20" y="55" font-size="18" font-weight="bold">x² = -c/a</text>
+                            <text x="20" y="80" font-size="14">Se -c/a &gt; 0 → x = ± √(-c/a)</text>
+                            <text x="20" y="95" font-size="14">Se -c/a &lt; 0 → não há solução real</text>
+                        </svg>
+                    </div>
+
+                    <div class="highlight-box">
+                        <strong>Exemplo:</strong> 2x² - 8 = 0 → 2x² = 8 → x² = 4 → x = ±2. S = {2, -2}.<br>
+                        <strong>Atenção:</strong> x² + 9 = 0 → x² = -9 → sem solução real (∅).
+                    </div>
+                </div>
+            </div>
+
+            <!-- TÓPICO 4: QUANDO b=0 e c=0 -->
+            <div class="content-group">
+                <div class="section-badge">🎯 4. Caso ax² = 0</div>
+                <div class="theory-box search-target">
+                    <h3>A única raiz dupla</h3>
+                    <p>Se b = 0 e c = 0, a equação reduz-se a ax² = 0. Como a ≠ 0, temos x² = 0, logo a única solução é x = 0 (raiz dupla).</p>
+                    
+                    <div class="visual-area">
+                        <svg width="200" height="60" viewBox="0 0 200 60">
+                            <text x="20" y="30" font-size="20" font-weight="bold">ax² = 0 → x = 0</text>
+                        </svg>
+                    </div>
+                    <div class="highlight-box">
+                        Exemplo: 5x² = 0 → x = 0 (duas raízes iguais a zero).
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-action" onclick="setMode('practice')">
+                Iniciar o Desafio das Incompletas (30 Q) ➜
+            </button>
+        </div>
+
+        <!-- ================= MODO PRÁTICA ================= -->
+        <div id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova Algébrica</h2>
+                <p style="color: #334155; font-size: 0.95rem; font-weight:600;">
+                    30 questões sobre equações do 2º grau incompletas. Acerta <strong>80% (24/30)</strong> para dominares o tema!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <!-- ================= MODO RESULTADO ================= -->
+        <div id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Avaliação Concluída</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Acertaste 0 de 30</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- LÓGICA DA PESQUISA ---
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        searchInput.addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let totalVisible = 0;
+
+            contentGroups.forEach(group => {
+                const textContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                if (textContent.includes(term)) {
+                    group.style.display = 'flex';
+                    totalVisible++;
+                } else {
+                    group.style.display = 'none';
+                }
+            });
+
+            noResultsMsg.style.display = totalVisible === 0 ? 'block' : 'none';
+        });
+
+        // --- BANCO DE QUESTÕES (30 ITENS DETALHADOS) ---
+        const questions = [
+            // Bloco 1: Conceitos básicos e identificação (1-6)
+            {
+                id: 1, level: "Fácil",
+                text: "Qual das seguintes equações é uma equação do 2º grau INCOMPLETA do tipo ax² + bx = 0?",
+                options: ["x² - 4 = 0", "2x² + 5x - 3 = 0", "3x² - 7x = 0", "x² + 9 = 0"],
+                correct: 2,
+                explanation: {
+                    correct: "Exato! 3x² - 7x = 0 tem c = 0, portanto é do tipo ax² + bx = 0.",
+                    options: [
+                        "Esta é do tipo ax² + c = 0 (falta b).",
+                        "Esta é completa (b ≠ 0 e c ≠ 0).",
+                        "Alternativa correta.",
+                        "Esta é do tipo ax² + c = 0 (falta b)."
+                    ]
+                }
+            },
+            {
+                id: 2, level: "Fácil",
+                text: "Na equação 5x² - 20 = 0, qual coeficiente está faltando (é igual a zero)?",
+                options: ["a", "b", "c", "Nenhum, é completa."],
+                correct: 1,
+                explanation: {
+                    correct: "Correto! b = 0 (não há termo em x), portanto é do tipo ax² + c = 0.",
+                    options: [
+                        "a = 5, diferente de zero.",
+                        "Alternativa correta.",
+                        "c = -20, não é zero.",
+                        "Está incompleta."
+                    ]
+                }
+            },
+            {
+                id: 3, level: "Fácil",
+                text: "A equação 7x² = 0 é considerada incompleta. Quantas soluções reais ela possui?",
+                options: ["Nenhuma", "Uma (x = 0)", "Duas (x = 0 e x = 7)", "Infinitas"],
+                correct: 1,
+                explanation: {
+                    correct: "Perfeito! 7x² = 0 → x² = 0 → x = 0 (raiz dupla, mas apenas um valor numérico).",
+                    options: [
+                        "x² = 0 tem solução real.",
+                        "Alternativa correta.",
+                        "x = 7 não satisfaz.",
+                        "Apenas uma solução."
+                    ]
+                }
+            },
+            {
+                id: 4, level: "Fácil",
+                text: "Das equações abaixo, qual é do tipo ax² + c = 0?",
+                options: ["2x² - 8x = 0", "x² + 4x + 4 = 0", "3x² - 27 = 0", "5x² + 2x = 0"],
+                correct: 2,
+                explanation: {
+                    correct: "3x² - 27 = 0 não possui termo em x (b = 0).",
+                    options: [
+                        "Tipo ax² + bx = 0.",
+                        "Completa.",
+                        "Alternativa correta.",
+                        "Tipo ax² + bx = 0."
+                    ]
+                }
+            },
+            {
+                id: 5, level: "Fácil",
+                text: "Para que uma equação do 2º grau seja incompleta, é necessário que:",
+                options: ["a = 0", "b = 0 ou c = 0 (ou ambos)", "b = 0 e c = 0 simultaneamente", "a ≠ 0 e b = c = 0"],
+                correct: 1,
+                explanation: {
+                    correct: "Exato! Pode faltar apenas b, apenas c, ou ambos. a nunca pode ser zero.",
+                    options: [
+                        "Se a = 0, não é do 2º grau.",
+                        "Alternativa correta.",
+                        "Isso é um caso particular (ax² = 0), mas não a única forma.",
+                        "Essa é uma condição possível, mas não a única."
+                    ]
+                }
+            },
+            {
+                id: 6, level: "Médio",
+                text: "Qual das alternativas representa corretamente a equação 4x² - 100 = 0 na forma ax² + c = 0?",
+                options: ["a = 4, b = -100, c = 0", "a = 4, b = 0, c = -100", "a = 4, b = 0, c = 100", "a = 4, b = -100, c = 0"],
+                correct: 1,
+                explanation: {
+                    correct: "a = 4, b = 0 (não há x), c = -100.",
+                    options: [
+                        "b seria -100, mas não há termo x.",
+                        "Alternativa correta.",
+                        "c = 100 mudaria o sinal.",
+                        "Mesmo erro do primeiro."
+                    ]
+                }
+            },
+            // Bloco 2: Resolução de ax² + bx = 0 (7-13)
+            {
+                id: 7, level: "Fácil",
+                text: "Resolva a equação x² - 5x = 0.",
+                options: ["x = 0 ou x = 5", "x = 0 ou x = -5", "x = 5 ou x = -5", "x = 0 apenas"],
+                correct: 0,
+                explanation: {
+                    correct: "x(x - 5) = 0 → x = 0 ou x = 5.",
+                    options: [
+                        "Alternativa correta.",
+                        "x = -5 daria 25 + 25 = 50 ≠ 0.",
+                        "Faltou a raiz zero.",
+                        "x = 5 também é solução."
+                    ]
+                }
+            },
+            {
+                id: 8, level: "Fácil",
+                text: "Qual é o conjunto solução de 2x² + 8x = 0?",
+                options: ["{0, -4}", "{0, 4}", "{-4, 4}", "{0}"],
+                correct: 0,
+                explanation: {
+                    correct: "2x(x + 4) = 0 → x = 0 ou x = -4.",
+                    options: [
+                        "Alternativa correta.",
+                        "x = 4 daria 2*16+32=64≠0.",
+                        "x = 4 não serve.",
+                        "x = -4 também é solução."
+                    ]
+                }
+            },
+            {
+                id: 9, level: "Médio",
+                text: "A equação 3x² - 12x = 0 tem como soluções:",
+                options: ["0 e 4", "0 e -4", "4 e -4", "0 e 12"],
+                correct: 0,
+                explanation: {
+                    correct: "3x(x - 4) = 0 → x = 0 ou x = 4.",
+                    options: [
+                        "Alternativa correta.",
+                        "x = -4 daria 48+48=96.",
+                        "0 está correto, mas -4 não.",
+                        "x = 12 daria 432 - 144 = 288."
+                    ]
+                }
+            },
+            {
+                id: 10, level: "Médio",
+                text: "Resolva: 5x² = -15x.",
+                options: ["{0, -3}", "{0, 3}", "{-3, 3}", "{0}"],
+                correct: 0,
+                explanation: {
+                    correct: "5x² + 15x = 0 → 5x(x + 3) = 0 → x = 0 ou x = -3.",
+                    options: [
+                        "Alternativa correta.",
+                        "x = 3 daria 45 = -45 (falso).",
+                        "Não, apenas -3 e 0.",
+                        "x = -3 também é solução."
+                    ]
+                }
+            },
+            {
+                id: 11, level: "Difícil",
+                text: "O produto das raízes da equação 4x² - 20x = 0 é:",
+                options: ["0", "5", "-5", "20"],
+                correct: 0,
+                explanation: {
+                    correct: "Raízes: 0 e 5. Produto = 0 × 5 = 0.",
+                    options: [
+                        "Alternativa correta.",
+                        "Soma seria 5, não produto.",
+                        "Produto não é negativo.",
+                        "Produto é zero."
+                    ]
+                }
+            },
+            {
+                id: 12, level: "Médio",
+                text: "A equação 9x² - 27x = 0 possui duas raízes reais. A soma delas é:",
+                options: ["0", "3", "-3", "9"],
+                correct: 1,
+                explanation: {
+                    correct: "9x(x - 3) = 0 → raízes 0 e 3. Soma = 3.",
+                    options: [
+                        "0 não é a soma.",
+                        "Alternativa correta.",
+                        "Não é -3.",
+                        "Não é 9."
+                    ]
+                }
+            },
+            {
+                id: 13, level: "Difícil",
+                text: "Quantas soluções reais distintas tem a equação x² - 100x = 0?",
+                options: ["0", "1", "2", "Infinitas"],
+                correct: 2,
+                explanation: {
+                    correct: "x(x - 100) = 0 → x = 0 e x = 100 → duas soluções distintas.",
+                    options: [
+                        "Tem soluções.",
+                        "Tem duas, não uma.",
+                        "Alternativa correta.",
+                        "Apenas duas."
+                    ]
+                }
+            },
+            // Bloco 3: Resolução de ax² + c = 0 (14-21)
+            {
+                id: 14, level: "Fácil",
+                text: "Resolva x² - 25 = 0.",
+                options: ["{5}", "{-5, 5}", "{0, 5}", "Não tem solução real"],
+                correct: 1,
+                explanation: {
+                    correct: "x² = 25 → x = ±5.",
+                    options: [
+                        "Faltou o -5.",
+                        "Alternativa correta.",
+                        "0 não é solução.",
+                        "Tem solução real."
+                    ]
+                }
+            },
+            {
+                id: 15, level: "Fácil",
+                text: "Qual é a solução da equação 2x² - 32 = 0?",
+                options: ["{4, -4}", "{4}", "{-4}", "{0, 4}"],
+                correct: 0,
+                explanation: {
+                    correct: "2x² = 32 → x² = 16 → x = ±4.",
+                    options: [
+                        "Alternativa correta.",
+                        "Faltou o -4.",
+                        "Faltou o 4.",
+                        "0 não é solução."
+                    ]
+                }
+            },
+            {
+                id: 16, level: "Fácil",
+                text: "A equação x² + 16 = 0 possui solução no conjunto dos números reais?",
+                options: ["Sim, x = ±4", "Sim, x = 4 apenas", "Não, pois x² = -16 não tem raiz real", "Sim, x = 0"],
+                correct: 2,
+                explanation: {
+                    correct: "x² = -16 → nenhum número real ao quadrado dá negativo.",
+                    options: [
+                        "(-4)² = 16, não -16.",
+                        "4² = 16.",
+                        "Alternativa correta.",
+                        "0² = 0."
+                    ]
+                }
+            },
+            {
+                id: 17, level: "Médio",
+                text: "Resolva 3x² - 75 = 0.",
+                options: ["{5, -5}", "{5}", "{-5}", "{0, 5}"],
+                correct: 0,
+                explanation: {
+                    correct: "3x² = 75 → x² = 25 → x = ±5.",
+                    options: [
+                        "Alternativa correta.",
+                        "Faltou -5.",
+                        "Faltou 5.",
+                        "0 não é solução."
+                    ]
+                }
+            },
+            {
+                id: 18, level: "Médio",
+                text: "O conjunto solução de 4x² - 36 = 0 é:",
+                options: ["{3, -3}", "{9, -9}", "{3}", "{-3}"],
+                correct: 0,
+                explanation: {
+                    correct: "4x² = 36 → x² = 9 → x = ±3.",
+                    options: [
+                        "Alternativa correta.",
+                        "x² = 9, não 81.",
+                        "Faltou -3.",
+                        "Faltou 3."
+                    ]
+                }
+            },
+            {
+                id: 19, level: "Difícil",
+                text: "A equação 2x² + 18 = 0, no universo dos reais, tem como solução:",
+                options: ["{3, -3}", "{-3}", "{ } (vazio)", "{0}"],
+                correct: 2,
+                explanation: {
+                    correct: "2x² = -18 → x² = -9 → sem solução real.",
+                    options: [
+                        "Não, pois daria positivo.",
+                        "Não.",
+                        "Alternativa correta.",
+                        "Não."
+                    ]
+                }
+            },
+            {
+                id: 20, level: "Difícil",
+                text: "Se a equação 5x² - k = 0 tem soluções reais iguais a ±3, qual o valor de k?",
+                options: ["45", "15", "5", "9"],
+                correct: 0,
+                explanation: {
+                    correct: "5x² - k = 0 → 5x² = k → x² = k/5. Para x = ±3, 9 = k/5 → k = 45.",
+                    options: [
+                        "Alternativa correta.",
+                        "Se k=15, x²=3, x=±√3.",
+                        "Não.",
+                        "Não."
+                    ]
+                }
+            },
+            {
+                id: 21, level: "Médio",
+                text: "A equação 7x² - 28 = 0 tem raízes:",
+                options: ["2 e -2", "4 e -4", "7 e -7", "0 e 2"],
+                correct: 0,
+                explanation: {
+                    correct: "7x² = 28 → x² = 4 → x = ±2.",
+                    options: [
+                        "Alternativa correta.",
+                        "x² = 4, não 16.",
+                        "x² = 4.",
+                        "0 não é solução."
+                    ]
+                }
+            },
+            // Bloco 4: Casos especiais e mistos (22-30)
+            {
+                id: 22, level: "Fácil",
+                text: "Qual das equações abaixo tem como única solução x = 0?",
+                options: ["x² - 4x = 0", "x² + 4 = 0", "3x² = 0", "x² - 9 = 0"],
+                correct: 2,
+                explanation: {
+                    correct: "3x² = 0 → x = 0 (duas raízes iguais a zero).",
+                    options: [
+                        "x(x-4)=0 → 0 e 4.",
+                        "Sem solução real.",
+                        "Alternativa correta.",
+                        "x = ±3."
+                    ]
+                }
+            },
+            {
+                id: 23, level: "Médio",
+                text: "Resolva a equação 2x² - 8x = 0 e assinale a alternativa que contém a maior raiz.",
+                options: ["0", "2", "4", "8"],
+                correct: 2,
+                explanation: {
+                    correct: "2x(x - 4) = 0 → raízes 0 e 4. A maior é 4.",
+                    options: [
+                        "0 é a menor.",
+                        "2 não é raiz.",
+                        "Alternativa correta.",
+                        "8 não é raiz."
+                    ]
+                }
+            },
+            {
+                id: 24, level: "Médio",
+                text: "A equação (x - 3)(x + 3) = 0 é equivalente a qual equação incompleta?",
+                options: ["x² - 9 = 0", "x² + 9 = 0", "x² - 3x = 0", "x² + 3x = 0"],
+                correct: 0,
+                explanation: {
+                    correct: "(x-3)(x+3) = x² - 9 = 0, que é do tipo ax² + c = 0.",
+                    options: [
+                        "Alternativa correta.",
+                        "Seria x² = -9.",
+                        "Seria x(x-3)=0.",
+                        "Seria x(x+3)=0."
+                    ]
+                }
+            },
+            {
+                id: 25, level: "Difícil",
+                text: "O valor de m para que a equação 4x² - mx = 0 tenha uma raiz igual a 5 é:",
+                options: ["20", "5", "0", "4"],
+                correct: 0,
+                explanation: {
+                    correct: "Substituindo x=5: 4*25 - m*5 = 0 → 100 - 5m = 0 → m = 20.",
+                    options: [
+                        "Alternativa correta.",
+                        "Não satisfaz.",
+                        "Não.",
+                        "Não."
+                    ]
+                }
+            },
+            {
+                id: 26, level: "Difícil",
+                text: "A equação 9x² - 49 = 0 tem soluções racionais?",
+                options: ["Sim, ±7/3", "Sim, ±3/7", "Não, são irracionais", "Apenas uma solução"],
+                correct: 0,
+                explanation: {
+                    correct: "9x² = 49 → x² = 49/9 → x = ±7/3 (racionais).",
+                    options: [
+                        "Alternativa correta.",
+                        "Invertido.",
+                        "São racionais.",
+                        "Duas soluções."
+                    ]
+                }
+            },
+            {
+                id: 27, level: "Difícil",
+                text: "A soma dos quadrados das raízes da equação x² - 6x = 0 é:",
+                options: ["36", "0", "6", "12"],
+                correct: 0,
+                explanation: {
+                    correct: "Raízes: 0 e 6. Quadrados: 0 + 36 = 36.",
+                    options: [
+                        "Alternativa correta.",
+                        "Não é zero.",
+                        "Soma das raízes é 6, não dos quadrados.",
+                        "12 seria 6²? Não."
+                    ]
+                }
+            },
+            {
+                id: 28, level: "Médio",
+                text: "A equação 3x² - 12 = 0 e a equação x² - 4 = 0 possuem:",
+                options: ["As mesmas raízes", "Raízes diferentes", "Uma raiz em comum", "Nenhuma raiz real"],
+                correct: 0,
+                explanation: {
+                    correct: "3x²-12=0 → x²=4 → ±2. x²-4=0 → ±2. Mesmas raízes.",
+                    options: [
+                        "Alternativa correta.",
+                        "São iguais.",
+                        "Ambas as raízes são comuns.",
+                        "Têm raízes reais."
+                    ]
+                }
+            },
+            {
+                id: 29, level: "Difícil",
+                text: "Se adicionarmos 9 ao quadrado de um número, obtemos 34. Qual é o número?",
+                options: ["5 ou -5", "3 ou -3", "4 ou -4", "6 ou -6"],
+                correct: 0,
+                explanation: {
+                    correct: "x² + 9 = 34 → x² = 25 → x = ±5.",
+                    options: [
+                        "Alternativa correta.",
+                        "9+9=18.",
+                        "16+9=25.",
+                        "36+9=45."
+                    ]
+                }
+            },
+            {
+                id: 30, level: "Difícil",
+                text: "A área de um quadrado é igual ao seu perímetro. Qual é a medida do lado? (Dica: lado = x, área = x², perímetro = 4x)",
+                options: ["0 ou 4", "4 apenas", "0 apenas", "2"],
+                correct: 0,
+                explanation: {
+                    correct: "x² = 4x → x² - 4x = 0 → x(x-4)=0 → x=0 (não serve) ou x=4.",
+                    options: [
+                        "Alternativa correta (0 é descartado).",
+                        "O 0 é solução matemática, mas geometricamente inválido.",
+                        "Apenas 0 não forma quadrado.",
+                        "2 daria área 4, perímetro 8."
+                    ]
+                }
+            }
+        ];
+
+        // LÓGICA GERAL DA PÁGINA
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+
+        function setMode(mode) {
+            const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+            views.forEach(v => document.getElementById(v).style.display = 'none');
+            document.getElementById('quizFooter').style.display = 'none';
+
+            if(mode === 'explanation') {
+                document.getElementById('viewExplanation').style.display = 'flex';
+                document.getElementById('btnExp').classList.add('active');
+                document.getElementById('btnPrac').classList.remove('active');
+            } else if (mode === 'practice') {
+                document.getElementById('viewPractice').style.display = 'block';
+                document.getElementById('quizFooter').style.display = 'flex';
+                document.getElementById('btnExp').classList.remove('active');
+                document.getElementById('btnPrac').classList.add('active');
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                document.getElementById('viewResult').style.display = 'block';
+                document.getElementById('quizFooter').style.display = 'none';
+            }
+            window.scrollTo(0,0);
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D'];
+            const ans = userAnswers[currentQuestion];
+
+            let badgeClass = '';
+            if(q.level === 'Fácil') badgeClass = 'dif-facil';
+            else if(q.level === 'Médio') badgeClass = 'dif-medio';
+            else badgeClass = 'dif-dificil';
+
+            container.innerHTML = `
+                <div class="card-content" style="border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                    <span class="difficulty-badge ${badgeClass}">${q.level}</span>
+                    <div style="margin-bottom: 20px;">
+                        <span style="font-size: 0.8rem; font-weight: 800; color: var(--theme-dark);">QUESTÃO ${currentQuestion + 1} DE ${questions.length}</span>
+                        <h2 style="font-size: 1.15rem; margin-top: 5px; color: var(--text-color); font-weight: 900;">${q.text}</h2>
+                    </div>
+                    <div class="options-list">
+                        ${q.options.map((opt, i) => {
+                            let cls = '';
+                            if (ans !== null) {
+                                if (i === q.correct) cls = 'correct';
+                                else if (i === ans) cls = 'wrong';
+                                else cls = 'disabled';
+                            }
+                            return `
+                                <button class="option-btn ${cls}" onclick="handleAnswer(${i})" ${ans !== null ? 'disabled' : ''}>
+                                    <div class="opt-circle">${letters[i]}</div>
+                                    <div>${opt}</div>
+                                </button>
+                            `;
+                        }).join('')}
+                    </div>
+                    ${ans !== null ? `
+                        <div class="feedback-box">
+                            <div class="feedback-title" style="color:${ans === q.correct ? 'var(--correct-border)' : 'var(--wrong-border)'}">
+                                ${ans === q.correct ? '✅ Matemática impecável!' : '❌ Ops! Erro de cálculo:'}
+                            </div>
+                            <div class="feedback-item correct-opt"><strong>Opção Exata:</strong> ${q.options[q.correct]}</div>
+                            <div style="margin-top:10px; font-size:0.95rem; color:#0F172A; margin-bottom:15px; font-weight:600;">
+                                ${q.explanation.correct}
+                            </div>
+                            <div style="margin-top:15px; border-top:1px dashed #CBD5E0; padding-top:10px;">
+                                <small style="color:var(--theme-dark);"><strong>Diagnóstico das Erradas:</strong></small>
+                                ${q.explanation.options.map((exp, i) => i !== q.correct ? `<div class="feedback-item wrong-opt" style="margin-top:8px;"><strong>${letters[i]})</strong> ${exp}</div>` : '').join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            updateNav();
+        }
+
+        function handleAnswer(idx) {
+            if (userAnswers[currentQuestion] !== null) return;
+            userAnswers[currentQuestion] = idx;
+            if (idx === questions[currentQuestion].correct) {
+                const duration = 1500;
+                const end = Date.now() + duration;
+                (function frame() {
+                    confetti({
+                        particleCount: 5, angle: 60, spread: 55, origin: { x: 0, y: 0.6 },
+                        colors: ['#0EA5E9', '#F97316', '#0369A1', '#F59E0B']
+                    });
+                    confetti({
+                        particleCount: 5, angle: 120, spread: 55, origin: { x: 1, y: 0.6 },
+                        colors: ['#0EA5E9', '#F97316', '#0369A1', '#F59E0B']
+                    });
+                    if (Date.now() < end) { requestAnimationFrame(frame); }
+                }());
+            } else {
+                const quizContainer = document.getElementById('quizContainer');
+                quizContainer.classList.remove('shake-effect');
+                void quizContainer.offsetWidth;
+                quizContainer.classList.add('shake-effect');
+                setTimeout(() => quizContainer.classList.remove('shake-effect'), 500);
+            }
+            renderQuestion();
+            renderMap();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = questions.map((q, i) => {
+                let cls = 'map-dot';
+                if (i === currentQuestion) cls += ' active';
+                if (userAnswers[i] !== null) {
+                    cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+                }
+                return `<div class="${cls}" onclick="goTo(${i})">${i+1}</div>`;
+            }).join('');
+
+            setTimeout(() => {
+                const activeDot = map.querySelector('.map-dot.active');
+                if (activeDot) {
+                    activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
+            }, 50);
+        }
+
+        function goTo(i) { 
+            if (window.confetti) confetti.reset(); 
+            currentQuestion = i; 
+            renderQuestion(); 
+            renderMap(); 
+        }
+        function changeQuestion(d) {
+            let n = currentQuestion + d;
+            if (n >= 0 && n < questions.length) goTo(n);
+        }
+
+        function updateNav() {
+            document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+            const next = document.getElementById('btnNext');
+            if (currentQuestion === questions.length - 1) {
+                next.textContent = "Finalizar Prova";
+                next.onclick = finish;
+            } else {
+                next.textContent = "Próxima";
+                next.onclick = () => changeQuestion(1);
+            }
+        }
+
+        function finish() {
+            let correct = userAnswers.filter((a, i) => a === questions[i].correct).length;
+            let percent = Math.round((correct / questions.length) * 100);
+            
+            if (window.confetti) confetti.reset();
+            
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Acertaste ${correct} de ${questions.length} equações.`;
+            document.getElementById('finalStars').textContent = percent >= 80 ? "⭐⭐⭐⭐⭐" : percent >= 60 ? "⭐⭐⭐" : "⭐";
+            
+            let summary = '<div style="text-align:left; margin-top:20px;">';
+            if (percent < 80) {
+                summary += `<div style="background:var(--wrong-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--wrong-border); color:var(--wrong-border);">
+                    <strong>⚠️ Precisa de mais prática!</strong> O domínio das equações incompletas exige atenção aos casos. Reveja a teoria e tente novamente. Meta: 80% (24 acertos).
+                </div>`;
+                document.getElementById('action-buttons').innerHTML = `<button class="btn-action" onclick="reset()">🔄 Recomeçar Estudo</button>`;
+            } else {
+                summary += `<div style="background:var(--correct-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--correct-border); color:var(--correct-border);">
+                    <strong>🎉 Parabéns, Mestre das Equações!</strong> Você domina as incompletas! Continue assim.
+                </div>`;
+                document.getElementById('action-buttons').innerHTML = `<button class="btn-action" onclick="reset()">🔄 Refazer Desafio</button>`;
+            }
+
+            if (correct < questions.length) {
+                summary += '<h4 style="margin-bottom:10px; color:var(--text-color);">Análise dos erros:</h4>';
+                questions.forEach((q, i) => {
+                    if(userAnswers[i] !== q.correct) {
+                        summary += `<div style="margin-bottom:10px; padding:15px; background:var(--white); border-radius:8px; border:2px dashed var(--theme-dark);">
+                            <strong style="color:var(--theme-dark);">Q${i+1}:</strong> ${q.text}<br>
+                            <span style="color:var(--wrong-border); font-size:0.9rem; font-weight:600; display:block; margin-top:5px;">A tua resposta: ${q.options[userAnswers[i]]}</span>
+                            <span style="color:var(--correct-border); font-size:0.9rem; font-weight:600; display:block; margin-top:2px;">Gabarito: ${q.options[q.correct]}</span>
+                        </div>`;
+                    }
+                });
+            }
+            summary += '</div>';
+            
+            document.getElementById('review-container').innerHTML = summary;
+            setMode('result');
+        }
+
+        function reset() { 
+            userAnswers = new Array(questions.length).fill(null); 
+            currentQuestion = 0; 
+            setMode('practice'); 
+        }
+        
+        setMode('explanation');
+    </script>
+</body>
+</html>
