@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equação do 2º Grau - Bhaskara - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- ESTILO PROMOVER (Matemática - Verde & Azul) --- */
+        :root {
+            --bg-color: #F0FDF4; /* Verde muito claro */
+            --text-color: #064E3B; /* Verde escuro */
+            --border-color: #000000;
+            --white: #FFFFFF;
+            
+            --theme-light: #A7F3D0; /* Verde Claro */
+            --theme-medium: #10B981; /* Verde Esmeralda */
+            --theme-dark: #047857; /* Verde Musgo */
+            --theme-contrast: #0284C7; /* Azul (Destaque) */
+            --theme-accent: #F59E0B; /* Âmbar */
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #BE123C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 100px;
+            background-image: linear-gradient(#d1fae5 1px, transparent 1px), linear-gradient(90deg, #d1fae5 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* ANIMAÇÕES */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .pulse-effect { animation: pulse 2s infinite; display: inline-block; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); color: var(--theme-contrast); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- HEADER --- */
+        .logo-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0 10px 0;
+        }
+
+        .css-logo {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--white);
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            border: 3px solid var(--border-color);
+            padding: 8px 20px;
+            border-radius: 12px;
+            background: var(--theme-dark);
+            box-shadow: 4px 4px 0px var(--theme-contrast);
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--text-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: #065F46;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+
+        /* --- NAVEGAÇÃO --- */
+        .toggle-container {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 10px;
+            box-shadow: 3px 3px 0px var(--border-color);
+        }
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #047857;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .toggle-btn.active {
+            background-color: var(--theme-dark);
+            color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .view-section { display: none; animation: fadeIn 0.4s ease; flex-direction: column; gap: 20px; }
+
+        /* --- BARRA DE PESQUISA --- */
+        .search-container { position: relative; width: 100%; }
+        .search-input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            background-color: var(--white);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            box-shadow: 4px 4px 0px var(--border-color);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .search-input:focus {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--theme-contrast);
+            border-color: var(--theme-dark);
+        }
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+        #no-results { text-align: center; color: var(--theme-dark); font-weight: 600; display: none; }
+
+        /* --- SEÇÕES DE CONTEÚDO (TEORIA) --- */
+        .content-group { display: flex; flex-direction: column; gap: 12px; }
+
+        .section-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: var(--theme-dark);
+            color: var(--white);
+            font-size: 0.9rem;
+            font-weight: 700;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+            align-self: flex-start;
+            margin-bottom: 5px;
+        }
+
+        .theory-box {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            border-radius: 16px;
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            box-shadow: 4px 4px 0px var(--border-color);
+            font-weight: 500;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            position: relative;
+            overflow: hidden;
+            gap: 15px;
+        }
+
+        .theory-box::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0; width: 10px;
+            background-color: var(--theme-contrast);
+            border-right: 2px solid var(--border-color);
+        }
+
+        .theory-box h3 { font-size: 1.2rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; display: flex; align-items: center; gap: 8px;}
+        
+        .visual-area {
+            background: #FAFAFA;
+            border: 2px dashed var(--theme-dark);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        svg { max-width: 100%; height: auto; }
+
+        .highlight-box {
+            background-color: #FEF3C7; 
+            border-left: 4px solid var(--theme-contrast);
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #78350F;
+        }
+
+        /* --- QUIZ UI --- */
+        .difficulty-badge {
+            display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800;
+            text-transform: uppercase; margin-bottom: 10px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1);
+        }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map {
+            display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px;
+            white-space: nowrap; -webkit-overflow-scrolling: touch; scroll-behavior: smooth;
+        }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot {
+            min-width: 35px; height: 35px; border: 2px solid var(--border-color); border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; font-weight: 800;
+            font-size: 0.8rem; color: #047857; background: white; cursor: pointer; transition: all 0.2s;
+        }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 2px 2px 0px var(--theme-contrast); transform: scale(1.1); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .option-btn {
+            display: flex; align-items: center; width: 100%; padding: 16px;
+            background-color: var(--white); border: 2px solid var(--border-color); border-radius: 12px;
+            margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease;
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 600; text-align: left;
+            color: var(--text-color);
+        }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .opt-circle {
+            width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border-color);
+            margin-right: 15px; display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 1rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark);
+        }
+        
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 2px 2px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box {
+            display: block; margin-top: 20px; background-color: #FAFAFA;
+            border: 2px dashed var(--theme-dark); border-radius: 12px; padding: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 0.95rem; margin-bottom: 10px; display:flex; align-items:center; gap:8px; color: var(--theme-dark); }
+        .feedback-item { margin-bottom: 8px; font-size: 0.85rem; padding-left: 10px; border-left: 3px solid #CBD5E1; line-height: 1.5; color: #334155; }
+        .feedback-item.correct-opt { border-left-color: var(--correct-border); font-weight: 700; color: var(--correct-border); background: var(--correct-bg); padding: 10px; border-radius: 0 6px 6px 0; }
+        .feedback-item.wrong-opt { border-left-color: var(--wrong-border); color: #7F1D1D; }
+
+        /* --- RESULTADO --- */
+        .result-card {
+            background: white; border: 3px solid var(--border-color); border-radius: 20px;
+            padding: 30px; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 30px; text-align: center;
+        }
+        .stars-container { font-size: 3.5rem; margin: 10px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 4.5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 10px 0; text-shadow: 3px 3px 0px var(--theme-contrast); }
+        
+        .btn-action {
+            width: 100%; padding: 18px; background-color: var(--theme-dark); color: white;
+            border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.1rem; font-weight: 900;
+            cursor: pointer; box-shadow: 4px 4px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 20px;
+        }
+        .btn-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+
+        .quiz-footer {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background-color: var(--bg-color); border-top: 3px solid var(--border-color);
+            padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100;
+        }
+        .nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 800; border: 2px solid var(--border-color); cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase;}
+        .btn-next { background-color: var(--theme-dark); color: white; }
+        .btn-prev { background-color: white; color: var(--text-color); }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">✖️²</span> PROMOVER</div>
+            <h1>Matemática 9º Ano</h1>
+            <p class="subtitle">Equação do 2º Grau – Fórmula de Bhaskara</p>
+        </header>
+
+        <!-- ABAS -->
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <!-- ================= MODO TEORIA ================= -->
+        <div id="viewExplanation" class="view-section" style="display: flex;">
+            
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar conceito... (ex: delta, discriminante)">
+            </div>
+            <div id="no-results"><p>😕 Nenhum conceito encontrado. Tenta outra palavra.</p></div>
+
+            <!-- TÓPICO 1: FORMA GERAL -->
+            <div class="content-group">
+                <div class="section-badge">📐 1. Forma Geral</div>
+                <div class="theory-box search-target">
+                    <h3>ax² + bx + c = 0</h3>
+                    <p>Toda equação do 2º grau pode ser escrita na forma <strong>ax² + bx + c = 0</strong>, com <strong>a ≠ 0</strong>. Os coeficientes <strong>a</strong>, <strong>b</strong> e <strong>c</strong> são números reais.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="260" height="80" viewBox="0 0 260 80">
+                            <text x="20" y="40" font-size="20" font-weight="bold" fill="#047857">a</text>
+                            <text x="40" y="40" font-size="20" font-weight="bold">x²</text>
+                            <text x="75" y="40" font-size="20" fill="#0284C7">+</text>
+                            <text x="95" y="40" font-size="20" font-weight="bold" fill="#047857">b</text>
+                            <text x="115" y="40" font-size="20" font-weight="bold">x</text>
+                            <text x="145" y="40" font-size="20" fill="#0284C7">+</text>
+                            <text x="165" y="40" font-size="20" font-weight="bold" fill="#047857">c</text>
+                            <text x="195" y="40" font-size="20">= 0</text>
+                            <line x1="20" y1="55" x2="230" y2="55" stroke="#000" stroke-width="2"/>
+                            <text x="20" y="75" font-size="12" fill="#064E3B">a, b, c ∈ ℝ, a ≠ 0</text>
+                        </svg>
+                    </div>
+
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>a</strong> é o coeficiente quadrático (nunca pode ser zero).</li>
+                        <li><strong>b</strong> é o coeficiente linear.</li>
+                        <li><strong>c</strong> é o termo independente.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- TÓPICO 2: DISCRIMINANTE (DELTA) -->
+            <div class="content-group">
+                <div class="section-badge">🔍 2. Discriminante (Δ)</div>
+                <div class="theory-box search-target">
+                    <h3>Δ = b² - 4ac</h3>
+                    <p>O valor do discriminante determina a <strong>natureza das raízes</strong> da equação:</p>
+                    
+                    <div class="visual-area" style="flex-direction:column; align-items:flex-start;">
+                        <div style="background: white; border: 2px solid #10B981; padding: 10px; border-radius: 8px; width: 100%;">
+                            <strong style="color:#059669;">Δ > 0</strong> → duas raízes reais e distintas.
+                        </div>
+                        <div style="background: white; border: 2px solid #F59E0B; padding: 10px; border-radius: 8px; width: 100%;">
+                            <strong style="color:#D97706;">Δ = 0</strong> → duas raízes reais e iguais (raiz dupla).
+                        </div>
+                        <div style="background: white; border: 2px solid #EF4444; padding: 10px; border-radius: 8px; width: 100%;">
+                            <strong style="color:#DC2626;">Δ < 0</strong> → nenhuma raiz real (raízes complexas).
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TÓPICO 3: FÓRMULA DE BHASKARA -->
+            <div class="content-group">
+                <div class="section-badge">⚡ 3. Fórmula de Bhaskara</div>
+                <div class="theory-box search-target">
+                    <h3>x = (-b ± √Δ) / (2a)</h3>
+                    <p>Uma vez calculado o discriminante, as raízes são obtidas por:</p>
+                    
+                    <div class="visual-area">
+                        <svg width="220" height="80" viewBox="0 0 220 80">
+                            <text x="20" y="40" font-size="18" font-weight="bold">x =</text>
+                            <text x="55" y="40" font-size="18">-b ± √Δ</text>
+                            <line x1="50" y1="48" x2="130" y2="48" stroke="#000" stroke-width="2"/>
+                            <text x="65" y="70" font-size="18">2a</text>
+                        </svg>
+                    </div>
+
+                    <div class="highlight-box">
+                        <strong>Passo a passo:</strong><br>
+                        1. Identificar a, b, c.<br>
+                        2. Calcular Δ = b² - 4ac.<br>
+                        3. Aplicar Bhaskara.<br>
+                        4. Escrever o conjunto solução.
+                    </div>
+                </div>
+            </div>
+
+            <!-- TÓPICO 4: EXEMPLO COMPLETO -->
+            <div class="content-group">
+                <div class="section-badge">📝 4. Exemplo Resolvido</div>
+                <div class="theory-box search-target">
+                    <h3>Resolver 2x² - 5x + 2 = 0</h3>
+                    <p>a = 2, b = -5, c = 2</p>
+                    <p>Δ = (-5)² - 4·2·2 = 25 - 16 = 9 → √Δ = 3</p>
+                    <p>x = [5 ± 3] / (2·2) = [5 ± 3] / 4</p>
+                    <p>x₁ = (5+3)/4 = 8/4 = 2</p>
+                    <p>x₂ = (5-3)/4 = 2/4 = 0,5</p>
+                    <p>S = {0,5 ; 2}</p>
+                </div>
+            </div>
+
+            <button class="btn-action" onclick="setMode('practice')">
+                Iniciar o Desafio de Bhaskara (30 Q) ➜
+            </button>
+        </div>
+
+        <!-- ================= MODO PRÁTICA ================= -->
+        <div id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Bhaskara</h2>
+                <p style="color: #065F46; font-size: 0.95rem; font-weight:600;">
+                    30 questões sobre equações do 2º grau completas. Acerta <strong>80% (24/30)</strong> para dominares a fórmula!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 100px;"></div>
+        </div>
+
+        <!-- ================= MODO RESULTADO ================= -->
+        <div id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Avaliação Concluída</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Acertaste 0 de 30</p>
+                <div id="review-container"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </div>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+    </footer>
+
+    <script>
+        // --- LÓGICA DA PESQUISA ---
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        searchInput.addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let totalVisible = 0;
+
+            contentGroups.forEach(group => {
+                const textContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                if (textContent.includes(term)) {
+                    group.style.display = 'flex';
+                    totalVisible++;
+                } else {
+                    group.style.display = 'none';
+                }
+            });
+
+            noResultsMsg.style.display = totalVisible === 0 ? 'block' : 'none';
+        });
+
+        // --- BANCO DE QUESTÕES (30 ITENS DETALHADOS) ---
+        const questions = [
+            // Bloco 1: Conceitos e identificação (1-6)
+            {
+                id: 1, level: "Fácil",
+                text: "Na equação 3x² - 5x + 2 = 0, qual o valor de a, b e c?",
+                options: ["a=3, b=5, c=2", "a=3, b=-5, c=2", "a=3, b=5, c=-2", "a=-3, b=5, c=2"],
+                correct: 1,
+                explanation: {
+                    correct: "A forma é ax²+bx+c=0. Aqui a=3, b=-5, c=2.",
+                    options: ["b teria sinal errado.", "Alternativa correta.", "c teria sinal errado.", "a teria sinal errado."]
+                }
+            },
+            {
+                id: 2, level: "Fácil",
+                text: "O discriminante (Δ) da equação x² - 4x + 4 = 0 vale:",
+                options: ["0", "8", "16", "-8"],
+                correct: 0,
+                explanation: {
+                    correct: "Δ = b² - 4ac = (-4)² - 4·1·4 = 16 - 16 = 0.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 3, level: "Fácil",
+                text: "Se Δ > 0, a equação do 2º grau possui:",
+                options: ["Duas raízes reais e iguais.", "Duas raízes reais e distintas.", "Nenhuma raiz real.", "Uma raiz real e uma imaginária."],
+                correct: 1,
+                explanation: {
+                    correct: "Δ positivo → duas raízes reais diferentes.",
+                    options: ["Isso ocorre quando Δ=0.", "Alternativa correta.", "Isso ocorre quando Δ<0.", "Não é o caso."]
+                }
+            },
+            {
+                id: 4, level: "Fácil",
+                text: "Qual a fórmula de Bhaskara?",
+                options: ["x = (-b ± √Δ)/2a", "x = (b ± √Δ)/2a", "x = (-b ± Δ)/2a", "x = (b ± Δ)/2a"],
+                correct: 0,
+                explanation: {
+                    correct: "x = [-b ± √(b²-4ac)] / (2a).",
+                    options: ["Alternativa correta.", "Falta o sinal negativo e a raiz.", "Falta a raiz quadrada.", "Faltam o sinal e a raiz."]
+                }
+            },
+            {
+                id: 5, level: "Fácil",
+                text: "A equação 2x² - 8x + 8 = 0 possui quantas raízes reais?",
+                options: ["0", "1 (dupla)", "2 distintas", "3"],
+                correct: 1,
+                explanation: {
+                    correct: "Δ = 64 - 64 = 0 → raiz dupla (apenas um valor real).",
+                    options: ["Incorreto.", "Alternativa correta.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 6, level: "Médio",
+                text: "Na equação x² - 2x - 3 = 0, o valor de Δ é:",
+                options: ["4", "8", "12", "16"],
+                correct: 3,
+                explanation: {
+                    correct: "Δ = (-2)² - 4·1·(-3) = 4 + 12 = 16.",
+                    options: ["Incorreto.", "Incorreto.", "Incorreto.", "Alternativa correta."]
+                }
+            },
+            // Bloco 2: Cálculo de raízes (7-15)
+            {
+                id: 7, level: "Fácil",
+                text: "As raízes da equação x² - 5x + 6 = 0 são:",
+                options: ["2 e 3", "-2 e -3", "1 e 6", "-1 e -6"],
+                correct: 0,
+                explanation: {
+                    correct: "Δ=25-24=1, x=(5±1)/2 → 3 e 2.",
+                    options: ["Alternativa correta.", "Soma seria -5, mas produto 6 positivo.", "Produto 6, soma 7.", "Produto 6, soma -7."]
+                }
+            },
+            {
+                id: 8, level: "Fácil",
+                text: "Resolva: x² + 2x - 3 = 0.",
+                options: ["1 e -3", "-1 e 3", "1 e 3", "-1 e -3"],
+                correct: 0,
+                explanation: {
+                    correct: "Δ=4+12=16, x=(-2±4)/2 → x=1 ou x=-3.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 9, level: "Fácil",
+                text: "A equação x² - 4x + 4 = 0 tem solução:",
+                options: ["x = 2 (dupla)", "x = -2 (dupla)", "x = 2 e x = -2", "x = 4 e x = 0"],
+                correct: 0,
+                explanation: {
+                    correct: "Δ=0, x=4/2=2 (raiz dupla).",
+                    options: ["Alternativa correta.", "Seria (-2)²+8+4? Não.", "Não são distintas.", "Não."]
+                }
+            },
+            {
+                id: 10, level: "Médio",
+                text: "As raízes de 2x² - 7x + 3 = 0 são:",
+                options: ["3 e 1/2", "-3 e -1/2", "3 e -1/2", "-3 e 1/2"],
+                correct: 0,
+                explanation: {
+                    correct: "Δ=49-24=25, x=(7±5)/4 → 12/4=3 e 2/4=1/2.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 11, level: "Médio",
+                text: "Resolva: x² + 3x - 10 = 0.",
+                options: ["2 e -5", "-2 e 5", "2 e 5", "-2 e -5"],
+                correct: 0,
+                explanation: {
+                    correct: "Δ=9+40=49, x=(-3±7)/2 → 2 e -5.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 12, level: "Médio",
+                text: "O conjunto solução de 3x² - 5x + 2 = 0 é:",
+                options: ["{1, 2/3}", "{-1, -2/3}", "{1, -2/3}", "{-1, 2/3}"],
+                correct: 0,
+                explanation: {
+                    correct: "Δ=25-24=1, x=(5±1)/6 → 1 e 4/6=2/3.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 13, level: "Difícil",
+                text: "A equação 4x² - 4x + 1 = 0 tem raiz:",
+                options: ["x = 1/2 (dupla)", "x = -1/2 (dupla)", "x = 1 (dupla)", "x = -1 (dupla)"],
+                correct: 0,
+                explanation: {
+                    correct: "Δ=16-16=0, x=4/8=1/2.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 14, level: "Difícil",
+                text: "Resolva: 9x² + 6x + 1 = 0.",
+                options: ["x = -1/3 (dupla)", "x = 1/3 (dupla)", "x = -1 (dupla)", "x = 1 (dupla)"],
+                correct: 0,
+                explanation: {
+                    correct: "Δ=36-36=0, x=-6/18=-1/3.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 15, level: "Difícil",
+                text: "As raízes de x² - 2x - 2 = 0 são:",
+                options: ["1 ± √3", "-1 ± √3", "2 ± √3", "-2 ± √3"],
+                correct: 0,
+                explanation: {
+                    correct: "Δ=4+8=12, √Δ=2√3, x=(2±2√3)/2=1±√3.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            // Bloco 3: Natureza das raízes e relação (16-23)
+            {
+                id: 16, level: "Médio",
+                text: "Para a equação x² - 4x + 5 = 0, podemos afirmar que:",
+                options: ["Tem duas raízes reais distintas.", "Tem raiz dupla.", "Não tem raízes reais.", "Tem raízes inteiras."],
+                correct: 2,
+                explanation: {
+                    correct: "Δ=16-20=-4 < 0 → sem raízes reais.",
+                    options: ["Incorreto.", "Incorreto.", "Alternativa correta.", "Incorreto."]
+                }
+            },
+            {
+                id: 17, level: "Médio",
+                text: "A soma das raízes da equação 2x² - 6x + 4 = 0 é:",
+                options: ["3", "-3", "2", "-2"],
+                correct: 0,
+                explanation: {
+                    correct: "Soma = -b/a = -(-6)/2 = 6/2 = 3.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 18, level: "Médio",
+                text: "O produto das raízes de x² - 7x + 10 = 0 é:",
+                options: ["10", "-10", "7", "-7"],
+                correct: 0,
+                explanation: {
+                    correct: "Produto = c/a = 10/1 = 10.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 19, level: "Difícil",
+                text: "Se uma das raízes da equação x² - 5x + k = 0 é 2, qual o valor de k?",
+                options: ["6", "-6", "10", "-10"],
+                correct: 0,
+                explanation: {
+                    correct: "Substituindo x=2: 4 -10 + k = 0 → k = 6.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 20, level: "Difícil",
+                text: "Para que a equação x² - 4x + m = 0 tenha raízes reais e iguais, m deve valer:",
+                options: ["4", "-4", "16", "-16"],
+                correct: 0,
+                explanation: {
+                    correct: "Δ=0 → 16 - 4m = 0 → m = 4.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 21, level: "Difícil",
+                text: "A equação x² - 6x + 9 = 0 tem raízes:",
+                options: ["3 e 3", "3 e -3", "9 e 1", "-3 e -3"],
+                correct: 0,
+                explanation: {
+                    correct: "Δ=36-36=0, x=6/2=3 (dupla).",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 22, level: "Médio",
+                text: "O valor de Δ na equação 5x² - 3x - 2 = 0 é:",
+                options: ["49", "9", "29", "39"],
+                correct: 0,
+                explanation: {
+                    correct: "Δ=9 - 4·5·(-2) = 9 + 40 = 49.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 23, level: "Médio",
+                text: "Resolva: x² - 3x - 4 = 0.",
+                options: ["4 e -1", "-4 e 1", "4 e 1", "-4 e -1"],
+                correct: 0,
+                explanation: {
+                    correct: "Δ=9+16=25, x=(3±5)/2 → 4 e -1.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            // Bloco 4: Problemas aplicados e finais (24-30)
+            {
+                id: 24, level: "Difícil",
+                text: "O dobro do quadrado de um número é igual a 18. Qual é o número?",
+                options: ["3 e -3", "9 e -9", "6 e -6", "2 e -2"],
+                correct: 0,
+                explanation: {
+                    correct: "2x² = 18 → x² = 9 → x = ±3.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 25, level: "Difícil",
+                text: "A área de um quadrado é 25 cm². Qual a medida do lado?",
+                options: ["5 cm", "5 cm (única)", "5 e -5", "25 cm"],
+                correct: 0,
+                explanation: {
+                    correct: "x² = 25 → x = 5 (medida positiva).",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 26, level: "Difícil",
+                text: "A equação x² - 4x + k = 0 tem uma raiz igual a 1. Qual a outra raiz?",
+                options: ["3", "2", "4", "5"],
+                correct: 0,
+                explanation: {
+                    correct: "Soma = 4 → 1 + r = 4 → r = 3.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 27, level: "Difícil",
+                text: "Qual o valor de m para que a equação x² - 2x + m = 0 tenha raízes reais e distintas?",
+                options: ["m < 1", "m > 1", "m = 1", "m ≤ 1"],
+                correct: 0,
+                explanation: {
+                    correct: "Δ > 0 → 4 - 4m > 0 → -4m > -4 → m < 1.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 28, level: "Médio",
+                text: "A equação 2x² - 8x + 8 = 0 tem raiz:",
+                options: ["x = 2", "x = -2", "x = 4", "x = 0"],
+                correct: 0,
+                explanation: {
+                    correct: "Δ=0, x=8/4=2.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 29, level: "Difícil",
+                text: "Se o produto das raízes de 3x² - 5x + k = 0 é 2, então k vale:",
+                options: ["6", "-6", "3", "-3"],
+                correct: 0,
+                explanation: {
+                    correct: "Produto = c/a = k/3 = 2 → k = 6.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            },
+            {
+                id: 30, level: "Difícil",
+                text: "A soma dos inversos das raízes da equação 2x² - 5x + 2 = 0 é:",
+                options: ["5/2", "2/5", "5", "2"],
+                correct: 0,
+                explanation: {
+                    correct: "Raízes: 2 e 1/2. Inversos: 1/2 e 2. Soma = 2,5 = 5/2.",
+                    options: ["Alternativa correta.", "Incorreto.", "Incorreto.", "Incorreto."]
+                }
+            }
+        ];
+
+        // LÓGICA GERAL DA PÁGINA
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+
+        function setMode(mode) {
+            const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+            views.forEach(v => document.getElementById(v).style.display = 'none');
+            document.getElementById('quizFooter').style.display = 'none';
+
+            if(mode === 'explanation') {
+                document.getElementById('viewExplanation').style.display = 'flex';
+                document.getElementById('btnExp').classList.add('active');
+                document.getElementById('btnPrac').classList.remove('active');
+            } else if (mode === 'practice') {
+                document.getElementById('viewPractice').style.display = 'block';
+                document.getElementById('quizFooter').style.display = 'flex';
+                document.getElementById('btnExp').classList.remove('active');
+                document.getElementById('btnPrac').classList.add('active');
+                renderQuestion();
+                renderMap();
+            } else if (mode === 'result') {
+                document.getElementById('viewResult').style.display = 'block';
+                document.getElementById('quizFooter').style.display = 'none';
+            }
+            window.scrollTo(0,0);
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            const letters = ['A', 'B', 'C', 'D'];
+            const ans = userAnswers[currentQuestion];
+
+            let badgeClass = '';
+            if(q.level === 'Fácil') badgeClass = 'dif-facil';
+            else if(q.level === 'Médio') badgeClass = 'dif-medio';
+            else badgeClass = 'dif-dificil';
+
+            container.innerHTML = `
+                <div class="card-content" style="border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                    <span class="difficulty-badge ${badgeClass}">${q.level}</span>
+                    <div style="margin-bottom: 20px;">
+                        <span style="font-size: 0.8rem; font-weight: 800; color: var(--theme-dark);">QUESTÃO ${currentQuestion + 1} DE ${questions.length}</span>
+                        <h2 style="font-size: 1.15rem; margin-top: 5px; color: var(--text-color); font-weight: 900;">${q.text}</h2>
+                    </div>
+                    <div class="options-list">
+                        ${q.options.map((opt, i) => {
+                            let cls = '';
+                            if (ans !== null) {
+                                if (i === q.correct) cls = 'correct';
+                                else if (i === ans) cls = 'wrong';
+                                else cls = 'disabled';
+                            }
+                            return `
+                                <button class="option-btn ${cls}" onclick="handleAnswer(${i})" ${ans !== null ? 'disabled' : ''}>
+                                    <div class="opt-circle">${letters[i]}</div>
+                                    <div>${opt}</div>
+                                </button>
+                            `;
+                        }).join('')}
+                    </div>
+                    ${ans !== null ? `
+                        <div class="feedback-box">
+                            <div class="feedback-title" style="color:${ans === q.correct ? 'var(--correct-border)' : 'var(--wrong-border)'}">
+                                ${ans === q.correct ? '✅ Bhaskara impecável!' : '❌ Atenção ao discriminante:'}
+                            </div>
+                            <div class="feedback-item correct-opt"><strong>Opção Exata:</strong> ${q.options[q.correct]}</div>
+                            <div style="margin-top:10px; font-size:0.95rem; color:#0F172A; margin-bottom:15px; font-weight:600;">
+                                ${q.explanation.correct}
+                            </div>
+                            <div style="margin-top:15px; border-top:1px dashed #CBD5E0; padding-top:10px;">
+                                <small style="color:var(--theme-dark);"><strong>Diagnóstico das Erradas:</strong></small>
+                                ${q.explanation.options.map((exp, i) => i !== q.correct ? `<div class="feedback-item wrong-opt" style="margin-top:8px;"><strong>${letters[i]})</strong> ${exp}</div>` : '').join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            updateNav();
+        }
+
+        function handleAnswer(idx) {
+            if (userAnswers[currentQuestion] !== null) return;
+            userAnswers[currentQuestion] = idx;
+            if (idx === questions[currentQuestion].correct) {
+                const duration = 1500;
+                const end = Date.now() + duration;
+                (function frame() {
+                    confetti({
+                        particleCount: 5, angle: 60, spread: 55, origin: { x: 0, y: 0.6 },
+                        colors: ['#10B981', '#0284C7', '#047857', '#F59E0B']
+                    });
+                    confetti({
+                        particleCount: 5, angle: 120, spread: 55, origin: { x: 1, y: 0.6 },
+                        colors: ['#10B981', '#0284C7', '#047857', '#F59E0B']
+                    });
+                    if (Date.now() < end) { requestAnimationFrame(frame); }
+                }());
+            } else {
+                const quizContainer = document.getElementById('quizContainer');
+                quizContainer.classList.remove('shake-effect');
+                void quizContainer.offsetWidth;
+                quizContainer.classList.add('shake-effect');
+                setTimeout(() => quizContainer.classList.remove('shake-effect'), 500);
+            }
+            renderQuestion();
+            renderMap();
+        }
+
+        function renderMap() {
+            const map = document.getElementById('qMap');
+            map.innerHTML = questions.map((q, i) => {
+                let cls = 'map-dot';
+                if (i === currentQuestion) cls += ' active';
+                if (userAnswers[i] !== null) {
+                    cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+                }
+                return `<div class="${cls}" onclick="goTo(${i})">${i+1}</div>`;
+            }).join('');
+
+            setTimeout(() => {
+                const activeDot = map.querySelector('.map-dot.active');
+                if (activeDot) {
+                    activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
+            }, 50);
+        }
+
+        function goTo(i) { 
+            if (window.confetti) confetti.reset(); 
+            currentQuestion = i; 
+            renderQuestion(); 
+            renderMap(); 
+        }
+        function changeQuestion(d) {
+            let n = currentQuestion + d;
+            if (n >= 0 && n < questions.length) goTo(n);
+        }
+
+        function updateNav() {
+            document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+            const next = document.getElementById('btnNext');
+            if (currentQuestion === questions.length - 1) {
+                next.textContent = "Finalizar Prova";
+                next.onclick = finish;
+            } else {
+                next.textContent = "Próxima";
+                next.onclick = () => changeQuestion(1);
+            }
+        }
+
+        function finish() {
+            let correct = userAnswers.filter((a, i) => a === questions[i].correct).length;
+            let percent = Math.round((correct / questions.length) * 100);
+            
+            if (window.confetti) confetti.reset();
+            
+            document.getElementById('finalPercent').textContent = percent + "%";
+            document.getElementById('finalScoreText').textContent = `Acertaste ${correct} de ${questions.length} equações.`;
+            document.getElementById('finalStars').textContent = percent >= 80 ? "⭐⭐⭐⭐⭐" : percent >= 60 ? "⭐⭐⭐" : "⭐";
+            
+            let summary = '<div style="text-align:left; margin-top:20px;">';
+            if (percent < 80) {
+                summary += `<div style="background:var(--wrong-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--wrong-border); color:var(--wrong-border);">
+                    <strong>⚠️ Precisa de mais prática!</strong> O domínio da fórmula de Bhaskara exige atenção ao discriminante. Meta: 80% (24 acertos). Reveja a teoria e tente novamente.
+                </div>`;
+                document.getElementById('action-buttons').innerHTML = `<button class="btn-action" onclick="reset()">🔄 Recomeçar Estudo</button>`;
+            } else {
+                summary += `<div style="background:var(--correct-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--correct-border); color:var(--correct-border);">
+                    <strong>🎉 Parabéns, Mestre de Bhaskara!</strong> Você domina as equações do 2º grau com maestria!
+                </div>`;
+                document.getElementById('action-buttons').innerHTML = `<button class="btn-action" onclick="reset()">🔄 Refazer Desafio</button>`;
+            }
+
+            if (correct < questions.length) {
+                summary += '<h4 style="margin-bottom:10px; color:var(--text-color);">Análise dos erros:</h4>';
+                questions.forEach((q, i) => {
+                    if(userAnswers[i] !== q.correct) {
+                        summary += `<div style="margin-bottom:10px; padding:15px; background:var(--white); border-radius:8px; border:2px dashed var(--theme-dark);">
+                            <strong style="color:var(--theme-dark);">Q${i+1}:</strong> ${q.text}<br>
+                            <span style="color:var(--wrong-border); font-size:0.9rem; font-weight:600; display:block; margin-top:5px;">A tua resposta: ${q.options[userAnswers[i]]}</span>
+                            <span style="color:var(--correct-border); font-size:0.9rem; font-weight:600; display:block; margin-top:2px;">Gabarito: ${q.options[q.correct]}</span>
+                        </div>`;
+                    }
+                });
+            }
+            summary += '</div>';
+            
+            document.getElementById('review-container').innerHTML = summary;
+            setMode('result');
+        }
+
+        function reset() { 
+            userAnswers = new Array(questions.length).fill(null); 
+            currentQuestion = 0; 
+            setMode('practice'); 
+        }
+        
+        setMode('explanation');
+    </script>
+</body>
+</html>
