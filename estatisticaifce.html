@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estatística - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE COR E TEMA --- */
+        :root {
+            --bg-color: #F8FAFC;
+            --text-color: #0F172A;
+            --border-color: #000000;
+            --white: #FFFFFF;
+            
+            --theme-light: #BAE6FD;
+            --theme-medium: #0EA5E9;
+            --theme-dark: #0369A1;
+            --theme-contrast: #F97316;
+            --theme-accent: #10B981;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #E11D48;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: linear-gradient(#E2E8F0 1px, transparent 1px), linear-gradient(90deg, #E2E8F0 1px, transparent 1px);
+            background-size: 25px 25px;
+        }
+
+        /* --- ANIMAÇÕES --- */
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1) rotate(-5deg); color: var(--theme-contrast); } }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+        
+        .pulse-effect { animation: pulse 2s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        /* --- LAYOUT PRINCIPAL --- */
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; }
+        .subtitle { font-size: 1rem; color: var(--theme-dark); font-weight: 700; margin-top: 5px; background: var(--theme-light); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        /* --- BOTÕES DE NAVEGAÇÃO DE VISTAS --- */
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--white); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        /* --- PESQUISA --- */
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        /* --- TEORIA --- */
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; }
+        .theory-box::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 14px; background-color: var(--theme-medium); border-right: 3px solid var(--border-color); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--text-color); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        .theory-box h4 { font-size: 1.1rem; font-weight: 800; color: var(--theme-dark); margin-top: 10px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; }
+        .theory-box p { color: #334155; }
+        .theory-box ul { padding-left: 25px; color: #334155; }
+        .theory-box li { margin-bottom: 8px; }
+        .theory-box li::marker { color: var(--theme-contrast); font-weight: 900; }
+
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 6px 14px; background-color: #F1F5F9; border: 2px solid #CBD5E1; border-radius: 8px; font-size: 0.85rem; color: #475569; font-weight: 700; letter-spacing: 0.5px; box-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .visual-area { background: #F8FAFC; border: 3px dashed #CBD5E1; border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; }
+        .visual-caption { font-size: 0.85rem; font-weight: 700; color: #64748B; text-align: center; text-transform: uppercase; letter-spacing: 1px;}
+        svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
+        .highlight-box { background-color: #FEF3C7; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #78350F; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.blue { background-color: #E0F2FE; border-left-color: var(--theme-medium); color: #075985; }
+        .highlight-title { display: block; font-weight: 900; font-size: 1.05rem; margin-bottom: 6px; text-transform: uppercase; color: var(--border-color); }
+
+        /* --- BOTÕES GERAIS --- */
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+
+        /* --- PRÁTICA (QUIZ) --- */
+        .quiz-intro-card { margin-bottom: 5px; background-color: var(--white); padding: 25px; border-radius: 16px; border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); }
+        .quiz-intro-title { color: var(--text-color); font-size: 1.4rem; font-weight: 900; margin-bottom: 8px; text-transform: uppercase; }
+        .quiz-intro-text { color: #334155; font-size: 1rem; font-weight: 500; line-height: 1.5; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-header { margin-bottom: 25px; }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; }
+        .quiz-question-text { font-size: 1.2rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; }
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        /* --- FEEDBACK DA QUESTÃO --- */
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-title.success { color: var(--correct-border); }
+        .feedback-title.error { color: var(--wrong-border); }
+        .feedback-explanation { margin-top: 15px; font-size: 1rem; color: var(--text-color); margin-bottom: 15px; font-weight: 600; }
+        .feedback-distortions { margin-top: 15px; border-top: 2px dashed #CBD5E1; padding-top: 15px; }
+        
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #064E3B; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #F1F5F9; border-color: #94A3B8; color: #475569; border-style: dashed; margin-top: 8px; }
+
+        /* --- RESULTADOS --- */
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .result-title { font-weight: 900; text-transform: uppercase; color: var(--text-color); }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        .score-text { font-size: 1.2rem; font-weight: 800; color: #475569; }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .error-log-container { text-align: left; margin-top: 20px; }
+        .error-log-title { margin-bottom: 15px; color: var(--text-color); font-size: 1.15rem; }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: #F8FAFC; border-radius: 12px; border: 3px dashed #CBD5E1; }
+        .error-log-question { color: var(--theme-dark); font-size: 1.05rem; display: block; margin-bottom: 8px; font-weight: bold; }
+        .error-log-user { color: var(--wrong-border); font-weight: 600; display: block; margin-bottom: 5px; }
+        .error-log-correct { color: var(--correct-border); font-weight: 700; display: block; }
+
+        /* --- RODAPÉ DE NAVEGAÇÃO --- */
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="logo-header">
+        <div class="css-logo"><span class="pulse-effect">📊</span> PROMOVER</div>
+        <h1>Estatística Analítica</h1>
+        <p class="subtitle">A Matemática da Incerteza e da Verdade</p>
+    </header>
+
+    <nav class="toggle-container">
+        <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria Rigorosa</button>
+        <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prova (30)</button>
+    </nav>
+
+    <!-- VISTA: TEORIA -->
+    <main id="viewExplanation" class="view-section active">
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar conceito... (ex: média, amostra, outlier)">
+        </div>
+        <div id="no-results"><p>Nenhuma correspondência estatística. Reveja o seu termo.</p></div>
+
+        <section class="content-group">
+            <div class="section-badge">🎯 1. O Todo e a Fração</div>
+            <article class="theory-box search-target">
+                <h3>População vs. Amostra</h3>
+                <p>Na estatística, os termos exigem rigor cirúrgico. Esqueça o significado de dicionário comum.</p>
+                
+                <h4>População (Universo)</h4>
+                <p>É o <strong>conjunto absoluto</strong> de todos os elementos que partilham a característica que queres estudar. Não são apenas "pessoas". Pode ser a população de parafusos de uma fábrica, os glóbulos vermelhos num corpo, ou as estrelas numa galáxia.</p>
+                <div class="inline-example">ex: Todos os 10 milhões de eleitores inscritos num país</div>
+                
+                <h4>Amostra (Subconjunto)</h4>
+                <p>Estudar a população inteira (fazer um <em>Censo</em>) é quase sempre financeiramente ruinoso, demorado ou fisicamente impossível. A <strong>Amostra</strong> é o "atalho" matemático: um grupo reduzido retirado da população.</p>
+                <div class="inline-example">ex: 2.000 eleitores inquiridos para uma sondagem política</div>
+
+                <div class="visual-area">
+                    <span class="visual-caption">Esquema Analítico: Extração</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="340" height="140" viewBox="0 0 340 140">
+                        <rect x="10" y="20" width="120" height="100" rx="12" fill="#E0F2FE" stroke="#0369A1" stroke-width="3" stroke-dasharray="6,4"/>
+                        <text x="70" y="45" text-anchor="middle" font-size="12" font-weight="900" fill="#0369A1">POPULAÇÃO</text>
+                        <circle cx="40" cy="70" r="4" fill="#0EA5E9"/> <circle cx="70" cy="65" r="4" fill="#F97316"/>
+                        <circle cx="100" cy="75" r="4" fill="#0EA5E9"/> <circle cx="55" cy="95" r="4" fill="#0EA5E9"/>
+                        <circle cx="85" cy="100" r="4" fill="#F97316"/> <circle cx="45" cy="110" r="4" fill="#0EA5E9"/>
+
+                        <path d="M 140 70 L 190 70" stroke="#0F172A" stroke-width="4" marker-end="url(#arrowStat)"/>
+                        <text x="165" y="60" text-anchor="middle" font-size="10" font-weight="700" fill="#64748B">Sorteio Aleatório</text>
+                        <defs><marker id="arrowStat" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#0F172A"/></marker></defs>
+
+                        <rect x="210" y="35" width="100" height="70" rx="8" fill="#FEF3C7" stroke="#F97316" stroke-width="3"/>
+                        <text x="260" y="60" text-anchor="middle" font-size="12" font-weight="900" fill="#B45309">AMOSTRA</text>
+                        <circle cx="240" cy="80" r="4" fill="#0EA5E9"/> <circle cx="280" cy="85" r="4" fill="#F97316"/>
+                    </svg>
+                </div>
+
+                <div class="highlight-box">
+                    <span class="highlight-title">⚠️ O Vírus do Viés Estatístico</span>
+                    Se a amostra não for selecionada aleatoriamente, o estudo é lixo intelectual. Avaliar a qualidade do ensino de uma cidade inquirindo apenas a melhor escola privada gera uma <strong>amostra enviesada</strong>. Ela não representa a realidade da População.
+                </div>
+            </article>
+        </section>
+
+        <section class="content-group">
+            <div class="section-badge">🧬 2. A Anatomia da Variável</div>
+            <article class="theory-box search-target">
+                <h3>Como Classificamos os Dados?</h3>
+                <p>Uma <strong>Variável</strong> é o que estás a investigar. Se tratares um texto como um número, a matemática falha. Elas dividem-se em duas famílias absolutas:</p>
+
+                <h4>1. Qualitativas (Atributos/Palavras)</h4>
+                <ul>
+                    <li><strong>Nominais:</strong> Não existe ordem hierárquica lógica. <div class="inline-example">ex: "Azul", "Verde", "Castanho" (Cor dos olhos)</div></li>
+                    <li><strong>Ordinais:</strong> Existe uma progressão de grandeza óbvia. <div class="inline-example">ex: "1º Lugar", "2º Lugar", "3º Lugar" (Classificação numa corrida)</div></li>
+                </ul>
+
+                <h4>2. Quantitativas (Números Matemáticos)</h4>
+                <ul>
+                    <li><strong>Discretas:</strong> Resultam de <em>contagem</em>. Só aceitam números inteiros. Ninguém tem "2.4 irmãos". <div class="inline-example">ex: 0, 1, 2, 3, 4... (Quantidade de filhos ou irmãos)</div></li>
+                    <li><strong>Contínuas:</strong> Resultam de <em>medição</em> com um instrumento. Aceitam casas decimais. <div class="inline-example">ex: 1.65m, 1.72m, 1.80m... (Altura em metros)</div></li>
+                </ul>
+
+                <div class="visual-area">
+                    <span class="visual-caption">Árvore de Decisão Lógica</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="340" height="180" viewBox="0 0 340 180">
+                        <rect x="100" y="10" width="140" height="35" rx="8" fill="#1E293B" stroke="#000" stroke-width="2"/>
+                        <text x="170" y="32" text-anchor="middle" font-size="12" font-weight="800" fill="#FFF">VARIÁVEIS</text>
+                        
+                        <path d="M 170 45 L 170 60 L 70 60 L 70 80" stroke="#0F172A" stroke-width="2" fill="none"/>
+                        <path d="M 170 45 L 170 60 L 270 60 L 270 80" stroke="#0F172A" stroke-width="2" fill="none"/>
+
+                        <rect x="10" y="80" width="120" height="30" rx="6" fill="#BAE6FD" stroke="#0369A1" stroke-width="2"/>
+                        <text x="70" y="100" text-anchor="middle" font-size="11" font-weight="800" fill="#0369A1">QUALITATIVAS</text>
+                        <path d="M 70 110 L 70 120 L 35 120 L 35 130" stroke="#0369A1" stroke-width="2" fill="none"/>
+                        <path d="M 70 110 L 70 120 L 105 120 L 105 130" stroke="#0369A1" stroke-width="2" fill="none"/>
+                        <text x="35" y="145" text-anchor="middle" font-size="10" font-weight="700">Nominal</text>
+                        <text x="105" y="145" text-anchor="middle" font-size="10" font-weight="700">Ordinal</text>
+
+                        <rect x="210" y="80" width="120" height="30" rx="6" fill="#FEF3C7" stroke="#F97316" stroke-width="2"/>
+                        <text x="270" y="100" text-anchor="middle" font-size="11" font-weight="800" fill="#B45309">QUANTITATIVAS</text>
+                        <path d="M 270 110 L 270 120 L 235 120 L 235 130" stroke="#F97316" stroke-width="2" fill="none"/>
+                        <path d="M 270 110 L 270 120 L 305 120 L 305 130" stroke="#F97316" stroke-width="2" fill="none"/>
+                        <text x="235" y="145" text-anchor="middle" font-size="10" font-weight="700">Discreta</text>
+                        <text x="305" y="145" text-anchor="middle" font-size="10" font-weight="700">Contínua</text>
+                    </svg>
+                </div>
+
+                <div class="highlight-box blue">
+                    <span class="highlight-title">⛔ Crime Matemático</span>
+                    O "Número de Telemóvel" ou o "Código Postal" usam algarismos, mas <strong>NÃO SÃO</strong> variáveis quantitativas. São rótulos de identificação (Qualitativa Nominal). Tentar calcular a média dos números de telefone de uma turma é um absurdo conceptual.
+                </div>
+            </article>
+        </section>
+
+        <section class="content-group">
+            <div class="section-badge">⚖️ 3. O Centro e a Mentira</div>
+            <article class="theory-box search-target">
+                <h3>Média, Moda e Mediana</h3>
+                <p>Estes três indicadores tentam resumir uma montanha de dados num único número representativo. Mas eles comportam-se de forma muito diferente.</p>
+
+                <ul>
+                    <li><strong>A Moda (Mo):</strong> É a democracia bruta. O valor que mais se repete. Pode haver empate (bimodal) ou não existir (amodal). <div class="inline-example">ex: No conjunto {2, 4, 4, 4, 7}, a Moda é 4</div></li>
+                    <li><strong>A Média Aritmética (x̄):</strong> Soma-se tudo e divide-se pelo total de elementos. É o indicador mais famoso, <strong>mas o mais ingénuo</strong>. <div class="inline-example">ex: Para os valores {10, 12, 14}, a Média é (10+12+14)/3 = 12</div></li>
+                    <li><strong>A Mediana (Md):</strong> Exige ordem (Rol). É o valor que está geograficamente no meio da lista ordenada. Ignora valores extremos. <div class="inline-example">ex: No rol ordenado {3, 7, 9, 15, 80}, a Mediana é 9</div></li>
+                </ul>
+
+                <div class="visual-area">
+                    <span class="visual-caption">O Efeito Distorçor do Outlier</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="340" height="150" viewBox="0 0 340 150">
+                        <rect x="20" y="80" width="30" height="40" fill="#94A3B8" stroke="#000" stroke-width="2"/>
+                        <rect x="60" y="80" width="30" height="40" fill="#94A3B8" stroke="#000" stroke-width="2"/>
+                        <rect x="100" y="80" width="30" height="40" fill="#10B981" stroke="#000" stroke-width="3"/>
+                        <rect x="140" y="80" width="30" height="40" fill="#94A3B8" stroke="#000" stroke-width="2"/>
+                        
+                        <rect x="180" y="20" width="30" height="100" fill="#F43F5E" stroke="#000" stroke-width="2"/>
+                        <text x="195" y="15" text-anchor="middle" font-size="10" font-weight="800" fill="#E11D48">OUTLIER</text>
+
+                        <text x="115" y="140" text-anchor="middle" font-size="11" font-weight="800" fill="#059669">Mediana (Justa)</text>
+                        
+                        <path d="M 10 50 L 220 50" stroke="#F97316" stroke-width="3" stroke-dasharray="6,4"/>
+                        <text x="270" y="55" text-anchor="middle" font-size="11" font-weight="800" fill="#C2410C">Média Puxada</text>
+                    </svg>
+                </div>
+
+                <div class="highlight-box">
+                    <span class="highlight-title">💡 A Ilusão do Bilionário</span>
+                    Se quatro pessoas ganham 1.000€ e o Elon Musk (ganha 10 milhões) entra na sala, a <strong>Média</strong> salarial dispara para 2 milhões. A Média é corruptível por <em>Outliers</em> (valores anómalos). A <strong>Mediana</strong> manter-se-á nos 1.000€, refletindo a realidade da maioria.
+                </div>
+            </article>
+        </section>
+
+        <section class="content-group">
+            <div class="section-badge">🏋️ 4. A Balança de Pesos</div>
+            <article class="theory-box search-target">
+                <h3>Média Ponderada (O Sistema do IFCE)</h3>
+                <p>No IFCE e em muitos concursos, nem todas as avaliações têm a mesma importância. A Média Ponderada atribui <strong>Pesos</strong> diferentes a cada valor, funcionando como um multiplicador de poder.</p>
+
+                <h4>A Regra de Ouro do Cálculo</h4>
+                <ul>
+                    <li><strong>Passo 1:</strong> Multiplica cada nota pelo seu próprio peso.</li>
+                    <li><strong>Passo 2:</strong> Soma todos os resultados dessas multiplicações.</li>
+                    <li><strong>Passo 3 (O Perigo!):</strong> Divide o valor total pela <strong>SOMA DOS PESOS</strong> (e nunca pela quantidade de disciplinas!).</li>
+                </ul>
+
+                <div class="visual-area">
+                    <span class="visual-caption">Fórmula Visual: Cálculo de Ingresso</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="340" height="130" viewBox="0 0 340 130">
+                        <rect x="10" y="15" width="85" height="45" rx="6" fill="#BAE6FD" stroke="#0369A1" stroke-width="2"/>
+                        <text x="52" y="33" text-anchor="middle" font-size="11" font-weight="800" fill="#0369A1">MAT: 8,0</text>
+                        <text x="52" y="48" text-anchor="middle" font-size="10" font-weight="700" fill="#0EA5E9">× Peso 3</text>
+                        
+                        <text x="115" y="45" text-anchor="middle" font-size="18" font-weight="900" fill="#0F172A">+</text>
+                        
+                        <rect x="135" y="15" width="85" height="45" rx="6" fill="#FEF3C7" stroke="#B45309" stroke-width="2"/>
+                        <text x="177" y="33" text-anchor="middle" font-size="11" font-weight="800" fill="#B45309">POR: 6,0</text>
+                        <text x="177" y="48" text-anchor="middle" font-size="10" font-weight="700" fill="#F97316">× Peso 2</text>
+
+                        <path d="M 5 75 L 225 75" stroke="#0F172A" stroke-width="3"/>
+                        <text x="115" y="95" text-anchor="middle" font-size="12" font-weight="800" fill="#0F172A">Soma dos Pesos: (3 + 2) = 5</text>
+
+                        <text x="245" y="55" text-anchor="middle" font-size="18" font-weight="900" fill="#0F172A">=</text>
+                        
+                        <rect x="265" y="35" width="60" height="40" rx="8" fill="#D1FAE5" stroke="#059669" stroke-width="3"/>
+                        <text x="295" y="61" text-anchor="middle" font-size="16" font-weight="900" fill="#059669">7,2</text>
+                    </svg>
+                </div>
+
+                <div class="highlight-box blue">
+                    <span class="highlight-title">⛔ O Erro Fatal do Candidato</span>
+                    Muitos alunos somam as notas (8 + 6 = 14) e dividem por 2 provas, achando que a média é 7,0. <strong>Isto destrói a aprovação!</strong> A Média Ponderada real no exemplo acima é <strong>7,2</strong> porque a Matemática (onde o aluno foi muito bem) tem "Peso 3", puxando o resultado final para cima com mais força.
+                </div>
+            </article>
+        </section>
+
+        <section class="content-group">
+            <div class="section-badge">📈 5. A Anatomia da Visualização</div>
+            <article class="theory-box search-target">
+                <h3>Escolher o Gráfico Correto</h3>
+                <p>O cérebro humano processa formas muito mais rápido do que números. Mas usar o gráfico errado é uma forma de manipulação de dados.</p>
+
+                <ul>
+                    <li><strong>Tabela de Frequências:</strong> A <em>Frequência Absoluta</em> é a contagem real. A <em>Frequência Relativa</em> é o peso percentual (Absoluta / Total). A soma das relativas tem de dar sempre 1 (ou 100%). <div class="inline-example">ex: Freq. Absoluta = 5 (alunos) | Freq. Relativa = 0.25 (ou 25%)</div></li>
+                    <li><strong>Gráfico Circular (Setores):</strong> O famoso gráfico de "pizza". Só deve ser usado para mostrar parcelas de um todo fixo (100%). <div class="inline-example">ex: 45% (Fatia A), 30% (Fatia B), 25% (Fatia C)</div></li>
+                    <li><strong>Histograma:</strong> As <strong>colunas estão coladas umas às outras</strong>. É usado apenas para Variáveis Contínuas agrupadas em intervalos. Onde uma barra acaba, a outra começa. <div class="inline-example">ex: Classes contínuas como [1.50m - 1.60m[, [1.60m - 1.70m[</div></li>
+                    <li><strong>Gráfico de Linhas:</strong> A ferramenta rainha para demonstrar a evolução de um fenómeno ao longo do tempo (séries cronológicas). <div class="inline-example">ex: Temperaturas mensais {Jan: 12ºC, Fev: 14ºC, Mar: 18ºC...}</div></li>
+                </ul>
+            </article>
+        </section>
+
+        <button class="btn-action" onclick="changeApplicationView('practice')">⚖️ Iniciar a Auditoria de Dados (30 Q) ➜</button>
+    </main>
+
+    <!-- VISTA: PRÁTICA (QUIZ) -->
+    <main id="viewPractice" class="view-section">
+        <div class="quiz-intro-card">
+            <h2 class="quiz-intro-title">Prova de Fogo Estatística</h2>
+            <p class="quiz-intro-text">30 questões sobre métodos de amostragem, classificação de variáveis e cálculo de distorções. Acerta <strong>80% (24/30)</strong> para provares rigor analítico.</p>
+        </div>
+        <div class="question-map" id="questionNavigationMap"></div>
+        <div id="quizContainer"></div>
+    </main>
+
+    <!-- VISTA: RESULTADOS -->
+    <main id="viewResult" class="view-section">
+        <div class="result-card">
+            <h2 class="result-title">Relatório de Auditoria</h2>
+            <div class="percentage-big" id="finalPercentageScore">0%</div>
+            <p class="score-text" id="finalRawScoreText">Acertaste 0 de 30</p>
+            <div id="resultsReviewContainer" class="error-log-container"></div>
+        </div>
+        <div id="actionButtonsContainer"></div>
+    </main>
+</div>
+
+<!-- RODAPÉ FIXO -->
+<footer class="quiz-footer" id="quizFooter">
+    <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">⬅️ Anterior</button>
+    <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Avançar Dados ➡️</button>
+</footer>
+
+<script>
+    /* --- ESTRUTURA DE DADOS (BASE DE QUESTÕES) --- */
+    const questionsDatabase = [
+        { level: "Fácil", text: "Um aluno do 9º ano quer entrar no curso de Informática do IFCE. Nos simulados, ele tirou 7, 8, 6 e 9. Qual a sua média aritmética simples?", options: ["7,0", "7,5", "8,0", "8,5"], correctIndex: 1, explanation: { correctText: "A média é a soma dividida pela quantidade: (7+8+6+9) / 4 = 30 / 4 = 7,5.", otherOptions: ["Incorreto.", "Alternativa correta.", "Incorreto. A soma dá 30, não 32.", "Incorreto."] } },
+        { level: "Fácil", text: "O IFCE de Fortaleza tem 3.000 alunos. Para uma pesquisa de satisfação, foram sorteados 150 alunos. Esse grupo de 150 alunos representa:", options: ["A População", "Uma Variável Contínua", "Uma Amostra", "O Rol"], correctIndex: 2, explanation: { correctText: "Amostra é um subconjunto selecionado do todo (população) para representar uma pesquisa.", otherOptions: ["A população seriam todos os 3.000 alunos.", "Incorreto.", "Alternativa correta.", "Rol é a ordenação de dados."] } },
+        { level: "Médio", text: "Na seleção do IFCE, a prova de Matemática tem peso 3 e a de Português tem peso 2. Um candidato tirou 8 em Matemática e 6 em Português. Qual sua nota final?", options: ["7,0", "7,2", "7,4", "7,6"], correctIndex: 1, explanation: { correctText: "Média Ponderada = [(8×3) + (6×2)] / (3+2) = (24 + 12) / 5 = 36 / 5 = 7,2.", otherOptions: ["Esta seria a média simples (8+6)/2.", "Alternativa correta.", "Erro no cálculo da soma.", "Incorreto."] } },
+        { level: "Fácil", text: "As idades de um grupo de amigos que vão fazer a prova do IFCE são: 14, 15, 14, 16 e 14. Qual é a MODA destas idades?", options: ["14", "14,6", "15", "16"], correctIndex: 0, explanation: { correctText: "A moda é o valor que mais se repete. O 14 aparece três vezes.", otherOptions: ["Alternativa correta.", "Essa é a média.", "Incorreto.", "Incorreto."] } },
+        { level: "Médio", text: "Cinco candidatos obtiveram as seguintes notas: 8, 6, 9, 7 e 5. Para achar a MEDIANA, o primeiro passo é colocá-las em ordem. Qual é a nota mediana?", options: ["6", "7", "7,5", "8"], correctIndex: 1, explanation: { correctText: "Em ordem (Rol): 5, 6, 7, 8, 9. O valor central é o 7.", otherOptions: ["Incorreto.", "Alternativa correta.", "Incorreto.", "Incorreto."] } },
+        { level: "Médio", text: "Se houver 4 candidatos com as notas: 6, 7, 8 e 9. Como a quantidade é par, qual será a MEDIANA?", options: ["7", "7,5", "8", "8,5"], correctIndex: 1, explanation: { correctText: "Quantidade par exige a média dos dois centrais: (7+8)/2 = 7,5.", otherOptions: ["Incorreto.", "Alternativa correta.", "Incorreto.", "Incorreto."] } },
+        { level: "Fácil", text: "A ficha de inscrição do IFCE pergunta: 'Qual curso você deseja (Edificações, Informática, Química)?'. Esta é uma variável:", options: ["Quantitativa Discreta", "Quantitativa Contínua", "Qualitativa Ordinal", "Qualitativa Nominal"], correctIndex: 3, explanation: { correctText: "São palavras/nomes (Qualitativa) sem ordem hierárquica matemática (Nominal).", otherOptions: ["Cursos não são números contáveis.", "Cursos não são medidas.", "Não existe ordem matemática entre os cursos.", "Alternativa correta."] } },
+        { level: "Médio", text: "Um aluno precisa de média 7,0 em 4 avaliações para não ir a recuperação. Ele já tirou 6, 7 e 8. Quanto ele precisa tirar na última prova?", options: ["6,0", "6,5", "7,0", "7,5"], correctIndex: 2, explanation: { correctText: "Para ter média 7 em 4 provas, a soma total tem de ser 28. Ele já tem 21 (6+7+8). Faltam 7.", otherOptions: ["Incorreto.", "Incorreto.", "Alternativa correta.", "Incorreto."] } },
+        { level: "Fácil", text: "Numa turma de 40 alunos do 9º ano, 10 querem fazer o curso de Eletrotécnica. Qual a Frequência Relativa (porcentagem) desses alunos?", options: ["10%", "20%", "25%", "40%"], correctIndex: 2, explanation: { correctText: "Frequência relativa = Parte / Todo = 10 / 40 = 0,25. Multiplicando por 100 temos 25%.", otherOptions: ["Incorreto.", "Incorreto.", "Alternativa correta.", "Incorreto."] } },
+        { level: "Difícil", text: "Quatro alunos têm média de idade igual a 15 anos. Se o professor (que tem 35 anos) se juntar ao grupo, qual será a nova média de idade do grupo de 5 pessoas?", options: ["18", "19", "20", "25"], correctIndex: 1, explanation: { correctText: "Soma das 4 idades = 4 × 15 = 60. Soma com o professor = 60 + 35 = 95. Nova média = 95 / 5 = 19.", otherOptions: ["Incorreto.", "Alternativa correta.", "Incorreto.", "A média não sobe tanto porque o peso dos 4 alunos puxa para baixo."] } },
+        { level: "Difícil", text: "No boletim, as notas são: 1º Bimestre (peso 1)=6, 2º Bimestre (peso 2)=6, 3º Bimestre (peso 3)=8. Qual a média parcial (pesos 1, 2 e 3)?", options: ["6,0", "6,5", "7,0", "7,5"], correctIndex: 2, explanation: { correctText: "Média Ponderada = [(6×1)+(6×2)+(8×3)] / (1+2+3) = (6+12+24) / 6 = 42 / 6 = 7,0.", otherOptions: ["Incorreto.", "Incorreto.", "Alternativa correta.", "Incorreto."] } },
+        { level: "Fácil", text: "Um candidato anotou o seu tempo de estudo por dia: 2h, 2h, 3h, 4h, 4h, 4h, 5h. Esta distribuição é:", options: ["Amodal (Sem moda)", "Unimodal", "Bimodal", "Multimodal"], correctIndex: 1, explanation: { correctText: "Tem apenas uma moda clara (4h, que aparece 3 vezes).", otherOptions: ["Incorreto.", "Alternativa correta.", "Incorreto.", "Incorreto."] } },
+        { level: "Médio", text: "Se você quer representar num gráfico que 50% dos alunos do IFCE são de cursos técnicos e 50% de superiores, usando um gráfico de setores (pizza), qual o ângulo de cada fatia?", options: ["90°", "100°", "180°", "360°"], correctIndex: 2, explanation: { correctText: "Um círculo tem 360°. Metade (50%) corresponde a 180° (meia volta).", otherOptions: ["Isso seria 25%.", "Incorreto.", "Alternativa correta.", "Isso seria 100%."] } },
+        { level: "Difícil", text: "As notas de um aluno são 3, 8, 8 e 9. O professor decidiu excluir a menor nota para calcular a média das restantes. Qual é a nova média?", options: ["8,0", "8,2", "8,33", "8,5"], correctIndex: 2, explanation: { correctText: "Retirando o 3, sobram 8, 8 e 9. A soma é 25. A nova média é 25 / 3 = 8,333...", otherOptions: ["Incorreto.", "Incorreto.", "Alternativa correta.", "Incorreto."] } },
+        { level: "Médio", text: "O número de acertos em 5 simulados foi: 20, 20, 30, 40, 40. Qual é a moda?", options: ["20", "40", "30", "20 e 40 (Bimodal)"], correctIndex: 3, explanation: { correctText: "Os valores 20 e 40 aparecem duas vezes cada um. Logo, há duas modas.", otherOptions: ["Incorreto.", "Incorreto.", "Incorreto.", "Alternativa correta."] } },
+        { level: "Fácil", text: "Na Estatística, o termo 'Frequência Absoluta' significa:", options: ["A porcentagem dos dados", "A contagem exata (número de vezes) que um dado aparece", "A soma de todos os dados", "O valor que está no meio"], correctIndex: 1, explanation: { correctText: "Frequência absoluta é simplesmente a contagem de repetições de um evento na amostra.", otherOptions: ["Isso é frequência relativa percentual.", "Alternativa correta.", "Incorreto.", "Isso é mediana."] } },
+        { level: "Médio", text: "A soma de todas as Frequências Relativas de uma pesquisa bem feita tem que ser SEMPRE igual a:", options: ["0", "1 (ou 100%)", "O número total de entrevistados", "A média"], correctIndex: 1, explanation: { correctText: "A frequência relativa mostra as partes de um todo. A soma de todas as partes é o todo (1 inteiro ou 100%).", otherOptions: ["Incorreto.", "Alternativa correta.", "Isso seria a soma das frequências absolutas.", "Incorreto."] } },
+        { level: "Difícil", text: "A turma A (20 alunos) teve média 6 no simulado. A turma B (30 alunos) teve média 8. Se juntarmos as duas turmas (50 alunos), qual a média geral?", options: ["7,0", "7,2", "7,4", "7,5"], correctIndex: 1, explanation: { correctText: "Média Global = [(20×6) + (30×8)] / 50 = (120 + 240) / 50 = 360 / 50 = 7,2.", otherOptions: ["Incorreto (isso seria se as turmas tivessem o mesmo nº de alunos).", "Alternativa correta.", "Incorreto.", "Incorreto."] } },
+        { level: "Fácil", text: "O número de questões corretas de um candidato no exame do IFCE é uma variável:", options: ["Quantitativa Discreta", "Quantitativa Contínua", "Qualitativa Nominal", "Qualitativa Ordinal"], correctIndex: 0, explanation: { correctText: "Questões contam-se usando números inteiros (1, 2, 3...). Não fazes '2.5' questões corretas no cartão de resposta.", otherOptions: ["Alternativa correta.", "Incorreto (seria contínua se aceitasse decimais, como a nota ou altura).", "Incorreto.", "Incorreto."] } },
+        { level: "Médio", text: "Se a MÉDIA de acertos de uma turma de 30 alunos foi de 20 questões, qual foi a soma total de acertos de toda a turma junta?", options: ["50", "300", "600", "Não é possível calcular"], correctIndex: 2, explanation: { correctText: "Média = Soma / Quantidade. Logo, Soma = Média × Quantidade = 20 × 30 = 600.", otherOptions: ["Incorreto.", "Incorreto.", "Alternativa correta.", "Incorreto."] } },
+        { level: "Difícil", text: "Uma questão da prova foi anulada e TODOS os 40 alunos da turma ganharam +1 ponto. O que acontece com a MÉDIA da turma?", options: ["Permanece igual", "Aumenta 1 ponto exato", "Aumenta 40 pontos", "Aumenta 0,25 pontos"], correctIndex: 1, explanation: { correctText: "Propriedade fundamental da média: Se somarmos uma constante a todos os valores, a nova média aumenta no exato valor dessa constante (+1).", otherOptions: ["Incorreto.", "Alternativa correta.", "A soma aumenta 40, mas a média aumenta 1.", "Incorreto."] } },
+        { level: "Médio", text: "Um aluno tirou 8, 8 e 8 nas três provas. A sua Média, Moda e Mediana são, respetivamente:", options: ["8, 0, 8", "8, 8, 8", "8, 24, 8", "Não se pode calcular"], correctIndex: 1, explanation: { correctText: "Quando todos os dados são idênticos, as três medidas de tendência central são iguais a esse valor.", otherOptions: ["Incorreto.", "Alternativa correta.", "Incorreto.", "Incorreto."] } },
+        { level: "Fácil", text: "A medida estatística que calcula a diferença entre a maior nota de Matemática da sala e a menor nota chama-se:", options: ["Desvio Padrão", "Variância", "Amplitude", "Mediana"], correctIndex: 2, explanation: { correctText: "A Amplitude Total é a diferença simples entre o Máximo e o Mínimo do conjunto.", otherOptions: ["Incorreto.", "Incorreto.", "Alternativa correta.", "Incorreto."] } },
+        { level: "Médio", text: "Qual das medidas de tendência central NÃO é 'enganada' se houver uma nota absurdamente baixa (um outlier/anomalia) na turma?", options: ["Média Simples", "Média Ponderada", "Amplitude", "Mediana"], correctIndex: 3, explanation: { correctText: "A Mediana é uma medida de posição e ignora os extremos. A Média sofreria grande impacto.", otherOptions: ["A Média seria afundada.", "A Média seria afundada.", "Amplitude não é medida central.", "Alternativa correta."] } },
+        { level: "Fácil", text: "O cantinho da farda do IFCE quer comprar camisas para vender. Qual medida estatística eles devem usar para saber o tamanho que devem encomendar em maior quantidade?", options: ["Média", "Moda", "Mediana", "Amplitude"], correctIndex: 1, explanation: { correctText: "A Moda indica exatamente a categoria que tem a maior demanda/frequência (o tamanho mais vendido).", otherOptions: ["Média não faz sentido para tamanhos como P, M, G.", "Alternativa correta.", "Incorreto.", "Incorreto."] } },
+        { level: "Difícil", text: "Tabela de notas: Duas pessoas tiraram 5, três pessoas tiraram 6 e cinco pessoas tiraram 8. Qual a MÉDIA do grupo?", options: ["6,3", "6,5", "6,8", "7,0"], correctIndex: 2, explanation: { correctText: "Média Ponderada pelas frequências: [(2×5)+(3×6)+(5×8)] / 10 = (10+18+40) / 10 = 68 / 10 = 6,8.", otherOptions: ["Incorreto.", "Incorreto.", "Alternativa correta.", "Incorreto."] } },
+        { level: "Médio", text: "Na tabela de frequências agrupadas, temos a classe de alturas [160cm - 170cm[. Qual é o 'ponto médio' dessa classe?", options: ["160", "165", "170", "165,5"], correctIndex: 1, explanation: { correctText: "O ponto médio é a média dos limites da classe: (160 + 170) / 2 = 165.", otherOptions: ["Incorreto.", "Alternativa correta.", "Incorreto.", "Incorreto."] } },
+        { level: "Médio", text: "Para demonstrar a EVOLUÇÃO do número de inscritos no IFCE ao longo de 10 anos consecutivos, qual é o gráfico perfeito?", options: ["Gráfico de Barras", "Gráfico de Setores (Pizza)", "Histograma", "Gráfico de Linhas"], correctIndex: 3, explanation: { correctText: "O gráfico de linhas é a melhor ferramenta mundial para visualizar séries temporais (evolução no tempo).", otherOptions: ["Incorreto.", "Incorreto.", "Incorreto.", "Alternativa correta."] } },
+        { level: "Difícil", text: "Se um conjunto de dados tem Média = 5, Mediana = 5 e Moda = 5, podemos afirmar matematicamente que a distribuição em gráfico se parece com:", options: ["Um sino perfeitamente simétrico", "Um gráfico torto para a direita (assimetria positiva)", "Um gráfico torto para a esquerda", "Não há gráfico"], correctIndex: 0, explanation: { correctText: "Quando Média = Mediana = Moda, a distribuição é simétrica (Normal), formando a famosa Curva de Sino.", otherOptions: ["Alternativa correta.", "Isso seria Média > Mediana.", "Isso seria Média < Mediana.", "Incorreto."] } },
+        { level: "Difícil", text: "Prova final do simulado: P1 tem peso 2. P2 tem peso 3. A nota mínima (média) para aprovação é 6,0. O aluno tirou 4,5 na P1. Quanto precisa tirar na P2?", options: ["6,0", "6,5", "7,0", "7,5"], correctIndex: 2, explanation: { correctText: "A soma total dos pesos é 5. Logo, ele precisa de (5 × 6,0) = 30 pontos totais. Na P1 ele fez 4,5 × 2 = 9 pontos. Faltam 21 pontos para a P2. Como a P2 tem peso 3: 21 / 3 = 7,0.", otherOptions: ["Incorreto.", "Incorreto.", "Alternativa correta.", "Incorreto."] } }
+    ];
+
+    /* --- GESTÃO DE ESTADO (STATE) --- */
+    const quizState = {
+        currentIndex: 0,
+        userAnswers: new Array(questionsDatabase.length).fill(null),
+        confettiAnimationId: null
+    };
+
+    /* --- FUNCIONALIDADES DE PESQUISA (TEORIA) --- */
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function(event) {
+            const searchTerm = normalizeText(event.target.value);
+            let totalVisibleElements = 0;
+            
+            contentGroups.forEach(group => {
+                const groupContent = normalizeText(group.textContent);
+                const isMatch = groupContent.includes(searchTerm);
+                
+                group.style.display = isMatch ? 'flex' : 'none';
+                if (isMatch) totalVisibleElements++;
+            });
+            
+            noResultsMsg.style.display = totalVisibleElements === 0 ? 'block' : 'none';
+        });
+    }
+
+    function normalizeText(text) {
+        return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    /* --- CONTROLO DE VISTAS (VIEWS) --- */
+    function changeApplicationView(viewName) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        
+        // Esconder todas as secções
+        views.forEach(viewId => {
+            document.getElementById(viewId).classList.remove('active');
+        });
+        
+        const quizFooter = document.getElementById('quizFooter');
+        if (quizFooter) quizFooter.style.display = 'none';
+
+        // Ativar a secção correta
+        if (viewName === 'explanation') {
+            document.getElementById('viewExplanation').classList.add('active');
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (viewName === 'practice') {
+            document.getElementById('viewPractice').classList.add('active');
+            if (quizFooter) quizFooter.style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            
+            renderCurrentQuestion();
+            renderNavigationMap();
+        } else if (viewName === 'result') {
+            document.getElementById('viewResult').classList.add('active');
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* --- GERAÇÃO DE INTERFACE DO QUIZ (UI BUILDERS) --- */
+    function getDifficultyBadgeClass(level) {
+        const mapping = {
+            'Fácil': 'dif-facil',
+            'Médio': 'dif-medio',
+            'Difícil': 'dif-dificil'
+        };
+        return mapping[level] || 'dif-facil';
+    }
+
+    function buildOptionsHTML(question, selectedAnswerIndex) {
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        return question.options.map((optionText, optionIndex) => {
+            let cssClass = '';
+            
+            if (selectedAnswerIndex !== null) {
+                if (optionIndex === question.correctIndex) {
+                    cssClass = 'correct';
+                } else if (optionIndex === selectedAnswerIndex) {
+                    cssClass = 'wrong';
+                } else {
+                    cssClass = 'disabled';
+                }
+            }
+
+            const isDisabled = selectedAnswerIndex !== null ? 'disabled' : '';
+
+            return `
+                <button class="option-btn ${cssClass}" onclick="handleOptionSelection(${optionIndex})" ${isDisabled}>
+                    <div class="opt-circle">${alphabet[optionIndex]}</div>
+                    <div>${optionText}</div>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function buildFeedbackHTML(question, selectedAnswerIndex) {
+        const isCorrect = selectedAnswerIndex === question.correctIndex;
+        const alphabet = ['A', 'B', 'C', 'D'];
+        
+        const titleClass = isCorrect ? 'success' : 'error';
+        const titleText = isCorrect ? '✅ Raciocínio Correto!' : '❌ Diagnóstico de Falha!';
+        
+        const distortionsHTML = question.explanation.otherOptions.map((explanationText, idx) => {
+            if (idx === question.correctIndex) return '';
+            return `<div class="feedback-item wrong-opt"><strong>${alphabet[idx]})</strong> ${explanationText}</div>`;
+        }).join('');
+
+        return `
+            <div class="feedback-box show">
+                <div class="feedback-title ${titleClass}">${titleText}</div>
+                <div class="feedback-item correct-opt"><strong>O Fato:</strong> ${question.options[question.correctIndex]}</div>
+                <div class="feedback-explanation">${question.explanation.correctText}</div>
+                <div class="feedback-distortions">
+                    <small style="color:var(--theme-dark);"><strong>Análise das Distorções:</strong></small>
+                    ${distortionsHTML}
+                </div>
+            </div>
+        `;
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+
+        const question = questionsDatabase[quizState.currentIndex];
+        const selectedAnswerIndex = quizState.userAnswers[quizState.currentIndex];
+        const badgeClass = getDifficultyBadgeClass(question.level);
+        
+        let feedbackHTML = '';
+        if (selectedAnswerIndex !== null) {
+            feedbackHTML = buildFeedbackHTML(question, selectedAnswerIndex);
+        }
+
+        container.innerHTML = `
+            <div class="quiz-question-card">
+                <span class="difficulty-badge ${badgeClass}">${question.level}</span>
+                <div class="quiz-question-header">
+                    <span class="quiz-question-counter">QUESTÃO ${quizState.currentIndex + 1} DE ${questionsDatabase.length}</span>
+                    <h2 class="quiz-question-text">${question.text}</h2>
+                </div>
+                <div class="options-list">
+                    ${buildOptionsHTML(question, selectedAnswerIndex)}
+                </div>
+                ${feedbackHTML}
+            </div>
+        `;
+        
+        updateNavigationButtons();
+    }
+
+    /* --- LÓGICA DO QUIZ (HANDLERS) --- */
+    function handleOptionSelection(selectedIndex) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        
+        quizState.userAnswers[quizState.currentIndex] = selectedIndex;
+        const isCorrect = selectedIndex === questionsDatabase[quizState.currentIndex].correctIndex;
+        
+        if (isCorrect) {
+            startSuccessAnimation();
+        } else {
+            triggerErrorShakeEffect();
+        }
+        
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const container = document.getElementById('quizContainer');
+        if (container) { 
+            container.classList.remove('shake-effect'); 
+            void container.offsetWidth; // Forçar o reflow do browser para reiniciar a animação
+            container.classList.add('shake-effect'); 
+            setTimeout(() => container.classList.remove('shake-effect'), 500); 
+        }
+    }
+
+    /* --- ANIMAÇÕES (CONFETTI) --- */
+    function startSuccessAnimation() {
+        const duration = 1500;
+        const end = Date.now() + duration;
+        
+        stopSuccessAnimation(); // Limpar a animação anterior se existir
+        
+        function animateFrame() {
+            if(window.confetti && typeof confetti === 'function') {
+                const config = { particleCount: 5, spread: 55, colors: ['#0EA5E9', '#F97316', '#0369A1', '#10B981'] };
+                confetti({ ...config, angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ ...config, angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) {
+                quizState.confettiAnimationId = requestAnimationFrame(animateFrame);
+            }
+        }
+        animateFrame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && typeof confetti.reset === 'function') confetti.reset(); 
+        if (quizState.confettiAnimationId) {
+            cancelAnimationFrame(quizState.confettiAnimationId);
+            quizState.confettiAnimationId = null;
+        }
+    }
+
+    /* --- NAVEGAÇÃO E MAPA DE PERGUNTAS --- */
+    function renderNavigationMap() {
+        const mapContainer = document.getElementById('questionNavigationMap');
+        if (!mapContainer) return;
+        
+        mapContainer.innerHTML = questionsDatabase.map((question, index) => {
+            const isCurrent = index === quizState.currentIndex;
+            const userAnswer = quizState.userAnswers[index];
+            const hasAnswered = userAnswer !== null;
+            const isCorrect = userAnswer === question.correctIndex;
+            
+            let cssClass = 'map-dot';
+            if (isCurrent) cssClass += ' active';
+            if (hasAnswered) cssClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+            
+            return `<div class="${cssClass}" onclick="goToQuestion(${index})">${index + 1}</div>`;
+        }).join('');
+        
+        // Auto-scroll do mapa para a pergunta selecionada
+        setTimeout(() => { 
+            const activeDot = mapContainer.querySelector('.map-dot.active'); 
+            if (activeDot) activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); 
+        }, 50);
+    }
+
+    function goToQuestion(targetIndex) { 
+        stopSuccessAnimation();
+        quizState.currentIndex = targetIndex; 
+        renderCurrentQuestion(); 
+        renderNavigationMap(); 
+    }
+    
+    function navigateQuestion(directionOffset) { 
+        const nextIndex = quizState.currentIndex + directionOffset; 
+        if (nextIndex >= 0 && nextIndex < questionsDatabase.length) {
+            goToQuestion(nextIndex); 
+        }
+    }
+
+    function updateNavigationButtons() {
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        
+        if (btnPrev) {
+            btnPrev.disabled = (quizState.currentIndex === 0);
+        }
+        
+        if (btnNext) {
+            const isLastQuestion = quizState.currentIndex === questionsDatabase.length - 1;
+            if (isLastQuestion) { 
+                btnNext.textContent = "Finalizar Auditoria"; 
+                btnNext.onclick = finishQuiz; 
+            } else { 
+                btnNext.textContent = "Avançar Dados ➡️"; 
+                btnNext.onclick = () => navigateQuestion(1); 
+            }
+        }
+    }
+
+    /* --- CÁLCULO DE RESULTADOS --- */
+    function finishQuiz() {
+        const unansweredCount = quizState.userAnswers.filter(answer => answer === null).length;
+        
+        if (unansweredCount > 0) {
+            const confirmMessage = `Existem ${unansweredCount} questões sem validação. Quer assumir estas lacunas como erro e terminar o teste?`;
+            if (!confirm(confirmMessage)) return;
+        }
+
+        stopSuccessAnimation();
+
+        const correctAnswersCount = quizState.userAnswers.filter((answer, index) => answer === questionsDatabase[index].correctIndex).length;
+        const totalQuestions = questionsDatabase.length;
+        const percentageScore = Math.round((correctAnswersCount / totalQuestions) * 100);
+        const isApproved = percentageScore >= 80;
+        
+        renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved);
+        changeApplicationView('result');
+    }
+
+    function renderResultsView(percentageScore, correctAnswersCount, totalQuestions, isApproved) {
+        document.getElementById('finalPercentageScore').textContent = `${percentageScore}%`;
+        document.getElementById('finalRawScoreText').textContent = `Dados Validados: ${correctAnswersCount} de ${totalQuestions}`;
+        
+        const reviewContainer = document.getElementById('resultsReviewContainer');
+        const actionButtonsContainer = document.getElementById('actionButtonsContainer');
+        
+        let summaryHTML = '';
+
+        if (isApproved) {
+            summaryHTML += `
+                <div class="result-summary-box success">
+                    <strong>🎉 AUDITORIA IMPECÁVEL!</strong> A tua capacidade de interpretação estatística está perfeitamente alinhada.
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetQuiz()">🔄 CONSOLIDAR COM NOVO TESTE</button>`;
+        } else {
+            summaryHTML += `
+                <div class="result-summary-box error">
+                    <strong>⚠️ ANÁLISE COMPROMETIDA!</strong> O nível de erro ultrapassa os limites aceitáveis. Foste avaliado abaixo de 80% (24). Refaz os cálculos.
+                </div>
+            `;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetQuiz()">🔄 SUBMETER NOVA AMOSTRA</button>`;
+        }
+        
+        if (correctAnswersCount < totalQuestions) {
+            summaryHTML += buildErrorLogHTML();
+        }
+
+        reviewContainer.innerHTML = summaryHTML;
+    }
+
+    function buildErrorLogHTML() {
+        let errorLog = '<h4 class="error-log-title">Registo de Desvios (Falhas):</h4>';
+        
+        questionsDatabase.forEach((question, index) => {
+            const userAnswerIndex = quizState.userAnswers[index];
+            if (userAnswerIndex !== question.correctIndex) {
+                const userAnswerText = userAnswerIndex === null ? "Falha de processamento (Em branco)" : question.options[userAnswerIndex];
+                const correctAnswerText = question.options[question.correctIndex];
+                
+                errorLog += `
+                    <div class="error-log-item">
+                        <strong class="error-log-question">Q${index + 1}: ${question.text}</strong>
+                        <span class="error-log-user">A tua premissa: ${userAnswerText}</span>
+                        <span class="error-log-correct">O Fato Exato: ${correctAnswerText}</span>
+                    </div>
+                `;
+            }
+        });
+        
+        return errorLog;
+    }
+
+    function resetQuiz() { 
+        quizState.userAnswers = new Array(questionsDatabase.length).fill(null); 
+        quizState.currentIndex = 0; 
+        changeApplicationView('practice'); 
+    }
+    
+    // START APPLICATION
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>
