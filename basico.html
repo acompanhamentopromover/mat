@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aventura da Matemática - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --bg-main: #F0FDF4; 
+            --text-main: #0F172A;
+            --card-bg: #FFFFFF;
+            
+            --c-add: #2563EB; 
+            --c-add-light: #DBEAFE;
+            
+            --c-sub: #DC2626; 
+            --c-sub-light: #FEE2E2;
+            
+            --c-mul: #10B981; 
+            --c-mul-light: #D1FAE5;
+            
+            --c-div: #8B5CF6; 
+            --c-div-light: #EDE9FE;
+            
+            --c-accent: #D97706;
+            --c-accent-light: #FEF3C7;
+            
+            --border-radius: 20px;
+            --border-width: 4px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(#CBD5E1 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+
+        @keyframes pop { 0% { transform: scale(0.95); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+        @keyframes expandDown { from { max-height: 0; opacity: 0; } to { max-height: 500px; opacity: 1; } }
+
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+        .bouncy { animation: bounce 2s infinite; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 20px; }
+        
+        .header-title { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 5px; }
+        .header-title h1 { font-size: 2.2rem; font-weight: 900; color: #1E293B; line-height: 1.1; }
+        .header-title p { font-size: 1.1rem; font-weight: 800; color: var(--c-accent); background: white; padding: 4px 16px; border-radius: 20px; border: 3px solid var(--c-accent); margin-top: 8px; transform: rotate(-1deg); }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: -1px; border: 3px solid #1E293B; padding: 8px 24px; border-radius: 12px; background: var(--c-mul); box-shadow: 4px 4px 0px var(--c-accent); margin-bottom: 15px; transform: rotate(-2deg); display: inline-block; }
+
+        .nav-tabs { display: flex; background: white; border: var(--border-width) solid #94A3B8; border-radius: 16px; padding: 6px; box-shadow: 0 4px 0 #94A3B8; position: sticky; top: 15px; z-index: 50; }
+        .nav-btn { flex: 1; border: none; background: transparent; padding: 10px 0; border-radius: 10px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem; color: #64748B; cursor: pointer; transition: all 0.2s; }
+        .nav-btn.active { background: var(--c-accent); color: white; border: 3px solid #B45309; box-shadow: 0 3px 0 #B45309; transform: translateY(-2px); }
+
+        .view-pane { display: none; animation: pop 0.3s ease-out; flex-direction: column; gap: 20px; }
+        .view-pane.active { display: flex; }
+
+        .kid-card { background: var(--card-bg); border: var(--border-width) solid #CBD5E1; border-radius: var(--border-radius); padding: 25px; box-shadow: 0 6px 0 #CBD5E1; }
+        .card-title { font-size: 1.6rem; font-weight: 900; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; text-align: center; }
+        .card-text { font-size: 1.05rem; font-weight: 600; color: #475569; line-height: 1.5; margin-bottom: 15px; text-align: center; }
+
+        .btn-huge { width: 100%; padding: 18px; background-color: var(--c-accent); color: white; border: 4px solid #B45309; border-radius: 16px; font-size: 1.3rem; font-weight: 900; cursor: pointer; box-shadow: 0 6px 0 #92400E; transition: all 0.1s; text-transform: uppercase; font-family: 'Nunito', sans-serif; display: flex; align-items: center; justify-content: center; gap: 10px;}
+        .btn-huge:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0 0 #92400E; }
+        .btn-huge:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: 0 6px 0 #92400E; }
+        .btn-huge.green { background-color: var(--c-mul); border-color: #065F46; box-shadow: 0 6px 0 #064E3B; }
+        .btn-huge.purple { background-color: var(--c-div); border-color: #4C1D95; box-shadow: 0 6px 0 #3B0764; }
+
+        /* --- ESTILOS VISUAIS APRENDER --- */
+        .hint-dots-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; align-items: center; }
+        .dot { width: 24px; height: 24px; border-radius: 50%; display: inline-block; box-shadow: inset -2px -2px 0px rgba(0,0,0,0.15); }
+        .dot.c1 { background-color: var(--c-add); }
+        .dot.c2 { background-color: var(--c-accent); }
+        .dot.cmul { background-color: var(--c-mul); margin: 3px; }
+        .crossed-dot-wrapper { position: relative; display: inline-block; }
+        .crossed-dot-wrapper::after { content: '❌'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.2rem; color: #7F1D1D; }
+        .dot.c-sub { background-color: var(--c-sub-light); border: 2px solid var(--c-sub); box-shadow: none; opacity: 0.6; }
+        .div-group-box { border: 3px dashed var(--c-div); border-radius: 12px; padding: 10px; display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; background: var(--c-div-light); min-width: 50px; min-height: 50px; }
+
+        /* --- ESTILOS ARMAR CONTA --- */
+        .math-board { background: #F8FAFC; border: 3px dashed #94A3B8; border-radius: 16px; padding: 30px; display: flex; flex-direction: column; align-items: center; font-family: monospace; font-size: 2.5rem; font-weight: 900; color: #1E293B; margin-bottom: 20px; min-height: 250px; justify-content: center;}
+        .step-explanation { background: var(--c-accent-light); border: 3px solid var(--c-accent); border-radius: 12px; padding: 15px; font-size: 1.15rem; font-weight: 700; color: #92400E; text-align: center; min-height: 80px; display: flex; align-items: center; justify-content: center; font-family: 'Nunito', sans-serif;}
+        
+        .mul-grid { display: grid; grid-template-columns: repeat(3, 40px); gap: 5px; text-align: center; position: relative; }
+        .mul-grid div { display: flex; align-items: center; justify-content: center; height: 50px; border-radius: 8px; transition: all 0.3s; }
+        .mul-line { grid-column: 1 / 4; height: 4px !important; background-color: #1E293B; margin: 5px 0; border-radius: 2px; }
+        .vai-um { font-size: 1.2rem; color: #EF4444; border: 2px solid #EF4444; border-radius: 50%; width: 30px !important; height: 30px !important; margin: 0 auto; }
+        .op-sign { color: var(--c-mul); font-size: 2rem; }
+
+        .div-container { display: flex; font-size: 2.5rem; align-items: flex-start; justify-content: center; gap: 10px; }
+        .div-col-left { display: flex; flex-direction: column; align-items: flex-end; }
+        .div-col-right { display: flex; flex-direction: column; align-items: flex-start; border-left: 4px solid #1E293B; padding-left: 10px; }
+        .div-chave-top { border-bottom: 4px solid #1E293B; width: 100%; text-align: center; padding-bottom: 5px; margin-bottom: 5px; }
+        .row { display: flex; gap: 5px; height: 50px; align-items: center; }
+        .row-sub { border-bottom: 4px solid #1E293B; width: 100%; justify-content: flex-end; padding-bottom: 5px; margin-bottom: 5px; }
+        .num-box { width: 35px; text-align: center; border-radius: 8px; transition: all 0.3s; }
+        
+        .highlight { background-color: var(--c-accent-light); color: #B45309; }
+        .fade-in { animation: fadeIn 0.5s ease forwards; }
+        .hidden { opacity: 0; pointer-events: none; }
+        .helper-labels { display: flex; justify-content: center; gap: 20px; font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 800; color: #64748B; margin-bottom: 10px; }
+        .label-box { padding: 4px 10px; border-radius: 8px; border: 2px solid #CBD5E1; }
+
+        /* --- ESTILOS TREINAR (QUIZ) --- */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+
+        .select-op-btn { padding: 12px 5px; border: 4px solid #E2E8F0; border-radius: 14px; font-size: 1.1rem; font-weight: 800; cursor: pointer; background: white; transition: all 0.2s; font-family: 'Nunito', sans-serif; display: flex; flex-direction: column; align-items: center; gap: 5px; color: #64748B; }
+        .select-op-btn .op-icon { font-size: 1.8rem; }
+        .select-op-btn[data-op="+"].selected { background: var(--c-add-light); color: var(--c-add); border-color: var(--c-add); box-shadow: 0 4px 0 var(--c-add); }
+        .select-op-btn[data-op="-"].selected { background: var(--c-sub-light); color: var(--c-sub); border-color: var(--c-sub); box-shadow: 0 4px 0 var(--c-sub); }
+        .select-op-btn[data-op="*"].selected { background: var(--c-mul-light); color: var(--c-mul); border-color: var(--c-mul); box-shadow: 0 4px 0 var(--c-mul); }
+        .select-op-btn[data-op="/"].selected { background: var(--c-div-light); color: var(--c-div); border-color: var(--c-div); box-shadow: 0 4px 0 var(--c-div); }
+
+        .num-btn { padding: 10px 0; border: 3px solid #E2E8F0; border-radius: 12px; font-size: 1.3rem; font-weight: 900; cursor: pointer; background: white; color: #475569; box-shadow: 0 4px 0 #E2E8F0; font-family: 'Nunito', sans-serif; transition: all 0.1s; }
+        .num-btn.selected { background: var(--c-accent); color: white; border-color: #B45309; box-shadow: 0 4px 0 #B45309; transform: translateY(2px); }
+        .num-btn:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
+        .num-misto { grid-column: span 5; background: var(--c-accent-light); color: #B45309; border-color: var(--c-accent); }
+        .num-misto.selected { background: var(--c-accent); color: white; border-color: #B45309; }
+
+        .progress-bar-bg { width: 100%; height: 16px; background: #E2E8F0; border-radius: 8px; overflow: hidden; margin-bottom: 20px; border: 2px solid #CBD5E1; }
+        .progress-bar-fill { height: 100%; background: var(--c-accent); transition: width 0.3s ease; width: 0%; }
+
+        .equation-wrapper { display: flex; align-items: center; justify-content: center; gap: 15px; font-size: 3.5rem; font-weight: 900; margin: 10px 0; font-family: monospace; }
+        .answer-input { width: 110px; height: 80px; font-size: 3rem; font-weight: 900; text-align: center; border: 5px solid #CBD5E1; border-radius: 16px; background: #F8FAFC; color: var(--text-main); font-family: 'Nunito', sans-serif; outline: none; transition: all 0.2s; }
+        .answer-input:focus { border-color: var(--c-accent); background: white; }
+        .answer-input.correct { background: var(--c-mul-light); border-color: var(--c-mul); color: var(--c-mul); }
+        .answer-input.wrong { background: var(--c-sub-light); border-color: var(--c-sub); color: var(--c-sub); }
+
+        .btn-hint { background: transparent; border: 3px dashed #94A3B8; color: #64748B; font-weight: 800; font-size: 1rem; padding: 10px 20px; border-radius: 12px; cursor: pointer; margin-bottom: 20px; transition: all 0.2s; font-family: 'Nunito', sans-serif; }
+        .btn-hint:hover { background: #F1F5F9; border-color: #64748B; color: #475569; }
+
+        .visual-hint-container { display: none; background: #F8FAFC; border: 3px solid #CBD5E1; border-radius: 16px; padding: 20px; margin-bottom: 20px; animation: expandDown 0.3s ease-out; }
+        .visual-hint-container.active { display: block; }
+        
+        .feedback-box { font-size: 1.3rem; font-weight: 800; min-height: 35px; margin-top: 10px; opacity: 0; transition: opacity 0.2s; text-align: center; }
+        .feedback-box.show { opacity: 1; }
+        .feedback-box.correct { color: var(--c-mul); }
+        .feedback-box.wrong { color: var(--c-sub); }
+
+        .result-card { text-align: center; }
+        .stars { font-size: 3.5rem; margin: 10px 0; letter-spacing: 5px; }
+        .score-big { font-size: 4rem; font-weight: 900; color: var(--c-accent); line-height: 1; margin-bottom: 10px; text-shadow: 2px 2px 0px #FEF3C7; }
+        .log-area { text-align: left; margin-top: 20px; max-height: 250px; overflow-y: auto; padding-right: 5px; }
+        .log-item { display: flex; justify-content: space-between; padding: 12px; border-radius: 12px; font-weight: 800; margin-bottom: 8px; font-size: 1.1rem; }
+        .log-item.error { background: var(--c-sub-light); color: #991B1B; border: 2px solid var(--c-sub); }
+        .log-item.success { background: var(--c-mul-light); color: #065F46; border: 2px solid var(--c-mul); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="header-title">
+            <div class="css-logo"><span class="pulse-effect">🚀</span> PROMOVER</div>
+            <h1>Aventura da Matemática</h1>
+            <p>O Parque das Continhas!</p>
+        </header>
+
+        <div class="nav-tabs">
+            <button class="nav-btn active" onclick="switchTab('aprender')">📚 Entender</button>
+            <button class="nav-btn" onclick="switchTab('armar')">✏️ Armar Conta</button>
+            <button class="nav-btn" onclick="switchTab('brincar')">🎮 Treinar</button>
+        </div>
+
+        <!-- VISTA 1: APRENDER / TEORIA -->
+        <main id="viewAprender" class="view-pane active">
+            <div class="kid-card" style="border-color: var(--c-add);">
+                <div class="card-title" style="color: var(--c-add);">➕ Adição (Juntar)</div>
+                <p class="card-text">Somar é como juntar dois grupos de objetos. Se tens 3 maçãs e ganhas 2 maçãs, ficas com 5 maçãs no total.</p>
+                <div class="hint-dots-row" style="background: var(--bg-main); padding: 15px; border-radius: 12px;">
+                    <div class="dot c1"></div><div class="dot c1"></div><div class="dot c1"></div>
+                    <strong style="font-size: 1.5rem; margin: 0 10px;">+</strong>
+                    <div class="dot c2"></div><div class="dot c2"></div>
+                    <strong style="font-size: 1.5rem; margin: 0 10px;">=</strong>
+                    <strong style="font-size: 1.5rem; color: var(--c-add);">5</strong>
+                </div>
+            </div>
+
+            <div class="kid-card" style="border-color: var(--c-sub);">
+                <div class="card-title" style="color: var(--c-sub);">➖ Subtração (Tirar)</div>
+                <p class="card-text">Subtrair é retirar objetos de um grupo. Se tinhas 5 doces e comeste 2, quantos sobraram intatos?</p>
+                <div class="hint-dots-row" style="background: var(--bg-main); padding: 15px; border-radius: 12px;">
+                    <div class="dot c1"></div><div class="dot c1"></div><div class="dot c1"></div>
+                    <div class="crossed-dot-wrapper"><div class="dot c-sub"></div></div>
+                    <div class="crossed-dot-wrapper"><div class="dot c-sub"></div></div>
+                    <strong style="font-size: 1.5rem; margin: 0 10px;">=</strong>
+                    <strong style="font-size: 1.5rem; color: var(--c-sub);">3</strong>
+                </div>
+            </div>
+
+            <div class="kid-card" style="border-color: var(--c-mul);">
+                <div class="card-title" style="color: var(--c-mul);">✖️ Multiplicação (Grupos)</div>
+                <p class="card-text">Multiplicar é uma forma rápida de somar o mesmo número. "3 vezes 4" significa que tens 3 grupos, e cada grupo tem 4 bolinhas.</p>
+                <div style="background: var(--bg-main); padding: 15px; border-radius: 12px; display: flex; flex-direction: column; align-items: center;">
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;">
+                        <div class="dot cmul"></div><div class="dot cmul"></div><div class="dot cmul"></div><div class="dot cmul"></div>
+                        <div class="dot cmul"></div><div class="dot cmul"></div><div class="dot cmul"></div><div class="dot cmul"></div>
+                        <div class="dot cmul"></div><div class="dot cmul"></div><div class="dot cmul"></div><div class="dot cmul"></div>
+                    </div>
+                    <strong style="font-size: 1.2rem; color: var(--c-mul); margin-top: 10px;">Total: 12</strong>
+                </div>
+            </div>
+
+            <div class="kid-card" style="border-color: var(--c-div);">
+                <div class="card-title" style="color: var(--c-div);">➗ Divisão (Repartir)</div>
+                <p class="card-text">Dividir é distribuir uma quantidade em caixas iguais. "6 dividido por 2" significa pegar 6 bolinhas e guardá-las em 2 caixas.</p>
+                <div class="hint-dots-row" style="background: var(--bg-main); padding: 15px; border-radius: 12px;">
+                    <div class="div-group-box"><div class="dot cmul"></div><div class="dot cmul"></div><div class="dot cmul"></div></div>
+                    <div class="div-group-box"><div class="dot cmul"></div><div class="dot cmul"></div><div class="dot cmul"></div></div>
+                    <strong style="font-size: 1.2rem; margin-left: 10px; color: var(--c-div);">3 por caixa</strong>
+                </div>
+            </div>
+
+            <button class="btn-huge" onclick="switchTab('armar')">Aprender a Armar a Conta! ➡️</button>
+        </main>
+
+        <!-- VISTA 2: ARMAR CONTA (PASSO A PASSO) -->
+        <main id="viewArmar" class="view-pane">
+            
+            <div class="kid-card" style="border-color: var(--c-mul);">
+                <div class="card-title" style="color: var(--c-mul);">Como armar Multiplicação?</div>
+                <p class="card-text">Vamos resolver: <strong>35 × 4</strong></p>
+                
+                <div class="helper-labels">
+                    <div class="label-box">C = Centena</div>
+                    <div class="label-box">D = Dezena</div>
+                    <div class="label-box">U = Unidade</div>
+                </div>
+
+                <div class="math-board">
+                    <div class="mul-grid" style="font-size: 1.2rem; color: #94A3B8; margin-bottom: -10px;">
+                        <div>C</div><div>D</div><div>U</div>
+                    </div>
+                    <div class="mul-grid">
+                        <div></div><div id="m-vai-2" class="vai-um hidden">2</div><div></div>
+                        <div></div><div id="m-n3">3</div><div id="m-n5">5</div>
+                        <div class="op-sign">×</div><div></div><div id="m-n4">4</div>
+                        <div class="mul-line"></div>
+                        <div id="m-r1" class="hidden" style="color: var(--c-mul);">1</div>
+                        <div id="m-r4" class="hidden" style="color: var(--c-mul);">4</div>
+                        <div id="m-r0" class="hidden" style="color: var(--c-mul);">0</div>
+                    </div>
+                </div>
+
+                <div class="step-explanation" id="mulExplanation">Clique em "Próximo Passo" para começarmos a armar a continha!</div>
+                <button class="btn-huge green" id="btnMulNext" onclick="nextMulStep()" style="margin-top: 20px;">Próximo Passo ➡️</button>
+                <button class="btn-huge" id="btnMulReset" onclick="resetMul()" style="margin-top: 10px; display: none;">Repetir Explicação 🔄</button>
+            </div>
+
+            <div class="kid-card" style="border-color: var(--c-div);">
+                <div class="card-title" style="color: var(--c-div);">O Método da Chave! (Divisão)</div>
+                <p class="card-text">Vamos resolver: <strong>85 ÷ 5</strong></p>
+
+                <div class="math-board">
+                    <div class="div-container">
+                        <div class="div-col-left">
+                            <div class="row">
+                                <div class="num-box" id="d-8">8</div>
+                                <div class="num-box" id="d-5">5</div>
+                            </div>
+                            <div class="row row-sub hidden" id="d-sub1-row">
+                                <div class="num-box" style="color: var(--c-sub); font-size: 1.5rem;">-</div>
+                                <div class="num-box" id="d-sub1">5</div><div class="num-box"></div>
+                            </div>
+                            <div class="row hidden" id="d-rest1-row">
+                                <div class="num-box"></div><div class="num-box" id="d-rest1">3</div>
+                                <div class="num-box hidden" id="d-desce5" style="color: var(--c-accent);">5</div>
+                            </div>
+                            <div class="row row-sub hidden" id="d-sub2-row">
+                                <div class="num-box" style="color: var(--c-sub); font-size: 1.5rem;">-</div>
+                                <div class="num-box" id="d-sub2-3">3</div><div class="num-box" id="d-sub2-5">5</div>
+                            </div>
+                            <div class="row hidden" id="d-rest2-row">
+                                <div class="num-box"></div><div class="num-box"></div>
+                                <div class="num-box" id="d-rest2" style="color: var(--c-mul);">0</div>
+                            </div>
+                        </div>
+                        <div class="div-col-right">
+                            <div class="div-chave-top">
+                                <div class="num-box" id="d-divisor" style="color: var(--c-div);">5</div>
+                            </div>
+                            <div class="row" style="color: var(--c-accent);">
+                                <div class="num-box hidden" id="d-q1">1</div><div class="num-box hidden" id="d-q7">7</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-explanation" id="divExplanation">Clique em "Próximo Passo" para aprendermos a usar a chave!</div>
+                <button class="btn-huge purple" id="btnDivNext" onclick="nextDivStep()" style="margin-top: 20px;">Próximo Passo ➡️</button>
+                <button class="btn-huge" id="btnDivReset" onclick="resetDiv()" style="margin-top: 10px; display: none;">Repetir Explicação 🔄</button>
+            </div>
+
+            <button class="btn-huge" onclick="switchTab('brincar')">Vamos Treinar Sozinhos! 🎮</button>
+        </main>
+
+        <!-- VISTA 3: BRINCAR (SETUP) -->
+        <main id="viewBrincar" class="view-pane">
+            <div class="kid-card" style="border-color: #94A3B8;">
+                <h2 style="font-size: 1.5rem; font-weight: 900; text-align: center; margin-bottom: 20px;">Configurar o Treino 🛠️</h2>
+                
+                <h4 style="font-weight: 800; color: #475569; margin-bottom: 10px;">1. Escolha a Operação:</h4>
+                <div class="grid-2">
+                    <button class="select-op-btn selected" data-op="+"><span class="op-icon">➕</span> Adição</button>
+                    <button class="select-op-btn" data-op="-"><span class="op-icon">➖</span> Subtração</button>
+                    <button class="select-op-btn" data-op="*"><span class="op-icon">✖️</span> Multiplicação</button>
+                    <button class="select-op-btn" data-op="/"><span class="op-icon">➗</span> Divisão</button>
+                </div>
+
+                <h4 style="font-weight: 800; color: #475569; margin-top: 25px; margin-bottom: 10px;">2. Escolha a Tabuada (Base):</h4>
+                <div class="grid-5">
+                    <button class="num-btn selected" data-num="1">1</button>
+                    <button class="num-btn" data-num="2">2</button>
+                    <button class="num-btn" data-num="3">3</button>
+                    <button class="num-btn" data-num="4">4</button>
+                    <button class="num-btn" data-num="5">5</button>
+                    <button class="num-btn" data-num="6">6</button>
+                    <button class="num-btn" data-num="7">7</button>
+                    <button class="num-btn" data-num="8">8</button>
+                    <button class="num-btn" data-num="9">9</button>
+                    <button class="num-btn" data-num="10">10</button>
+                    <button class="num-btn num-misto" data-num="misto">🎲 Modo Misto (1 ao 10)</button>
+                </div>
+
+                <button class="btn-huge" onclick="startGame()" style="margin-top: 25px;">Começar Desafio!</button>
+            </div>
+        </main>
+
+        <!-- VISTA 4: JOGO -->
+        <main id="viewJogo" class="view-pane">
+            <div class="kid-card" style="border-color: var(--c-accent); padding-bottom: 30px;">
+                <div class="progress-bar-bg"><div class="progress-bar-fill" id="gameProgress"></div></div>
+                <h2 id="lblGameTitle" style="text-align: center; color: #1E293B; font-weight: 900; font-size: 1.4rem;">Tabuada</h2>
+                
+                <div class="equation-wrapper">
+                    <span id="valA">5</span>
+                    <span id="valOp" style="color: var(--c-mul);">×</span>
+                    <span id="valB">4</span>
+                    <span style="color: #94A3B8;">=</span>
+                    <input type="number" id="txtInput" class="answer-input" inputmode="numeric" autocomplete="off">
+                </div>
+
+                <div style="text-align: center;">
+                    <button class="btn-hint" id="btnHint" onclick="showVisualHint()">Preciso de uma dica visual 👀</button>
+                </div>
+                <div id="visualHintArea" class="visual-hint-container"></div>
+
+                <div id="msgFeedback" class="feedback-box"></div>
+
+                <button class="btn-huge" id="btnVerificar" onclick="checkAnswer()" style="margin-top: 15px;">Verificar ✔️</button>
+                <button class="btn-huge" id="btnProxima" onclick="nextQuestion()" style="margin-top: 15px; display: none; background-color: var(--c-mul); border-color: #065F46; box-shadow: 0 6px 0 #064E3B;">Avançar ➡️</button>
+            </div>
+        </main>
+
+        <!-- VISTA 5: RESULTADO -->
+        <main id="viewResultado" class="view-pane">
+            <div class="kid-card result-card" style="border-color: var(--c-accent);">
+                <h2 style="font-size: 2rem; font-weight: 900; color: #1E293B;">Fim do Treino! 🏆</h2>
+                <div class="stars" id="resStars">⭐⭐⭐</div>
+                <div class="score-big" id="resScore">100%</div>
+                <p style="font-size: 1.2rem; font-weight: 800; color: #475569; margin-bottom: 20px;" id="resText"></p>
+                <div class="log-area" id="reviewLog"></div>
+                <button class="btn-huge" onclick="switchTab('brincar')" style="margin-top: 20px;">Treinar Novamente 🔄</button>
+            </div>
+        </main>
+
+    </div>
+
+<script>
+    // --- ESTADO GERAL ---
+    const gameState = { op: '+', base: '1', questions: [], currIdx: 0, score: 0, logs: [], hintUsed: false, isProcessing: false };
+    const opColors = { '+': 'var(--c-add)', '-': 'var(--c-sub)', '*': 'var(--c-mul)', '/': 'var(--c-div)' };
+    const opSigns = { '+': '➕', '-': '➖', '*': '✖️', '/': '➗' };
+    const opNames = { '+': 'Adição', '-': 'Subtração', '*': 'Multiplicação', '/': 'Divisão' };
+
+    // --- NAVEGAÇÃO ---
+    function switchTab(tab) {
+        ['viewAprender', 'viewArmar', 'viewBrincar', 'viewJogo', 'viewResultado'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+
+        if (tab === 'aprender') {
+            document.getElementById('viewAprender').classList.add('active');
+            document.querySelectorAll('.nav-btn')[0].classList.add('active');
+        } else if (tab === 'armar') {
+            document.getElementById('viewArmar').classList.add('active');
+            document.querySelectorAll('.nav-btn')[1].classList.add('active');
+        } else if (tab === 'brincar') {
+            document.getElementById('viewBrincar').classList.add('active');
+            document.querySelectorAll('.nav-btn')[2].classList.add('active');
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // --- ARMAR CONTA: MULTIPLICAÇÃO ---
+    let mulStep = 0;
+    const mulTexts = [
+        "Para armar a conta, colocamos a Unidade debaixo da Unidade (5 e 4 na mesma coluna). Começamos sempre pela direita!",
+        "1º Passo: Multiplicamos 4 × 5. Na tabuada do 4, isso dá 20!",
+        "Atenção: Não podemos colocar o 20 inteiro ali embaixo! Deixamos o 0 na Unidade...",
+        "...e o 2 'Sobe' lá para cima, para a casa das Dezenas! Chamamos a isso de 'Vai Dois'.",
+        "2º Passo: Agora multiplicamos a Dezena. Fazemos 4 × 3, que dá 12.",
+        "Não se esqueça do número que subiu! Somamos o 12 com o 2 lá de cima: 12 + 2 = 14.",
+        "Colocamos o 14 lá embaixo. E pronto! 35 × 4 = 140! 🎉"
+    ];
+
+    function resetMulHighlights() {
+        ['m-n5', 'm-n4', 'm-n3', 'm-vai-2'].forEach(id => document.getElementById(id).classList.remove('highlight'));
+    }
+
+    function nextMulStep() {
+        const exp = document.getElementById('mulExplanation');
+        resetMulHighlights();
+        if (mulStep === 0) { document.getElementById('m-n5').classList.add('highlight'); document.getElementById('m-n4').classList.add('highlight'); } 
+        else if (mulStep === 1) { document.getElementById('m-r0').classList.remove('hidden'); document.getElementById('m-r0').classList.add('fade-in'); }
+        else if (mulStep === 2) { document.getElementById('m-vai-2').classList.remove('hidden'); document.getElementById('m-vai-2').classList.add('fade-in', 'highlight'); }
+        else if (mulStep === 3) { document.getElementById('m-n4').classList.add('highlight'); document.getElementById('m-n3').classList.add('highlight'); }
+        else if (mulStep === 4) { document.getElementById('m-vai-2').classList.add('highlight'); }
+        else if (mulStep === 5) {
+            document.getElementById('m-r1').classList.remove('hidden'); document.getElementById('m-r4').classList.remove('hidden');
+            document.getElementById('m-r1').classList.add('fade-in'); document.getElementById('m-r4').classList.add('fade-in');
+            if (window.confetti) confetti({ particleCount: 50, spread: 60, colors: ['#10B981'] });
+        }
+        if (mulStep < mulTexts.length) { exp.innerHTML = mulTexts[mulStep]; mulStep++; }
+        if (mulStep === mulTexts.length) { document.getElementById('btnMulNext').style.display = 'none'; document.getElementById('btnMulReset').style.display = 'flex'; }
+    }
+
+    function resetMul() {
+        mulStep = 0; resetMulHighlights();
+        ['m-r0', 'm-r1', 'm-r4', 'm-vai-2'].forEach(id => { const el = document.getElementById(id); el.classList.add('hidden'); el.classList.remove('fade-in'); });
+        document.getElementById('mulExplanation').innerHTML = 'Clique em "Próximo Passo" para começarmos a armar a continha!';
+        document.getElementById('btnMulNext').style.display = 'flex'; document.getElementById('btnMulReset').style.display = 'none';
+    }
+
+    // --- ARMAR CONTA: DIVISÃO ---
+    let divStep = 0;
+    const divTexts = [
+        "O número que vamos dividir (85) fica de fora (Dividendo). O que divide (5) fica na Chave (Divisor).",
+        "Começamos pelo primeiro número da esquerda: 8. Como 8 é MAIOR que 5, dividimos só o 8!",
+        "Quantas vezes o 5 cabe no 8 sem passar? 5 × 1 = 5. Colocamos 1 na resposta (quociente).",
+        "Multiplicamos 1 × 5 = 5. Colocamos o 5 debaixo do 8 e fazemos: 8 - 5 = 3. O resto é 3.",
+        "Próximo passo: 'Descemos' o 5. Ele junta-se com o 3 e forma 35!",
+        "Quantas vezes o 5 cabe no 35? Na tabuada: 5 × 7 = 35. Pomos o 7 na resposta.",
+        "Multiplicamos 7 × 5 = 35. Subtraímos: 35 - 35 = 0. O resto é ZERO!",
+        "Não há mais números. A conta acabou! 85 ÷ 5 é exatamente 17. 🎉"
+    ];
+
+    function resetDivHighlights() {
+        ['d-8', 'd-divisor', 'd-q1', 'd-sub1', 'd-rest1', 'd-5', 'd-desce5', 'd-sub2-3', 'd-sub2-5', 'd-q7'].forEach(id => document.getElementById(id).classList.remove('highlight'));
+    }
+
+    function nextDivStep() {
+        const exp = document.getElementById('divExplanation');
+        resetDivHighlights();
+        if (divStep === 0) { document.getElementById('d-8').classList.add('highlight'); document.getElementById('d-divisor').classList.add('highlight'); }
+        else if (divStep === 1) { document.getElementById('d-q1').classList.remove('hidden'); document.getElementById('d-q1').classList.add('fade-in', 'highlight'); }
+        else if (divStep === 2) {
+            document.getElementById('d-sub1-row').classList.remove('hidden'); document.getElementById('d-rest1-row').classList.remove('hidden');
+            document.getElementById('d-sub1-row').classList.add('fade-in'); document.getElementById('d-rest1-row').classList.add('fade-in'); document.getElementById('d-rest1').classList.add('highlight');
+        }
+        else if (divStep === 3) { document.getElementById('d-5').classList.add('highlight'); document.getElementById('d-desce5').classList.remove('hidden'); document.getElementById('d-desce5').classList.add('fade-in', 'highlight'); }
+        else if (divStep === 4) { document.getElementById('d-q7').classList.remove('hidden'); document.getElementById('d-q7').classList.add('fade-in', 'highlight'); }
+        else if (divStep === 5) {
+            document.getElementById('d-sub2-row').classList.remove('hidden'); document.getElementById('d-rest2-row').classList.remove('hidden');
+            document.getElementById('d-sub2-row').classList.add('fade-in'); document.getElementById('d-rest2-row').classList.add('fade-in'); document.getElementById('d-rest2').classList.add('highlight');
+        }
+        else if (divStep === 6) { if (window.confetti) confetti({ particleCount: 50, spread: 60, colors: ['#8B5CF6'] }); }
+
+        if (divStep < divTexts.length) { exp.innerHTML = divTexts[divStep]; divStep++; }
+        if (divStep === divTexts.length) { document.getElementById('btnDivNext').style.display = 'none'; document.getElementById('btnDivReset').style.display = 'flex'; }
+    }
+
+    function resetDiv() {
+        divStep = 0; resetDivHighlights();
+        ['d-q1', 'd-sub1-row', 'd-rest1-row', 'd-desce5', 'd-sub2-row', 'd-rest2-row', 'd-q7'].forEach(id => { const el = document.getElementById(id); el.classList.add('hidden'); el.classList.remove('fade-in'); });
+        document.getElementById('divExplanation').innerHTML = 'Clique em "Próximo Passo" para aprendermos a usar a chave!';
+        document.getElementById('btnDivNext').style.display = 'flex'; document.getElementById('btnDivReset').style.display = 'none';
+    }
+
+    // --- SETUP TREINAR JOGO ---
+    document.querySelectorAll('.select-op-btn').forEach(btn => {
+        btn.addEventListener('click', () => { document.querySelectorAll('.select-op-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); gameState.op = btn.getAttribute('data-op'); });
+    });
+    document.querySelectorAll('.num-btn').forEach(btn => {
+        btn.addEventListener('click', () => { document.querySelectorAll('.num-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); gameState.base = btn.getAttribute('data-num'); });
+    });
+    document.getElementById('txtInput').addEventListener('keypress', function(e) {
+        if(e.key === 'Enter') { if(document.getElementById('btnVerificar').style.display !== 'none') checkAnswer(); else if(document.getElementById('btnProxima').style.display !== 'none') nextQuestion(); }
+    });
+
+    // --- LÓGICA DO JOGO ---
+    function startGame() {
+        gameState.currIdx = 0; gameState.score = 0; gameState.logs = []; gameState.questions = buildQuestions();
+        document.getElementById('viewBrincar').classList.remove('active'); document.getElementById('viewJogo').classList.add('active');
+        let titleNum = gameState.base === 'misto' ? 'Mista' : `do ${gameState.base}`;
+        document.getElementById('lblGameTitle').textContent = `Tabuada ${titleNum} (${opNames[gameState.op]})`;
+        document.getElementById('valOp').style.color = opColors[gameState.op]; document.getElementById('valOp').textContent = opSigns[gameState.op];
+        loadQuestion();
+    }
+
+    function buildQuestions() {
+        let qs = []; let mix = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].sort(() => Math.random() - 0.5);
+        for (let i = 0; i < 10; i++) {
+            let bNum = gameState.base === 'misto' ? Math.floor(Math.random() * 10) + 1 : parseInt(gameState.base);
+            let dNum = mix[i]; let a, b, ans;
+            if (gameState.op === '+') { a = bNum; b = dNum; ans = a + b; } 
+            else if (gameState.op === '-') { ans = dNum; b = bNum; a = ans + b; } 
+            else if (gameState.op === '*') { a = bNum; b = dNum; ans = a * b; } 
+            else if (gameState.op === '/') { ans = dNum; b = bNum; a = ans * b; }
+            qs.push({ a, b, ans });
+        }
+        return qs;
+    }
+
+    function loadQuestion() {
+        let q = gameState.questions[gameState.currIdx];
+        document.getElementById('gameProgress').style.width = `${(gameState.currIdx / 10) * 100}%`;
+        document.getElementById('valA').textContent = q.a; document.getElementById('valB').textContent = q.b;
+        let inp = document.getElementById('txtInput'); inp.value = ''; inp.className = 'answer-input'; inp.disabled = false;
+        document.getElementById('msgFeedback').className = 'feedback-box';
+        document.getElementById('visualHintArea').classList.remove('active');
+        document.getElementById('btnHint').style.display = 'inline-block';
+        document.getElementById('btnVerificar').style.display = 'block'; document.getElementById('btnProxima').style.display = 'none';
+        gameState.hintUsed = false; gameState.isProcessing = false;
+        setTimeout(() => inp.focus(), 100);
+    }
+
+    function showVisualHint() {
+        if(gameState.hintUsed) return; gameState.hintUsed = true;
+        document.getElementById('btnHint').style.display = 'none';
+        let q = gameState.questions[gameState.currIdx], op = gameState.op, html = '';
+        if (op === '+') {
+            html += `<div class="hint-dots-row">`; for(let i=0; i<q.a; i++) html += `<div class="dot c1"></div>`;
+            html += `<strong style="font-size:1.5rem; margin:0 5px;">+</strong>`; for(let i=0; i<q.b; i++) html += `<div class="dot c2"></div>`; html += `</div>`;
+        } else if (op === '-') {
+            html += `<div class="hint-dots-row">`; let rem = q.a - q.b;
+            for(let i=0; i<rem; i++) html += `<div class="dot c1"></div>`; for(let i=0; i<q.b; i++) html += `<div class="crossed-dot-wrapper"><div class="dot c-sub"></div></div>`; html += `</div>`;
+        } else if (op === '*') {
+            html += `<div style="display:grid; grid-template-columns: repeat(${q.b}, 1fr); gap:6px; justify-items:center; max-width:200px; margin: 0 auto;">`;
+            for(let i=0; i<(q.a * q.b); i++) html += `<div class="dot cmul"></div>`; html += `</div>`;
+        } else if (op === '/') {
+            html += `<div class="hint-dots-row">`; let pb = q.a / q.b;
+            for(let box=0; box<q.b; box++) { html += `<div class="div-group-box">`; for(let dot=0; dot<pb; dot++) html += `<div class="dot cmul" style="background:var(--c-div); margin:2px;"></div>`; html += `</div>`; } html += `</div>`;
+        }
+        let hc = document.getElementById('visualHintArea'); hc.innerHTML = html; hc.classList.add('active');
+    }
+
+    const frAcerto = ["Uau! Que incrível! 🌟", "Certa resposta! 🎉", "Mandou muito bem! 😎"];
+    const frErro = ["Ops! Foi quase! 😅", "Tente de novo na próxima! 💪"];
+
+    function checkAnswer() {
+        if (gameState.isProcessing) return;
+        let inp = document.getElementById('txtInput'), userVal = parseInt(inp.value), q = gameState.questions[gameState.currIdx];
+        if (isNaN(userVal)) { inp.classList.remove('shake-effect'); void inp.offsetWidth; inp.classList.add('shake-effect'); return; }
+        
+        gameState.isProcessing = true; inp.disabled = true;
+        document.getElementById('btnVerificar').style.display = 'none'; document.getElementById('btnProxima').style.display = 'block';
+        let msg = document.getElementById('msgFeedback'), isC = userVal === q.ans;
+        gameState.logs.push({ text: `${q.a} ${opSigns[gameState.op]} ${q.b}`, user: userVal, ans: q.ans, correct: isC });
+
+        if (isC) {
+            gameState.score++; inp.classList.add('correct'); msg.textContent = frAcerto[Math.floor(Math.random() * frAcerto.length)]; msg.className = 'feedback-box show correct';
+            if (window.confetti) confetti({ particleCount: 30, spread: 50, origin: { y: 0.6 } });
+            setTimeout(nextQuestion, 1500); 
+        } else {
+            inp.classList.add('wrong'); inp.classList.add('shake-effect'); msg.innerHTML = `${frErro[Math.floor(Math.random() * frErro.length)]} <br><span style="font-size:1.1rem; color:#475569;">A resposta certa era ${q.ans}</span>`; msg.className = 'feedback-box show wrong';
+            showVisualHint();
+        }
+        document.getElementById('btnProxima').focus();
+    }
+
+    function nextQuestion() {
+        gameState.currIdx++;
+        if (gameState.currIdx < 10) loadQuestion(); else { document.getElementById('gameProgress').style.width = `100%`; setTimeout(showResult, 400); }
+    }
+
+    function showResult() {
+        document.getElementById('viewJogo').classList.remove('active'); document.getElementById('viewResultado').classList.add('active');
+        let pct = Math.round((gameState.score / 10) * 100);
+        document.getElementById('resScore').textContent = `${pct}%`; document.getElementById('resText').textContent = `Você acertou ${gameState.score} de 10 continhas!`;
+        let stars = pct === 100 ? "⭐⭐⭐⭐⭐" : pct >= 80 ? "⭐⭐⭐⭐" : pct >= 60 ? "⭐⭐⭐" : pct >= 40 ? "⭐⭐" : pct > 0 ? "⭐" : "🌑";
+        document.getElementById('resStars').textContent = stars;
+        if (pct === 100 && window.confetti) confetti({ particleCount: 150, spread: 80, origin: { y: 0.5 } });
+        let logHtml = '';
+        gameState.logs.forEach(l => {
+            if (l.correct) logHtml += `<div class="log-item success"><span>${l.text} = ${l.ans}</span> <span>✅</span></div>`;
+            else logHtml += `<div class="log-item error"><span>${l.text} = <strong>${l.ans}</strong></span> <span style="font-size:0.9rem">(Você colocou ${l.user})</span></div>`;
+        });
+        document.getElementById('reviewLog').innerHTML = logHtml || `<div class="log-item" style="justify-content:center; background:var(--c-mul-light); color:var(--c-mul);">🎉 Parabéns! Tudo certo!</div>`;
+    }
+</script>
+</body>
+</html>
