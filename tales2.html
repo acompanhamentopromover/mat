@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matemática: Teorema de Tales - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #F0F9FF; 
+            --text-color: #0C4A6E; 
+            --border-color: #0369A1; 
+            --white: #FFFFFF;
+            
+            --theme-light: #E0F2FE; 
+            --theme-medium: #38BDF8; 
+            --theme-dark: #0284C7; 
+            --theme-contrast: #F59E0B; 
+            --theme-accent: #EF4444; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #E11D48;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(var(--theme-light) 2px, transparent 2px);
+            background-size: 25px 25px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05) rotate(-3deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2.5s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        
+        .visual-area { background: var(--bg-color); border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .highlight-box { background-color: #FEF3C7; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #92400E; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.blue { background-color: #E0F2FE; border-left-color: #0284C7; color: #0C4A6E; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #059669; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #FFE4E6; border-color: #E11D48; color: #BE123C; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
+        .math-eq { display: inline-flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 900; gap: 10px; margin: 10px 0;}
+        .math-frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 5px; }
+        .math-frac span:first-child { border-bottom: 3px solid currentColor; padding: 2px 8px; width: 100%; text-align: center; }
+        .math-frac span:last-child { padding: 2px 8px; width: 100%; text-align: center; }
+        
+        .q-svg-container { display: flex; justify-content: center; margin: 15px 0; background: var(--white); border-radius: 8px; padding: 10px; border: 2px dashed #94A3B8; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">📐</span> PROMOVER</div>
+            <h1>Matemática / 9º Ano</h1>
+            <p class="subtitle">Geometria: Teorema de Tales</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <main id="viewExplanation" class="view-section active">
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar conceito... (ex: Paralelas, Proporção, Triângulos)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">🏛️ 1. Tales de Mileto</div>
+                <article class="theory-box search-target">
+                    <h3>O Matemático e a Sombra</h3>
+                    <p>Tales de Mileto foi um brilhante matemático grego da antiguidade. A lenda diz que ele foi ao Egito e conseguiu calcular a altura exata da Grande Pirâmide de Quéops medindo apenas a sombra que ela projetava no chão, utilizando uma estaca e a proporcionalidade dos raios solares.</p>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">📏 2. O Enunciado do Teorema</div>
+                <article class="theory-box search-target">
+                    <h3>Retas Paralelas e Transversais</h3>
+                    <p>O Teorema de Tales afirma que: <strong>"Um feixe de retas paralelas cortadas por duas retas transversais determina segmentos proporcionais."</strong></p>
+                    
+                    <div class="visual-area">
+                        <svg viewBox="0 0 250 150" width="100%" height="auto" style="max-width: 250px;">
+                            <line x1="20" y1="30" x2="230" y2="30" stroke="#0284C7" stroke-width="3"/>
+                            <line x1="20" y1="80" x2="230" y2="80" stroke="#0284C7" stroke-width="3"/>
+                            <line x1="20" y1="130" x2="230" y2="130" stroke="#0284C7" stroke-width="3"/>
+                            
+                            <line x1="60" y1="10" x2="120" y2="150" stroke="#EF4444" stroke-width="3"/>
+                            <line x1="160" y1="10" x2="190" y2="150" stroke="#EF4444" stroke-width="3"/>
+                            
+                            <text x="65" y="25" font-size="14" font-weight="bold" fill="#0F172A">A</text>
+                            <text x="85" y="75" font-size="14" font-weight="bold" fill="#0F172A">B</text>
+                            <text x="110" y="125" font-size="14" font-weight="bold" fill="#0F172A">C</text>
+                            
+                            <text x="145" y="25" font-size="14" font-weight="bold" fill="#0F172A">D</text>
+                            <text x="160" y="75" font-size="14" font-weight="bold" fill="#0F172A">E</text>
+                            <text x="175" y="125" font-size="14" font-weight="bold" fill="#0F172A">F</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; font-weight: 700; color: var(--theme-dark); margin-top: 10px;">As retas azuis são paralelas e as vermelhas são transversais.</p>
+                    </div>
+
+                    <div class="math-eq" style="background: none; border: none; box-shadow: none; justify-content: center; display: flex; width: 100%;">
+                        <div class="math-frac" style="color: #0284C7;">
+                            <span>AB</span>
+                            <span>BC</span>
+                        </div>
+                        <span>=</span>
+                        <div class="math-frac" style="color: #EF4444;">
+                            <span>DE</span>
+                            <span>EF</span>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">✖️ 3. Como Resolver?</div>
+                <article class="theory-box search-target">
+                    <h3>Multiplicação Cruzada (Regra de Três)</h3>
+                    <p>Como o teorema cria uma igualdade entre duas frações, resolvemos qualquer problema multiplicando os valores em cruz ("em X").</p>
+                    
+                    <div class="highlight-box blue">
+                        <strong>Exemplo Visual:</strong> Se AB = 2, BC = 4, DE = 3 e queres descobrir o valor de EF (x).
+                        
+                        <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 30px; margin-top: 15px; margin-bottom: 15px;">
+                            <!-- O desenho geométrico das retas -->
+                            <div style="background: white; border-radius: 8px; padding: 10px; border: 2px dashed #94A3B8; display: flex; align-items: center; justify-content: center;">
+                                <svg viewBox="0 0 140 120" width="120" height="auto">
+                                    <line x1="10" y1="20" x2="130" y2="20" stroke="#0284C7" stroke-width="3"/>
+                                    <line x1="10" y1="60" x2="130" y2="60" stroke="#0284C7" stroke-width="3"/>
+                                    <line x1="10" y1="100" x2="130" y2="100" stroke="#0284C7" stroke-width="3"/>
+                                    
+                                    <line x1="30" y1="10" x2="50" y2="110" stroke="#0F172A" stroke-width="2"/>
+                                    <line x1="110" y1="10" x2="90" y2="110" stroke="#0F172A" stroke-width="2"/>
+                                    
+                                    <text x="25" y="45" font-size="14" font-weight="bold" fill="#0F172A">2</text>
+                                    <text x="30" y="85" font-size="14" font-weight="bold" fill="#0F172A">4</text>
+                                    <text x="110" y="45" font-size="14" font-weight="bold" fill="#0F172A">3</text>
+                                    <text x="105" y="85" font-size="14" font-weight="bold" fill="#EF4444">x</text>
+                                </svg>
+                            </div>
+                            
+                            <!-- A Fração Cruzada -->
+                            <div class="math-eq" style="margin: 0;">
+                                <span style="font-size: 0.9rem; color: #0C4A6E; font-weight: 700; margin-right: 5px; text-align: right;">valor de<br>EF (x).</span>
+                                <div class="math-frac">
+                                    <span style="color: #0F172A;">2</span>
+                                    <span style="color: #0F172A;">4</span>
+                                </div>
+                                <svg width="40" height="40" viewBox="0 0 40 40" style="margin: 0 -10px; z-index: 1;">
+                                    <line x1="5" y1="5" x2="35" y2="35" stroke="#F59E0B" stroke-width="4" marker-end="url(#arrow-cross)"/>
+                                    <line x1="5" y1="35" x2="35" y2="5" stroke="#F59E0B" stroke-width="4" marker-end="url(#arrow-cross)"/>
+                                    <defs>
+                                        <marker id="arrow-cross" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#F59E0B"/></marker>
+                                    </defs>
+                                </svg>
+                                <div class="math-frac">
+                                    <span style="color: #0F172A;">3</span>
+                                    <span style="color: #EF4444;">x</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 10px;">
+                            <strong>1º Passo:</strong> Multiplicar cruzado: 2 · x = 4 · 3<br>
+                            <strong>2º Passo:</strong> Resolver a equação: 2x = 12<br>
+                            <strong>3º Passo:</strong> x = 12 ÷ 2 ➔ <strong style="color: #EF4444; font-size: 1.2rem;">x = 6</strong>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">📐 4. Teorema de Tales em Triângulos</div>
+                <article class="theory-box search-target">
+                    <h3>Uma Paralela na Base</h3>
+                    <p>Se traçares uma linha paralela à base de um triângulo, ela corta os outros dois lados em partes estritamente proporcionais.</p>
+                    
+                    <div class="visual-area">
+                        <svg viewBox="0 0 200 150" width="100%" height="auto" style="max-width: 200px;">
+                            <polygon points="100,20 40,130 160,130" fill="none" stroke="#0284C7" stroke-width="3"/>
+                            <line x1="60" y1="90" x2="140" y2="90" stroke="#F59E0B" stroke-width="3" stroke-dasharray="4"/>
+                            
+                            <text x="100" y="15" font-size="14" font-weight="bold" fill="#0F172A">A</text>
+                            <text x="45" y="85" font-size="14" font-weight="bold" fill="#0F172A">D</text>
+                            <text x="145" y="85" font-size="14" font-weight="bold" fill="#0F172A">E</text>
+                            <text x="25" y="140" font-size="14" font-weight="bold" fill="#0F172A">B</text>
+                            <text x="165" y="140" font-size="14" font-weight="bold" fill="#0F172A">C</text>
+                        </svg>
+                    </div>
+
+                    <div class="math-eq" style="justify-content: center; width: 100%;">
+                        <div class="math-frac">
+                            <span>AD</span>
+                            <span>DB</span>
+                        </div>
+                        <span>=</span>
+                        <div class="math-frac">
+                            <span>AE</span>
+                            <span>EC</span>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação ➜
+            </button>
+        </main>
+
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo - 9º Ano</h2>
+                <p style="color: var(--theme-contrast); font-size: 0.95rem; font-weight:600;">
+                    30 questões sobre Proporcionalidade, Retas Paralelas e Triângulos. Acerta <strong>80% (24/30)</strong> para dominares o Teorema de Tales!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer"></div>
+        </main>
+
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900;">Relatório de Desempenho</h2>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p id="finalScoreText" style="font-weight: 700; color: #555;"></p>
+                <div id="review-container" style="margin-top: 25px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima</button>
+    </footer>
+
+<script>
+    const questionsDatabase = [
+        { level: "Fácil", text: "O que afirma rigorosamente o Teorema de Tales?", options: ["Num triângulo retângulo, a hipotenusa é igual à soma dos catetos.", "Um feixe de retas paralelas cortadas por duas retas transversais determina segmentos proporcionais.", "A soma dos ângulos internos de um triângulo é 180 graus.", "Retas transversais nunca se cruzam."], correctIndex: 1, explanation: { correctText: "O teorema baseia-se na proporcionalidade gerada quando linhas paralelas são intersetadas por transversais.", otherOptions: [] } },
+        { level: "Fácil", text: "Como se chamam as retas do feixe que mantêm sempre a mesma distância entre si e nunca se tocam?", options: ["Retas Perpendiculares.", "Retas Transversais.", "Retas Coincidentes.", "Retas Paralelas."], correctIndex: 3, explanation: { correctText: "O feixe base do Teorema de Tales é sempre composto por retas Paralelas.", otherOptions: [] } },
+        { level: "Fácil", text: "Como se designam as retas que cortam o feixe de retas paralelas?", options: ["Retas Transversais.", "Retas Paralelas.", "Retas Tangentes.", "Retas Obliquas cegas."], correctIndex: 0, explanation: { correctText: "As retas que atravessam e cortam as paralelas são chamadas de Transversais.", otherOptions: [] } },
+        { level: "Médio", text: "Segundo o Teorema de Tales, qual é a relação matemática que se forma entre os segmentos medidos nas transversais?", options: ["Eles são sempre iguais em tamanho.", "A sua soma é igual a zero.", "Eles determinam uma relação de Proporcionalidade.", "A sua diferença é sempre 1."], correctIndex: 2, explanation: { correctText: "Eles não são necessariamente iguais, mas as divisões dos seus comprimentos (razões) mantêm a mesma proporção matemática.", otherOptions: [] } },
+        { level: "Fácil", text: "A fórmula clássica de resolução do Teorema de Tales baseia-se em que tipo de operação ou conceito matemático?", options: ["Soma de matrizes.", "Igualdade de frações (Proporções).", "Raiz quadrada.", "Logaritmos."], correctIndex: 1, explanation: { correctText: "Para encontrar valores desconhecidos, usamos a igualdade entre duas razões (frações), ou seja, uma proporção.", otherOptions: [] } },
+        { level: "Médio", text: `Calcula o valor de x na figura abaixo, sabendo que as retas azuis são paralelas:<br>
+            <div class="q-svg-container">
+                <svg viewBox="0 0 200 120" width="180" height="auto">
+                    <line x1="10" y1="20" x2="190" y2="20" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="10" y1="60" x2="190" y2="60" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="10" y1="100" x2="190" y2="100" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="40" y1="10" x2="80" y2="110" stroke="#EF4444" stroke-width="2"/>
+                    <line x1="130" y1="10" x2="160" y2="110" stroke="#F59E0B" stroke-width="2"/>
+                    <text x="30" y="45" font-size="14" font-weight="bold">15</text>
+                    <text x="40" y="85" font-size="14" font-weight="bold">45</text>
+                    <text x="145" y="45" font-size="14" font-weight="bold">25</text>
+                    <text x="155" y="85" font-size="14" font-weight="bold" fill="#EF4444">x</text>
+                </svg>
+            </div>`, options: ["50", "75", "100", "125"], correctIndex: 1, explanation: { correctText: "Armamos a fração: 15 / 45 = 25 / x. Simplificando a primeira fração temos 1/3. Multiplicando em cruz: x = 3 · 25, logo x = 75.", otherOptions: [] } },
+        { level: "Médio", text: `Observa as transversais cortadas por retas paralelas. Qual o valor de x?<br>
+            <div class="q-svg-container">
+                <svg viewBox="0 0 200 120" width="180" height="auto">
+                    <line x1="10" y1="20" x2="190" y2="20" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="10" y1="60" x2="190" y2="60" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="10" y1="100" x2="190" y2="100" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="50" y1="10" x2="80" y2="110" stroke="#EF4444" stroke-width="2"/>
+                    <line x1="150" y1="10" x2="120" y2="110" stroke="#F59E0B" stroke-width="2"/>
+                    <text x="35" y="45" font-size="14" font-weight="bold">24</text>
+                    <text x="40" y="85" font-size="14" font-weight="bold">72</text>
+                    <text x="145" y="45" font-size="14" font-weight="bold" fill="#EF4444">x</text>
+                    <text x="135" y="85" font-size="14" font-weight="bold">108</text>
+                </svg>
+            </div>`, options: ["24", "36", "48", "54"], correctIndex: 1, explanation: { correctText: "24 / 72 = x / 108. Simplificando a primeira para 1/3. Multiplicando em cruz: 3x = 108, logo x = 36.", otherOptions: [] } },
+        { level: "Fácil", text: "Qual é a famosa lenda prática que envolve Tales de Mileto no Egito antigo?", options: ["Ele dividiu o Nilo em duas partes proporcionais.", "Ele mediu a altura exata de uma pirâmide utilizando a sombra dela e de um bastão, aplicando a ideia de proporções.", "Ele inventou os números negativos.", "Ele descobriu a fórmula do círculo."], correctIndex: 1, explanation: { correctText: "A lenda diz que ele espetou um bastão no chão e esperou até que a sombra do bastão fosse igual à sua altura, concluindo que nesse momento a sombra da pirâmide também seria igual à altura desta.", otherOptions: [] } },
+        { level: "Médio", text: "Aplicando o Teorema num triângulo: se traçares uma linha estritamente paralela à base do triângulo, cortando os lados esquerdo e direito, ela divide esses lados de forma...", options: ["Igual (ao meio).", "Inversamente proporcional.", "Proporcional.", "Aleatória."], correctIndex: 2, explanation: { correctText: "Qualquer paralela a um lado do triângulo divide os outros dois lados em segmentos diretamente proporcionais.", otherOptions: [] } },
+        { level: "Médio", text: `Resolvendo a proporção geométrica da figura abaixo, qual é o valor de x?<br>
+            <div class="q-svg-container">
+                <svg viewBox="0 0 200 120" width="180" height="auto">
+                    <line x1="10" y1="20" x2="190" y2="20" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="10" y1="60" x2="190" y2="60" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="10" y1="100" x2="190" y2="100" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="40" y1="10" x2="80" y2="110" stroke="#EF4444" stroke-width="2"/>
+                    <line x1="130" y1="10" x2="160" y2="110" stroke="#F59E0B" stroke-width="2"/>
+                    <text x="35" y="45" font-size="14" font-weight="bold" fill="#EF4444">x</text>
+                    <text x="45" y="85" font-size="14" font-weight="bold">14</text>
+                    <text x="145" y="45" font-size="14" font-weight="bold">45</text>
+                    <text x="155" y="85" font-size="14" font-weight="bold">30</text>
+                </svg>
+            </div>`, options: ["15", "18", "21", "25"], correctIndex: 2, explanation: { correctText: "A proporção é x / 14 = 45 / 30. Simplificando a segunda fração temos 3/2. Cruzando: 2x = 42, então x = 21.", otherOptions: [] } },
+        { level: "Médio", text: `Temos segmentos proporcionais nas transversais abaixo. Qual é o valor de x?<br>
+            <div class="q-svg-container">
+                <svg viewBox="0 0 200 120" width="180" height="auto">
+                    <line x1="10" y1="20" x2="190" y2="20" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="10" y1="60" x2="190" y2="60" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="10" y1="100" x2="190" y2="100" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="80" y1="10" x2="40" y2="110" stroke="#EF4444" stroke-width="2"/>
+                    <line x1="130" y1="10" x2="160" y2="110" stroke="#F59E0B" stroke-width="2"/>
+                    <text x="40" y="45" font-size="14" font-weight="bold">18</text>
+                    <text x="30" y="85" font-size="14" font-weight="bold" fill="#EF4444">x</text>
+                    <text x="145" y="45" font-size="14" font-weight="bold">54</text>
+                    <text x="155" y="85" font-size="14" font-weight="bold">72</text>
+                </svg>
+            </div>`, options: ["16", "24", "32", "36"], correctIndex: 1, explanation: { correctText: "18 / x = 54 / 72. Simplificando 54/72 dá 3/4. Resolvendo 18/x = 3/4: 3x = 72, logo x = 24.", otherOptions: [] } },
+        { level: "Fácil", text: "Como se resolve tipicamente, de forma rápida, a equação gerada pelo Teorema de Tales?", options: ["Elevando tudo ao quadrado.", "Somando os numeradores.", "Através da multiplicação cruzada (Regra de três).", "Dividindo A por C e somando D."], correctIndex: 2, explanation: { correctText: "A regra de três simples (multiplicação cruzada) é a ferramenta de eleição para resolver igualdades de frações.", otherOptions: [] } },
+        { level: "Médio", text: "Se vários segmentos são proporcionais ao longo de retas paralelas, a divisão (razão) entre os segmentos correspondentes de qualquer transversal deve ser sempre:", options: ["Um número par.", "Zero.", "Constante (sempre igual).", "Um número ímpar."], correctIndex: 2, explanation: { correctText: "Essa é a essência da proporção: não importa as medidas, o resultado da fração (a constante de proporcionalidade) mantém-se o mesmo.", otherOptions: [] } },
+        { level: "Fácil", text: "O Teorema de Tales estabelece a base fundamental para o estudo avançado de qual tema da geometria?", options: ["Volume das esferas.", "Semelhança de Triângulos.", "Cálculo de matrizes.", "Geometria analítica vetorial."], correctIndex: 1, explanation: { correctText: "A proporcionalidade ensinada por Tales é o pilar que sustenta o conceito de que figuras podem ser ampliadas ou reduzidas mantendo as suas proporções (Semelhança).", otherOptions: [] } },
+        { level: "Difícil", text: `Encontra o valor de x utilizando a álgebra simples na figura abaixo:<br>
+            <div class="q-svg-container">
+                <svg viewBox="0 0 200 120" width="180" height="auto">
+                    <line x1="10" y1="20" x2="190" y2="20" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="10" y1="60" x2="190" y2="60" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="10" y1="100" x2="190" y2="100" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="40" y1="10" x2="80" y2="110" stroke="#EF4444" stroke-width="2"/>
+                    <line x1="140" y1="10" x2="120" y2="110" stroke="#F59E0B" stroke-width="2"/>
+                    <text x="35" y="45" font-size="14" font-weight="bold" fill="#EF4444">x</text>
+                    <text x="35" y="85" font-size="12" font-weight="bold">x+10</text>
+                    <text x="140" y="45" font-size="14" font-weight="bold">15</text>
+                    <text x="135" y="85" font-size="14" font-weight="bold">45</text>
+                </svg>
+            </div>`, options: ["5", "10", "15", "20"], correctIndex: 0, explanation: { correctText: "Arma-se a equação: x / (x+10) = 15 / 45. A fração 15/45 é igual a 1/3. Cruzando: 3x = 1(x+10) -> 3x = x + 10 -> 2x = 10 -> x = 5.", otherOptions: [] } },
+        { level: "Fácil", text: "Para aplicar o Teorema de Tales na sua forma clássica de feixe, precisas no mínimo de quantas retas PARALELAS?", options: ["Uma.", "Duas.", "Três.", "Quatro."], correctIndex: 2, explanation: { correctText: "Para teres dois segmentos em cada transversal que possam ser comparados, precisas de três linhas paralelas a cortá-las.", otherOptions: [] } },
+        { level: "Fácil", text: "Quantas retas TRANSVERSAIS são necessárias, no mínimo, para montar o problema clássico de proporcionalidade do Teorema de Tales?", options: ["Uma.", "Duas.", "Três.", "Muitas."], correctIndex: 1, explanation: { correctText: "Precisas de duas retas a serem cortadas para poder comparar as proporções de um lado com o outro lado.", otherOptions: [] } },
+        { level: "Médio", text: "Se traçarmos uma paralela à base de um triângulo, o pequeno triângulo que se forma no topo em relação ao triângulo original grande é classificado como:", options: ["Equilátero.", "Isósceles.", "Semelhante ao triângulo maior.", "Inverso ao triângulo maior."], correctIndex: 2, explanation: { correctText: "Como as proporções dos lados se mantêm e os ângulos são iguais (devido às paralelas), o triângulo pequeno é uma cópia exata, mas reduzida, do triângulo grande (Semelhante).", otherOptions: [] } },
+        { level: "Difícil", text: `Num feixe de paralelas, os segmentos são como ilustrado na imagem. Qual é a medida de EF?<br>
+            <div class="q-svg-container">
+                <svg viewBox="0 0 200 120" width="180" height="auto">
+                    <line x1="10" y1="20" x2="190" y2="20" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="10" y1="60" x2="190" y2="60" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="10" y1="100" x2="190" y2="100" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="50" y1="10" x2="50" y2="110" stroke="#EF4444" stroke-width="2"/>
+                    <line x1="130" y1="10" x2="150" y2="110" stroke="#F59E0B" stroke-width="2"/>
+                    <text x="25" y="45" font-size="14" font-weight="bold">32</text>
+                    <text x="35" y="85" font-size="14" font-weight="bold">8</text>
+                    <text x="140" y="45" font-size="14" font-weight="bold">100</text>
+                    <text x="155" y="85" font-size="14" font-weight="bold" fill="#EF4444">EF</text>
+                </svg>
+            </div>`, options: ["15", "20", "25", "30"], correctIndex: 2, explanation: { correctText: "Proporção: 32 / 8 = 100 / EF. Como 32/8 é 4. Temos 4 = 100 / EF. Cruzando: 4(EF) = 100, logo EF = 25.", otherOptions: [] } },
+        { level: "Médio", text: "Uma propriedade deduzida do Teorema: Se os segmentos gerados numa das transversais forem rigorosamente IGUAIS entre si, o que acontece aos segmentos na outra transversal?", options: ["Serão o dobro.", "Serão a metade.", "Também serão rigorosamente iguais entre si.", "Serão nulos."], correctIndex: 2, explanation: { correctText: "Se a razão de um lado for 1 (porque 5/5=1), a razão do outro lado também tem de ser 1, pelo que os segmentos da outra reta também medirão o mesmo entre si.", otherOptions: [] } },
+        { level: "Fácil", text: "Tales de Mileto, que deu nome ao teorema, foi um dos primeiros matemáticos e filósofos de que grande civilização antiga?", options: ["Romana.", "Grega.", "Egípcia.", "Babilônica."], correctIndex: 1, explanation: { correctText: "Tales vivia em Mileto, uma colônia da Grécia Antiga. Ele é um dos Sete Sábios da Grécia.", otherOptions: [] } },
+        { level: "Difícil", text: `Problema das Sombras (Semelhança e Tales): Um poste faz sombra no chão, e ao lado, um prédio também faz sombra. Calcula a altura do prédio (h).<br>
+            <div class="q-svg-container">
+                <svg viewBox="0 0 250 120" width="220" height="auto">
+                    <!-- Chão -->
+                    <line x1="10" y1="100" x2="240" y2="100" stroke="#1E293B" stroke-width="2"/>
+                    <!-- Poste e Triângulo -->
+                    <line x1="40" y1="40" x2="40" y2="100" stroke="#F59E0B" stroke-width="4"/>
+                    <line x1="40" y1="40" x2="80" y2="100" stroke="#0284C7" stroke-width="2" stroke-dasharray="4"/>
+                    <text x="25" y="70" font-size="12" font-weight="bold">6m</text>
+                    <text x="50" y="115" font-size="12" font-weight="bold">3m</text>
+                    <!-- Prédio e Triângulo -->
+                    <rect x="120" y="20" width="30" height="80" fill="#94A3B8"/>
+                    <line x1="120" y1="20" x2="220" y2="100" stroke="#0284C7" stroke-width="2" stroke-dasharray="4"/>
+                    <text x="105" y="60" font-size="14" font-weight="bold" fill="#EF4444">h</text>
+                    <text x="160" y="115" font-size="12" font-weight="bold">45m</text>
+                </svg>
+            </div>`, options: ["60m", "75m", "90m", "105m"], correctIndex: 2, explanation: { correctText: "Altura poste / Sombra poste = Altura prédio / Sombra prédio. 6/3 = h/45. Como 6/3 = 2, temos 2 = h/45. Logo, h = 90 metros.", otherOptions: [] } },
+        { level: "Médio", text: "Se ao calculares a razão (divisão) entre os dois segmentos da transversal da esquerda obtiveres o resultado 1/3, qual deverá ser a razão dos segmentos da transversal da direita?", options: ["1/3, para manter a proporcionalidade do teorema.", "3, porque inverte.", "1, porque é o limite.", "Não há ligação lógica."], correctIndex: 0, explanation: { correctText: "O teorema dita que a proporção (razão) tem de ser matematicamente a mesma em qualquer transversal cortada pelo mesmo feixe de paralelas.", otherOptions: [] } },
+        { level: "Difícil", text: `Resolve a proporção gerada pelo teorema na figura abaixo. O valor correto de x é:<br>
+            <div class="q-svg-container">
+                <svg viewBox="0 0 200 120" width="180" height="auto">
+                    <line x1="10" y1="20" x2="190" y2="20" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="10" y1="60" x2="190" y2="60" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="10" y1="100" x2="190" y2="100" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="40" y1="10" x2="80" y2="110" stroke="#EF4444" stroke-width="2"/>
+                    <line x1="140" y1="10" x2="120" y2="110" stroke="#F59E0B" stroke-width="2"/>
+                    <text x="25" y="45" font-size="12" font-weight="bold" fill="#EF4444">x-5</text>
+                    <text x="45" y="85" font-size="14" font-weight="bold">12</text>
+                    <text x="140" y="45" font-size="14" font-weight="bold">45</text>
+                    <text x="135" y="85" font-size="14" font-weight="bold">54</text>
+                </svg>
+            </div>`, options: ["12", "15", "18", "20"], correctIndex: 1, explanation: { correctText: "A proporção é (x-5) / 12 = 45 / 54. Simplificando 45/54 por 9 dá 5/6. Cruzando (x-5)/12 = 5/6: 6(x-5) = 60 -> 6x - 30 = 60 -> 6x = 90 -> x = 15.", otherOptions: [] } },
+        { level: "Médio", text: "Se um feixe de retas paralelas corta uma transversal e gera dois segmentos, um de 5 cm e outro de 15 cm. A constante de proporcionalidade (razão) simplificada entre eles é:", options: ["1/2", "1/3 ou 3", "5", "15"], correctIndex: 1, explanation: { correctText: "Dividindo 5 por 15 obtemos 1/3. Se dividirmos 15 por 5 obtemos 3. Ambas representam a mesma proporção geométrica.", otherOptions: [] } },
+        { level: "Fácil", text: "Qual é a propriedade base da matemática que justifica o facto de podermos usar a 'Regra de Três Simples' no Teorema de Tales?", options: ["Propriedade da Proporcionalidade Direta das igualdades.", "Propriedade dos ângulos opostos.", "Raízes simétricas.", "Limites trigonométricos."], correctIndex: 0, explanation: { correctText: "A regra de três só funciona quando há uma relação direta de proporcionalidade linear entre as partes de uma equação.", otherOptions: [] } },
+        { level: "Médio", text: "Num triângulo ABC, um segmento de reta DE é traçado paralelamente ao lado da base BC. A reta corta os lados AB no ponto D e AC no ponto E. Pelo Teorema de Tales nos triângulos, a divisão AD / DB será exatamente igual a:", options: ["BC / DE", "AE / EC", "AB / AC", "DB / AD"], correctIndex: 1, explanation: { correctText: "O lado esquerdo fica proporcional ao lado direito na mesma sequência do corte. O corte no topo esquerdo a dividir pela base esquerda (AD/DB) é igual ao corte topo direito a dividir pela base direita (AE/EC).", otherOptions: [] } },
+        { level: "Fácil", text: "Ao desenhar o problema de Tales no caderno, o que acontece se as duas retas transversais se cruzarem formando um 'X' em cima das paralelas?", options: ["O Teorema de Tales deixa de funcionar.", "O Teorema de Tales continua a funcionar perfeitamente, os segmentos em cada reta mantêm as suas proporções independentemente do cruzamento.", "As linhas paralelas ficam curvas.", "O resultado será sempre negativo."], correctIndex: 1, explanation: { correctText: "O formato de 'X' das transversais (vulgo gravata borboleta) não destrói a matemática. As retas transversais não têm de ser paralelas entre si, podem cruzar-se à vontade.", otherOptions: [] } },
+        { level: "Médio", text: "O que significa fisicamente afirmar que 'dois segmentos de reta são proporcionais a outros dois'?", options: ["Que eles medem exatamente os mesmos centímetros.", "Que a divisão dos comprimentos do primeiro par resulta no mesmo valor exato da divisão dos comprimentos do segundo par.", "Que eles se somam para dar zero.", "Que eles formam um ângulo de 90 graus."], correctIndex: 1, explanation: { correctText: "A palavra 'proporcional' significa que a razão matemática (a divisão) entre os valores é equivalente.", otherOptions: [] } },
+        { level: "Difícil", text: `Atenção aos cruzamentos! As retas transversais cruzam-se exatamente sobre a linha paralela do meio. Descobre o valor de x prestando atenção à linha transversal que cada segmento pertence:<br>
+            <div class="q-svg-container">
+                <svg viewBox="0 0 200 120" width="180" height="auto">
+                    <line x1="10" y1="20" x2="190" y2="20" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="10" y1="60" x2="190" y2="60" stroke="#0284C7" stroke-width="3"/>
+                    <line x1="10" y1="100" x2="190" y2="100" stroke="#0284C7" stroke-width="3"/>
+                    
+                    <!-- Transversal 1 (Vermelha) -->
+                    <line x1="40" y1="10" x2="160" y2="110" stroke="#EF4444" stroke-width="2"/>
+                    <!-- Transversal 2 (Laranja) -->
+                    <line x1="160" y1="10" x2="40" y2="110" stroke="#F59E0B" stroke-width="2"/>
+                    
+                    <!-- Textos Transversal 1 -->
+                    <text x="65" y="45" font-size="14" font-weight="bold">35</text>
+                    <text x="135" y="85" font-size="14" font-weight="bold">105</text>
+                    
+                    <!-- Textos Transversal 2 -->
+                    <text x="125" y="45" font-size="14" font-weight="bold" fill="#F59E0B">x</text>
+                    <text x="55" y="85" font-size="14" font-weight="bold">120</text>
+                </svg>
+            </div>`, options: ["20", "30", "40", "50"], correctIndex: 2, explanation: { correctText: "A regra de ouro nas retas cruzadas é seguir a MESMA RETA! Na reta vermelha a proporção é 35/105 (que dá 1/3). Na reta laranja a proporção é x/120. Cruzando 1/3 = x/120 temos 3x = 120, logo x = 40.", otherOptions: [] } }
+    ];
+
+    const quizState = {
+        currentIndex: 0,
+        userAnswers: new Array(questionsDatabase.length).fill(null),
+        confettiAnimationId: null
+    };
+
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+        if (!searchInput) return;
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let found = 0;
+            contentGroups.forEach(g => {
+                const match = g.textContent.toLowerCase().includes(term);
+                g.style.display = match ? 'flex' : 'none';
+                if (match) found++;
+            });
+            noResultsMsg.style.display = found === 0 ? 'block' : 'none';
+        });
+    }
+
+    function changeApplicationView(viewName) {
+        const viewMapping = {
+            'explanation': 'viewExplanation',
+            'practice': 'viewPractice',
+            'result': 'viewResult'
+        };
+
+        const targetId = viewMapping[viewName];
+        Object.values(viewMapping).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('active');
+        });
+
+        const targetView = document.getElementById(targetId);
+        if (targetView) targetView.classList.add('active');
+
+        const quizFooter = document.getElementById('quizFooter');
+        if (quizFooter) quizFooter.style.display = (viewName === 'practice') ? 'flex' : 'none';
+
+        const btnExp = document.getElementById('btnExp');
+        const btnPrac = document.getElementById('btnPrac');
+        if (btnExp) btnExp.classList.toggle('active', viewName === 'explanation');
+        if (btnPrac) btnPrac.classList.toggle('active', viewName === 'practice');
+
+        if (viewName === 'practice') {
+            renderCurrentQuestion();
+            renderNavigationMap();
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function getDifficultyBadgeClass(level) {
+        if (level === 'Fácil') return 'dif-facil';
+        if (level === 'Médio') return 'dif-medio';
+        return 'dif-dificil';
+    }
+
+    function buildOptionsHTML(q, sel) {
+        const letters = ['A', 'B', 'C', 'D'];
+        return q.options.map((opt, i) => {
+            let cls = '';
+            if (sel !== null) {
+                if (i === q.correctIndex) cls = 'correct';
+                else if (i === sel) cls = 'wrong';
+                else cls = 'disabled';
+            }
+            return `<button class="option-btn ${cls}" onclick="handleSelection(${i})" ${sel !== null ? 'disabled' : ''}>
+                <div class="opt-circle">${letters[i]}</div><div>${opt}</div>
+            </button>`;
+        }).join('');
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+
+        const q = questionsDatabase[quizState.currentIndex];
+        const sel = quizState.userAnswers[quizState.currentIndex];
+        const badge = getDifficultyBadgeClass(q.level);
+        
+        let optionsHTML = buildOptionsHTML(q, sel);
+        let feedbackHTML = (sel !== null) ? `<div class="feedback-box">
+            <div class="feedback-item correct-opt"><strong>Resposta Correta:</strong> ${q.options[q.correctIndex]}</div>
+            <p style="font-weight:600; color:var(--text-color);">${q.explanation.correctText}</p>
+        </div>` : '';
+
+        container.innerHTML = `<div class="quiz-question-card">
+            <span class="difficulty-badge ${badge}">${q.level}</span>
+            <p style="font-size:0.85rem; font-weight:900; color:var(--theme-dark);">QUESTÃO ${quizState.currentIndex + 1}/30</p>
+            <h2 class="quiz-question-text">${q.text}</h2>
+            ${optionsHTML}
+            ${feedbackHTML}
+        </div>`;
+        updateNavButtons();
+    }
+
+    function handleSelection(idx) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        quizState.userAnswers[quizState.currentIndex] = idx;
+        if (idx === questionsDatabase[quizState.currentIndex].correctIndex) {
+            confetti({ particleCount: 40, spread: 70, origin: { y: 0.8 } });
+        }
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function renderNavigationMap() {
+        const map = document.getElementById('qMap');
+        if (!map) return;
+        map.innerHTML = questionsDatabase.map((_, i) => {
+            let cls = 'map-dot';
+            if (i === quizState.currentIndex) cls += ' active';
+            if (quizState.userAnswers[i] !== null) cls += (quizState.userAnswers[i] === questionsDatabase[i].correctIndex) ? ' answered-correct' : ' answered-wrong';
+            return `<div class="${cls}" onclick="goTo(${i})">${i+1}</div>`;
+        }).join('');
+    }
+
+    function goTo(i) { quizState.currentIndex = i; renderCurrentQuestion(); renderNavigationMap(); }
+    function navigateQuestion(dir) { 
+        const next = quizState.currentIndex + dir;
+        if (next >= 0 && next < questionsDatabase.length) goTo(next);
+    }
+
+    function updateNavButtons() {
+        const nextBtn = document.getElementById('btnNext');
+        const prevBtn = document.getElementById('btnPrev');
+        if (prevBtn) prevBtn.disabled = quizState.currentIndex === 0;
+        if (nextBtn) {
+            if (quizState.currentIndex === questionsDatabase.length - 1) {
+                nextBtn.textContent = "Finalizar";
+                nextBtn.onclick = finish;
+            } else {
+                nextBtn.textContent = "Próxima";
+                nextBtn.onclick = () => navigateQuestion(1);
+            }
+        }
+    }
+
+    function finish() {
+        const correct = quizState.userAnswers.filter((a, i) => a === questionsDatabase[i].correctIndex).length;
+        const total = questionsDatabase.length;
+        const percent = Math.round((correct/total)*100);
+        
+        const finalPercentEl = document.getElementById('finalPercent');
+        const finalScoreTextEl = document.getElementById('finalScoreText');
+        const reviewContainerEl = document.getElementById('review-container');
+        const actionButtonsEl = document.getElementById('action-buttons');
+
+        if (finalPercentEl) finalPercentEl.textContent = `${percent}%`;
+        if (finalScoreTextEl) finalScoreTextEl.textContent = `Acertaste ${correct} de ${total} questões.`;
+        
+        let reviewHTML = '';
+        if (percent < 80) {
+            reviewHTML = `<div class="result-summary-box error"><strong>⚠️ MULTIPLICAÇÃO INCOMPLETA!</strong> Precisas de rever a regra de três e as proporções cruzadas de Tales.</div>`;
+        } else {
+            reviewHTML = `<div class="result-summary-box success"><strong>🎉 GEOMETRIA DOMINADA!</strong> Domínio absoluto das proporções! Tales estaria orgulhoso!</div>`;
+        }
+        
+        if (reviewContainerEl) reviewContainerEl.innerHTML = reviewHTML;
+        if (actionButtonsEl) actionButtonsEl.innerHTML = `<button class="btn-action" onclick="location.reload()">🔄 Refazer Teste</button>`;
+        
+        changeApplicationView('result');
+    }
+
+    // Inicialização
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>
