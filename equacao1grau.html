@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matemática: Equação do 1º Grau - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #FFF7ED; 
+            --text-color: #431407; 
+            --border-color: #9A3412; 
+            --white: #FFFFFF;
+            
+            --theme-light: #FFEDD5; 
+            --theme-medium: #F97316; 
+            --theme-dark: #C2410C; 
+            --theme-contrast: #0EA5E9; 
+            --theme-accent: #10B981; 
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #E11D48;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(var(--theme-light) 2px, transparent 2px);
+            background-size: 25px 25px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05) rotate(-3deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2.5s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        
+        .visual-area { background: var(--bg-color); border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.5rem; color: var(--theme-dark); font-weight: 800; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); text-align: center;}
+        
+        .highlight-box { background-color: #FEF3C7; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #92400E; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.blue { background-color: #E0F2FE; border-left-color: #0284C7; color: #0C4A6E; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #059669; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #F1F5F9; border-color: #94A3B8; color: #475569; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
+        .q-svg-container { display: flex; justify-content: center; margin: 15px 0; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">⚖️</span> PROMOVER</div>
+            <h1>Matemática / Ensino Fundamental</h1>
+            <p class="subtitle">Equação do 1º Grau</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (30)</button>
+        </div>
+
+        <main id="viewExplanation" class="view-section active">
+            
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Balança, Incógnita, Isolar)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">⚖️ 1. O que é uma Equação?</div>
+                <article class="theory-box search-target">
+                    <h3>A Balança Perfeita</h3>
+                    <p>Uma equação é uma afirmação de que duas coisas têm exatamente o mesmo valor. Pense numa <strong>balança de dois pratos</strong> que está em perfeito equilíbrio.</p>
+                    
+                    <div class="visual-area">
+                        <svg width="220" height="150" viewBox="0 0 220 150">
+                            <!-- Base e Pilar -->
+                            <rect x="100" y="130" width="20" height="20" fill="#94A3B8" stroke="#1E293B" stroke-width="2"/>
+                            <line x1="110" y1="130" x2="110" y2="40" stroke="#1E293B" stroke-width="4"/>
+                            <polygon points="110,30 100,45 120,45" fill="#1E293B"/>
+                            
+                            <!-- Braço da Balança -->
+                            <line x1="40" y1="40" x2="180" y2="40" stroke="#1E293B" stroke-width="4"/>
+                            
+                            <!-- Prato Esquerdo -->
+                            <line x1="40" y1="40" x2="20" y2="90" stroke="#64748B" stroke-width="2"/>
+                            <line x1="40" y1="40" x2="60" y2="90" stroke="#64748B" stroke-width="2"/>
+                            <path d="M 15 90 Q 40 110 65 90 Z" fill="#E2E8F0" stroke="#1E293B" stroke-width="2"/>
+                            
+                            <!-- Prato Direito -->
+                            <line x1="180" y1="40" x2="160" y2="90" stroke="#64748B" stroke-width="2"/>
+                            <line x1="180" y1="40" x2="200" y2="90" stroke="#64748B" stroke-width="2"/>
+                            <path d="M 155 90 Q 180 110 205 90 Z" fill="#E2E8F0" stroke="#1E293B" stroke-width="2"/>
+
+                            <!-- Pesos Esquerdo -->
+                            <rect x="25" y="70" width="20" height="20" fill="#0EA5E9" stroke="#0369A1" stroke-width="2"/>
+                            <text x="35" y="85" font-size="12" font-weight="bold" fill="#FFF" text-anchor="middle">x</text>
+                            
+                            <circle cx="50" cy="80" r="8" fill="#10B981" stroke="#047857" stroke-width="2"/>
+                            <text x="50" y="84" font-size="10" font-weight="bold" fill="#FFF" text-anchor="middle">2</text>
+
+                            <!-- Pesos Direito -->
+                            <circle cx="180" cy="80" r="10" fill="#10B981" stroke="#047857" stroke-width="2"/>
+                            <text x="180" y="84" font-size="10" font-weight="bold" fill="#FFF" text-anchor="middle">10</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; font-weight: 700; color: var(--theme-dark); text-align: center; margin-top: -10px;">x + 2 = 10</p>
+                    </div>
+
+                    <p>O símbolo de igual <strong>(=)</strong> é o centro da balança. O que está no prato da esquerda pesa o mesmo que o prato da direita.</p>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">📦 2. A Incógnita (O 'x')</div>
+                <article class="theory-box search-target">
+                    <h3>A Caixa Misteriosa</h3>
+                    <p>O <strong>x</strong> (ou qualquer outra letra) chama-se <strong>Incógnita</strong>. Ele representa um número misterioso escondido dentro de uma caixa.</p>
+                    <p>Resolver uma equação significa descobrir qual é o número que está escondido no lugar do 'x' para que a balança fique reta. Se <strong style="color:var(--theme-contrast);">x + 2 = 10</strong>, então a caixa 'x' só pode pesar 8!</p>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">🔄 3. O Jogo das Operações Inversas</div>
+                <article class="theory-box search-target">
+                    <h3>Mudar de Lado = Mudar o Sinal</h3>
+                    <p>Para descobrir o valor do 'x', temos de o deixar <strong>sozinho</strong> de um dos lados do igual (=). Quando atiramos um número para o outro lado da ponte, ele troca de "roupa" e faz a <strong>operação inversa</strong>!</p>
+                    
+                    <div class="highlight-box blue">
+                        <ul style="list-style-type: none; padding: 0;">
+                            <li>➕ Se está a somar, passa a <strong>subtrair</strong> (➖).</li>
+                            <li>➖ Se está a subtrair, passa a <strong>somar</strong> (➕).</li>
+                            <li>✖️ Se está a multiplicar, passa a <strong>dividir</strong> (➗).</li>
+                            <li>➗ Se está a dividir, passa a <strong>multiplicar</strong> (✖️).</li>
+                        </ul>
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">📝 4. Passo a Passo</div>
+                <article class="theory-box search-target">
+                    <h3>Isolando o 'x' na prática</h3>
+                    <p>Vamos resolver: <strong style="font-size: 1.2rem; color: var(--theme-dark);">2x + 3 = 11</strong></p>
+                    
+                    <ul style="padding-left: 20px; display:flex; flex-direction:column; gap:8px;">
+                        <li><strong>Passo 1:</strong> Passar os números soltos para a direita. O <strong>+3</strong> passa para o outro lado a subtrair <strong>-3</strong>.<br>
+                        <code>2x = 11 - 3</code></li>
+                        <li><strong>Passo 2:</strong> Fazer a conta.<br>
+                        <code>2x = 8</code></li>
+                        <li><strong>Passo 3:</strong> O 2 está a multiplicar o x (2 vezes x). Passa para a direita a <strong>dividir</strong>.<br>
+                        <code>x = 8 ÷ 2</code></li>
+                        <li><strong>Passo 4:</strong> Resultado final!<br>
+                        <code style="color: var(--theme-dark); font-weight: bold;">x = 4</code></li>
+                    </ul>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (30 Questões) ➜
+            </button>
+        </main>
+
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo</h2>
+                <p style="color: var(--theme-dark); font-size: 0.95rem; font-weight:600;">
+                    30 questões essenciais sobre igualdades, isolar o "x", frações e interpretação. Acerte <strong>80% (24/30)</strong> para dominar!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima ➡️</button>
+    </footer>
+
+<script>
+    /* --- ESTRUTURA DE DADOS (BASE DE QUESTÕES - Equação 1º Grau) --- */
+    const questionsDatabase = [
+        { level: "Fácil", text: "O que o sinal de igual (=) representa em uma equação?", options: ["Que o lado direito é sempre maior que o esquerdo.", "Que devemos somar tudo.", "Uma balança em perfeito equilíbrio: o que está do lado esquerdo tem exatamente o mesmo valor do lado direito.", "O fim da conta matemática."], correctIndex: 2, explanation: { correctText: "A equação é uma balança. Tudo o que está no prato da esquerda pesa rigorosamente o mesmo que o que está no prato da direita.", otherOptions: [] } },
+        { level: "Fácil", text: "Na equação x + 5 = 12, qual é o valor da incógnita 'x'?", options: ["5", "7", "12", "17"], correctIndex: 1, explanation: { correctText: "Passando o +5 para o outro lado, ele vira -5. Logo, x = 12 - 5, que resulta em 7.", otherOptions: [] } },
+        { level: "Fácil", text: "Para isolar o 'x' na equação x - 4 = 10, o que devemos fazer com o número 4?", options: ["Passar para o outro lado somando (+4).", "Dividir o 10 por 4.", "Multiplicar o 10 por 4.", "Deletá-lo da conta."], correctIndex: 0, explanation: { correctText: "Operação inversa: se está subtraindo (-4), passa para o outro lado da ponte somando (+4). x = 10 + 4 = 14.", otherOptions: [] } },
+        { level: "Fácil", text: `Observando a balança em equilíbrio abaixo, qual o peso da caixa 'x'?<br>
+            <div class="q-svg-container">
+                <svg width="200" height="120" viewBox="0 0 220 150">
+                    <rect x="100" y="130" width="20" height="20" fill="#94A3B8"/>
+                    <line x1="110" y1="130" x2="110" y2="40" stroke="#1E293B" stroke-width="4"/>
+                    <polygon points="110,30 100,45 120,45" fill="#1E293B"/>
+                    <line x1="40" y1="40" x2="180" y2="40" stroke="#1E293B" stroke-width="4"/>
+                    <line x1="40" y1="40" x2="20" y2="90" stroke="#64748B" stroke-width="2"/>
+                    <line x1="40" y1="40" x2="60" y2="90" stroke="#64748B" stroke-width="2"/>
+                    <path d="M 15 90 Q 40 110 65 90 Z" fill="#E2E8F0" stroke="#1E293B" stroke-width="2"/>
+                    <line x1="180" y1="40" x2="160" y2="90" stroke="#64748B" stroke-width="2"/>
+                    <line x1="180" y1="40" x2="200" y2="90" stroke="#64748B" stroke-width="2"/>
+                    <path d="M 155 90 Q 180 110 205 90 Z" fill="#E2E8F0" stroke="#1E293B" stroke-width="2"/>
+                    
+                    <!-- Esquerda -->
+                    <rect x="30" y="70" width="20" height="20" fill="#0EA5E9"/>
+                    <text x="40" y="85" font-size="12" font-weight="bold" fill="#FFF" text-anchor="middle">x</text>
+                    
+                    <!-- Direita -->
+                    <circle cx="180" cy="80" r="10" fill="#10B981"/>
+                    <text x="180" y="84" font-size="10" font-weight="bold" fill="#FFF" text-anchor="middle">8</text>
+                </svg>
+            </div>`, options: ["2", "4", "8", "16"], correctIndex: 2, explanation: { correctText: "A balança está equilibrada. De um lado só temos 'x', do outro só o '8'. Logo, x = 8.", otherOptions: [] } },
+        { level: "Fácil", text: "O que significa '3x' em uma equação, como em 3x = 15?", options: ["Trinta e 'x'.", "Três mais 'x'.", "Três VEZES 'x' (3 multiplicado por x).", "Três dividido por 'x'."], correctIndex: 2, explanation: { correctText: "Sempre que um número está encostado em uma letra (sem sinal no meio), ele está a multiplicar. 3x é o mesmo que 3 · x.", otherOptions: [] } },
+        { level: "Médio", text: "Resolva a equação: 2x = 10. Qual é o valor de x?", options: ["5", "8", "12", "20"], correctIndex: 0, explanation: { correctText: "O 2 está multiplicando o x. Passa para o outro lado dividindo: x = 10 ÷ 2. Logo, x = 5.", otherOptions: [] } },
+        { level: "Médio", text: "Na equação x/3 = 4 (ou seja, x dividido por 3 é igual a 4). Qual o valor de x?", options: ["1", "7", "12", "15"], correctIndex: 2, explanation: { correctText: "A operação inversa da divisão é a multiplicação. O 3 passa a multiplicar o 4. x = 4 · 3 = 12.", otherOptions: [] } },
+        { level: "Médio", text: "Resolva a equação de dois passos: 2x + 1 = 9.", options: ["3", "4", "5", "8"], correctIndex: 1, explanation: { correctText: "Primeiro o +1 passa como -1 (2x = 9 - 1 ➔ 2x = 8). Depois o 2 passa dividindo (x = 8 ÷ 2 = 4).", otherOptions: [] } },
+        { level: "Médio", text: "Qual o valor de x na equação 3x - 5 = 16?", options: ["5", "7", "9", "21"], correctIndex: 1, explanation: { correctText: "O -5 passa como +5 (3x = 16 + 5 ➔ 3x = 21). O 3 passa dividindo (x = 21 ÷ 3 = 7).", otherOptions: [] } },
+        { level: "Fácil", text: "Se 'o dobro de um número é 14', como podemos escrever isso em forma de equação?", options: ["x + 2 = 14", "x / 2 = 14", "2x = 14", "x - 2 = 14"], correctIndex: 2, explanation: { correctText: "O 'dobro' de um número é ele multiplicado por 2 (2x). 'É 14' significa igual a 14 (= 14). Logo, 2x = 14.", otherOptions: [] } },
+        { level: "Médio", text: "Resolva o problema: O triplo de um número mais 4 é igual a 19. Que número é esse?", options: ["4", "5", "6", "15"], correctIndex: 1, explanation: { correctText: "Equação: 3x + 4 = 19. ➔ 3x = 19 - 4 ➔ 3x = 15 ➔ x = 15 ÷ 3 = 5.", otherOptions: [] } },
+        { level: "Médio", text: `Baseado na balança em equilíbrio, qual o peso de cada 'x'?<br>
+            <div class="q-svg-container">
+                <svg width="200" height="120" viewBox="0 0 220 150">
+                    <rect x="100" y="130" width="20" height="20" fill="#94A3B8"/>
+                    <line x1="110" y1="130" x2="110" y2="40" stroke="#1E293B" stroke-width="4"/>
+                    <polygon points="110,30 100,45 120,45" fill="#1E293B"/>
+                    <line x1="40" y1="40" x2="180" y2="40" stroke="#1E293B" stroke-width="4"/>
+                    <line x1="40" y1="40" x2="20" y2="90" stroke="#64748B" stroke-width="2"/>
+                    <line x1="40" y1="40" x2="60" y2="90" stroke="#64748B" stroke-width="2"/>
+                    <path d="M 15 90 Q 40 110 65 90 Z" fill="#E2E8F0" stroke="#1E293B" stroke-width="2"/>
+                    <line x1="180" y1="40" x2="160" y2="90" stroke="#64748B" stroke-width="2"/>
+                    <line x1="180" y1="40" x2="200" y2="90" stroke="#64748B" stroke-width="2"/>
+                    <path d="M 155 90 Q 180 110 205 90 Z" fill="#E2E8F0" stroke="#1E293B" stroke-width="2"/>
+                    
+                    <!-- Esquerda -->
+                    <rect x="25" y="70" width="15" height="15" fill="#0EA5E9"/>
+                    <text x="32" y="82" font-size="10" font-weight="bold" fill="#FFF" text-anchor="middle">x</text>
+                    <rect x="42" y="70" width="15" height="15" fill="#0EA5E9"/>
+                    <text x="49" y="82" font-size="10" font-weight="bold" fill="#FFF" text-anchor="middle">x</text>
+                    
+                    <!-- Direita -->
+                    <circle cx="180" cy="80" r="12" fill="#10B981"/>
+                    <text x="180" y="84" font-size="10" font-weight="bold" fill="#FFF" text-anchor="middle">10</text>
+                </svg>
+            </div>`, options: ["2", "5", "10", "20"], correctIndex: 1, explanation: { correctText: "Do lado esquerdo temos 2x. Do direito temos 10. A equação é 2x = 10. Dividindo, x = 5.", otherOptions: [] } },
+        { level: "Difícil", text: "Quando temos 'x' dos dois lados, como em 5x = 3x + 10, o que fazemos primeiro?", options: ["Cortamos os 'x' e fica 5 = 3 + 10.", "Passamos o 3x para a esquerda subtraindo, juntando as 'letras com as letras'.", "Dividimos tudo por 10.", "Somamos 5x + 3x = 8x."], correctIndex: 1, explanation: { correctText: "Regra de ouro: Letras para a esquerda, números para a direita! O 3x positivo da direita pula a cerca e vira -3x. Fica: 5x - 3x = 10.", otherOptions: [] } },
+        { level: "Difícil", text: "Resolva a equação: 5x = 3x + 8. O valor de x é:", options: ["2", "4", "8", "11"], correctIndex: 1, explanation: { correctText: "O 3x passa para a esquerda: 5x - 3x = 8 ➔ 2x = 8. O 2 passa dividindo: x = 8 ÷ 2 = 4.", otherOptions: [] } },
+        { level: "Médio", text: "Resolva a equação: 4x - 6 = x + 9.", options: ["3", "5", "8", "15"], correctIndex: 1, explanation: { correctText: "O 'x' passa como '-x' e o '-6' passa como '+6'. Fica: 4x - x = 9 + 6 ➔ 3x = 15 ➔ x = 15 ÷ 3 = 5.", otherOptions: [] } },
+        { level: "Difícil", text: "O que a propriedade distributiva (o 'chuveirinho') faz numa equação como 2(x + 3) = 14?", options: ["Multiplica apenas o 'x'.", "Soma 2 com 3.", "O número de fora multiplica TODOS os que estão dentro do parênteses. Ficaria: 2x + 6 = 14.", "Corta os parênteses sem alterar os números."], correctIndex: 2, explanation: { correctText: "O chuveirinho molha todo mundo lá dentro! 2 · x é 2x. 2 · 3 é 6. A equação montada fica 2x + 6 = 14.", otherOptions: [] } },
+        { level: "Difícil", text: "Resolva: 3(x - 2) = 15.", options: ["3", "5", "7", "9"], correctIndex: 2, explanation: { correctText: "Aplicando o chuveirinho: 3x - 6 = 15 ➔ 3x = 15 + 6 ➔ 3x = 21 ➔ x = 21 ÷ 3 = 7.", otherOptions: [] } },
+        { level: "Médio", text: "A metade de um número mais 5 é igual a 10. Qual é a equação e o valor do número?", options: ["x/2 + 5 = 10 ➔ x = 10", "x/2 - 5 = 10 ➔ x = 5", "2x + 5 = 10 ➔ x = 2,5", "x/2 + 5 = 10 ➔ x = 5"], correctIndex: 0, explanation: { correctText: "Equação: x/2 + 5 = 10. O +5 passa como -5 (x/2 = 5). O 2 passa multiplicando (x = 5 · 2 = 10).", otherOptions: [] } },
+        { level: "Fácil", text: "Na equação -x = 7, o que fazemos para encontrar o valor do 'x' positivo?", options: ["Dizemos que não tem solução.", "Multiplicamos ambos os lados da equação por -1, invertendo os sinais de todos. Fica: x = -7.", "Dividimos por 7.", "Somamos 1."], correctIndex: 1, explanation: { correctText: "Sempre que a letra isolada ficar negativa, o truque é multiplicar a linha toda por (-1). Assim, o -x vira +x, e o +7 vira -7.", otherOptions: [] } },
+        { level: "Difícil", text: "Resolva a equação: 7x - 10 = 2x + 20.", options: ["5", "6", "10", "30"], correctIndex: 1, explanation: { correctText: "Letras para a esquerda: 7x - 2x = 5x. Números para a direita: 20 + 10 = 30. Equação: 5x = 30 ➔ x = 30 ÷ 5 = 6.", otherOptions: [] } },
+        { level: "Médio", text: "Se João tem 'x' figurinhas e a sua mãe lhe dá mais 15, ficando com 40. A equação x + 15 = 40 indica que ele tinha inicialmente:", options: ["15", "25", "40", "55"], correctIndex: 1, explanation: { correctText: "x + 15 = 40 ➔ x = 40 - 15 = 25. Ele tinha 25 figurinhas.", otherOptions: [] } },
+        { level: "Médio", text: `Observando a balança:<br>
+            Esquerda: Uma caixa 'x', outra caixa 'x' e um peso de 2kg.<br>
+            Direita: Um peso de 10kg.<br>
+            Qual é a equação que representa isto?`, options: ["x + 2 = 10", "x + x + 2 = 10", "10x = 2", "2x = 10 + 2"], correctIndex: 1, explanation: { correctText: "Um x mais um x (ou 2x) mais 2 é igual a 10. A equação correta é x + x + 2 = 10 (ou 2x + 2 = 10).", otherOptions: [] } },
+        { level: "Fácil", text: "Se x = 3, qual é o valor da expressão 4x + 1?", options: ["5", "7", "12", "13"], correctIndex: 3, explanation: { correctText: "Substituímos o x por 3: 4 · 3 + 1 = 12 + 1 = 13.", otherOptions: [] } },
+        { level: "Difícil", text: "Resolva a equação com frações: (x + 2) / 3 = 4.", options: ["2", "8", "10", "14"], correctIndex: 2, explanation: { correctText: "O 3 que está a dividir tudo passa multiplicando o 4. Fica: x + 2 = 4 · 3 ➔ x + 2 = 12 ➔ x = 12 - 2 = 10.", otherOptions: [] } },
+        { level: "Médio", text: "O quádruplo de um número subtraído de 5 é 27. A equação correta é:", options: ["4x - 5 = 27", "x/4 - 5 = 27", "4(x - 5) = 27", "5 - 4x = 27"], correctIndex: 0, explanation: { correctText: "Quádruplo de um número é 4x. Subtraído de 5 é -5. Logo, 4x - 5 = 27.", otherOptions: [] } },
+        { level: "Difícil", text: "Resolva: 2(x + 5) - 3 = 13.", options: ["3", "5", "8", "11"], correctIndex: 0, explanation: { correctText: "Chuveirinho: 2x + 10 - 3 = 13 ➔ 2x + 7 = 13 ➔ 2x = 13 - 7 ➔ 2x = 6 ➔ x = 3.", otherOptions: [] } },
+        { level: "Fácil", text: "A expressão 2x + 3x pode ser simplificada (juntando as laranjas) para:", options: ["23x", "5x", "6x", "5x²"], correctIndex: 1, explanation: { correctText: "Como as letras são exatamente iguais, basta somar os números (coeficientes). 2 + 3 = 5x.", otherOptions: [] } },
+        { level: "Difícil", text: "Resolva: x + 2x + 3x = 18.", options: ["2", "3", "6", "18"], correctIndex: 1, explanation: { correctText: "Somando todos os 'x' (lembre-se que 'x' é '1x'): 1x + 2x + 3x = 6x. A equação fica 6x = 18 ➔ x = 18 ÷ 6 = 3.", otherOptions: [] } },
+        { level: "Médio", text: "Num parque, o número de cães mais 10 é igual a 30. A equação correta e o número de cães é:", options: ["x + 10 = 30, sendo x = 20", "10x = 30, sendo x = 3", "x - 10 = 30, sendo x = 40", "30 - x = 10, sendo x = 15"], correctIndex: 0, explanation: { correctText: "Número de cães (x) + 10 = 30. Logo, x = 30 - 10 = 20 cães.", otherOptions: [] } },
+        { level: "Difícil", text: "Último desafio: 10 - 2x = -4. Qual o valor de x?", options: ["-3", "3", "7", "14"], correctIndex: 2, explanation: { correctText: "Deixando as letras isoladas: -2x = -4 - 10 ➔ -2x = -14. Multiplicando tudo por -1 fica: 2x = 14 ➔ x = 7.", otherOptions: [] } }
+    ];
+
+    const STORAGE_KEY = 'promover_mat_eq1grau_progress';
+    
+    let quizState = {
+        currentIndex: 0,
+        userAnswers: new Array(questionsDatabase.length).fill(null),
+        confettiAnimationId: null
+    };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    
+                    let lastAnswered = -1;
+                    for (let i = parsed.length - 1; i >= 0; i--) {
+                        if (parsed[i] !== null) {
+                            lastAnswered = i;
+                            break;
+                        }
+                    }
+
+                    if (lastAnswered < questionsDatabase.length - 1) {
+                        quizState.currentIndex = lastAnswered + 1;
+                    } else {
+                        quizState.currentIndex = questionsDatabase.length - 1;
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao carregar progresso:", e);
+        }
+    }
+
+    function saveProgress() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers)); } catch (e) {}
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tem certeza que deseja reiniciar do zero?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            changeApplicationView('practice');
+        }
+    }
+
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function(event) {
+            const searchTerm = event.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let totalVisibleElements = 0;
+            
+            contentGroups.forEach(group => {
+                const groupContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const isMatch = groupContent.includes(searchTerm);
+                
+                group.style.display = isMatch ? 'flex' : 'none';
+                if (isMatch) totalVisibleElements++;
+            });
+            
+            noResultsMsg.style.display = totalVisibleElements === 0 ? 'block' : 'none';
+        });
+    }
+
+    function changeApplicationView(viewName) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        views.forEach(viewId => document.getElementById(viewId).classList.remove('active'));
+        
+        const quizFooter = document.getElementById('quizFooter');
+        if (quizFooter) quizFooter.style.display = 'none';
+
+        if (viewName === 'explanation') {
+            document.getElementById('viewExplanation').classList.add('active');
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (viewName === 'practice') {
+            document.getElementById('viewPractice').classList.add('active');
+            if (quizFooter) quizFooter.style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            
+            renderCurrentQuestion();
+            renderNavigationMap();
+        } else if (viewName === 'result') {
+            document.getElementById('viewResult').classList.add('active');
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function getDifficultyBadgeClass(level) {
+        if (level === 'Fácil') return 'dif-facil';
+        if (level === 'Médio') return 'dif-medio';
+        return 'dif-dificil';
+    }
+
+    function buildOptionsHTML(question, selectedAnswerIndex) {
+        const alphabet = ['A', 'B', 'C', 'D'];
+        return question.options.map((optionText, optionIndex) => {
+            let cssClass = '';
+            if (selectedAnswerIndex !== null) {
+                if (optionIndex === question.correctIndex) cssClass = 'correct';
+                else if (optionIndex === selectedAnswerIndex) cssClass = 'wrong';
+                else cssClass = 'disabled';
+            }
+            const isDisabled = selectedAnswerIndex !== null ? 'disabled' : '';
+            return `
+                <button class="option-btn ${cssClass}" onclick="handleOptionSelection(${optionIndex})" ${isDisabled}>
+                    <div class="opt-circle">${alphabet[optionIndex]}</div>
+                    <div>${optionText}</div>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function buildFeedbackHTML(question, selectedAnswerIndex) {
+        const isCorrect = selectedAnswerIndex === question.correctIndex;
+        const titleClass = isCorrect ? 'success' : 'error';
+        const titleText = isCorrect ? '✅ Resposta Correta!' : '❌ Ops! Errou a continha.';
+        
+        return `
+            <div class="feedback-box show">
+                <div class="feedback-title ${titleClass}" style="color: ${isCorrect ? 'var(--correct-border)' : 'var(--wrong-border)'}">${titleText}</div>
+                <div class="feedback-item correct-opt"><strong>A Resposta Correta:</strong> ${question.options[question.correctIndex]}</div>
+                <div style="margin-top:15px;font-size:1rem;color:var(--text-color);margin-bottom:15px;font-weight:600;">${question.explanation.correctText}</div>
+            </div>
+        `;
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+
+        const question = questionsDatabase[quizState.currentIndex];
+        const selectedAnswerIndex = quizState.userAnswers[quizState.currentIndex];
+        const badgeClass = getDifficultyBadgeClass(question.level);
+        
+        let feedbackHTML = selectedAnswerIndex !== null ? buildFeedbackHTML(question, selectedAnswerIndex) : '';
+
+        container.innerHTML = `
+            <div class="quiz-question-card">
+                <div class="quiz-question-counter">
+                    <span class="difficulty-badge ${badgeClass}" style="margin:0;">${question.level}</span>
+                    <span>QUESTÃO ${quizState.currentIndex + 1} DE ${questionsDatabase.length}</span>
+                </div>
+                <h2 class="quiz-question-text">${question.text}</h2>
+                <div class="options-list">
+                    ${buildOptionsHTML(question, selectedAnswerIndex)}
+                </div>
+                ${feedbackHTML}
+            </div>
+        `;
+        updateNavigationButtons();
+    }
+
+    function handleOptionSelection(selectedIndex) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        
+        quizState.userAnswers[quizState.currentIndex] = selectedIndex;
+        saveProgress();
+
+        const isCorrect = selectedIndex === questionsDatabase[quizState.currentIndex].correctIndex;
+        if (isCorrect) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const container = document.getElementById('quizContainer');
+        if (container) { 
+            container.classList.remove('shake-effect'); 
+            void container.offsetWidth; 
+            container.classList.add('shake-effect'); 
+            setTimeout(() => container.classList.remove('shake-effect'), 500); 
+        }
+    }
+
+    function startSuccessAnimation() {
+        stopSuccessAnimation();
+        const end = Date.now() + 1500;
+        function animateFrame() {
+            if(window.confetti) {
+                confetti({ particleCount: 5, spread: 55, colors: ['#0EA5E9', '#10B981', '#F97316', '#C2410C'], angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ particleCount: 5, spread: 55, colors: ['#0EA5E9', '#10B981', '#F97316', '#C2410C'], angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(animateFrame);
+        }
+        animateFrame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && typeof confetti.reset === 'function') confetti.reset(); 
+        if (quizState.confettiAnimationId) {
+            cancelAnimationFrame(quizState.confettiAnimationId);
+            quizState.confettiAnimationId = null;
+        }
+    }
+
+    function renderNavigationMap() {
+        const mapContainer = document.getElementById('qMap');
+        if (!mapContainer) return;
+        mapContainer.innerHTML = questionsDatabase.map((question, index) => {
+            const isCurrent = index === quizState.currentIndex;
+            const userAnswer = quizState.userAnswers[index];
+            const hasAnswered = userAnswer !== null;
+            const isCorrect = userAnswer === question.correctIndex;
+            
+            let cssClass = 'map-dot';
+            if (isCurrent) cssClass += ' active';
+            if (hasAnswered) cssClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+            return `<div class="${cssClass}" onclick="goToQuestion(${index})">${index + 1}</div>`;
+        }).join('');
+        
+        setTimeout(() => { 
+            const activeDot = mapContainer.querySelector('.map-dot.active'); 
+            if (activeDot) activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); 
+        }, 50);
+    }
+
+    function goToQuestion(targetIndex) { 
+        stopSuccessAnimation();
+        quizState.currentIndex = targetIndex; 
+        renderCurrentQuestion(); 
+        renderNavigationMap(); 
+    }
+    
+    function navigateQuestion(directionOffset) { 
+        const nextIndex = quizState.currentIndex + directionOffset; 
+        if (nextIndex >= 0 && nextIndex < questionsDatabase.length) goToQuestion(nextIndex); 
+    }
+
+    function updateNavigationButtons() {
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        if (btnPrev) btnPrev.disabled = (quizState.currentIndex === 0);
+        if (btnNext) {
+            if (quizState.currentIndex === questionsDatabase.length - 1) { 
+                btnNext.textContent = "Finalizar Avaliação"; 
+                btnNext.onclick = finishQuiz; 
+            } else { 
+                btnNext.textContent = "Próxima ➡️"; 
+                btnNext.onclick = () => navigateQuestion(1); 
+            }
+        }
+    }
+
+    function finishQuiz() {
+        const unansweredCount = quizState.userAnswers.filter(answer => answer === null).length;
+        if (unansweredCount > 0) {
+            if (!confirm(`Faltam responder ${unansweredCount} questões. Tem a certeza de que quer terminar?`)) return;
+        }
+        stopSuccessAnimation();
+
+        const correctAnswersCount = quizState.userAnswers.filter((answer, index) => answer === questionsDatabase[index].correctIndex).length;
+        const totalQuestions = questionsDatabase.length;
+        const percentageScore = Math.round((correctAnswersCount / totalQuestions) * 100);
+        const isApproved = percentageScore >= 80;
+        
+        document.getElementById('finalPercent').textContent = `${percentageScore}%`;
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correctAnswersCount} de ${totalQuestions}`;
+        
+        let stars = "🌑";
+        if (percentageScore === 100) stars = "⭐⭐⭐⭐⭐";
+        else if (percentageScore >= 80) stars = "⭐⭐⭐⭐";
+        else if (percentageScore >= 60) stars = "⭐⭐⭐";
+        else if (percentageScore >= 40) stars = "⭐⭐";
+        else if (percentageScore > 0) stars = "⭐";
+        document.getElementById('finalStars').textContent = stars;
+
+        const actionButtonsContainer = document.getElementById('action-buttons');
+        const reviewContainer = document.getElementById('review-container');
+        
+        if (isApproved) {
+            reviewContainer.innerHTML = `<div class="result-summary-box success"><strong>🎉 MESTRE DAS EQUAÇÕES!</strong> Isolaste o 'x' como um profissional! A tua balança algébrica está em perfeito equilíbrio.</div>`;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR E REPETIR PARA 100%</button>`;
+        } else {
+            reviewContainer.innerHTML = `<div class="result-summary-box error"><strong>⚠️ DESEQUILÍBRIO NA BALANÇA!</strong> Avaliado abaixo da meta (80%). Revisa as operações inversas (soma vira subtração, multiplicar vira dividir).</div>`;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR E REFAZER AVALIAÇÃO</button>`;
+        }
+        
+        if (correctAnswersCount < totalQuestions) {
+            let errorHTML = '<h4 style="margin-top:15px; margin-bottom:15px;">Correções:</h4>';
+            questionsDatabase.forEach((question, index) => {
+                const userAnswerIndex = quizState.userAnswers[index];
+                if (userAnswerIndex !== question.correctIndex) {
+                    const userAnswerText = userAnswerIndex === null ? "Em branco" : question.options[userAnswerIndex];
+                    let plainQuestionText = question.text.replace(/<div class="q-svg-container">[\s\S]*?<\/div>/gi, ' [Desenho Omitido] ');
+                    errorHTML += `
+                        <div class="error-log-item">
+                            <strong>Q${index + 1}: ${plainQuestionText}</strong><br>
+                            <span style="color:var(--wrong-border);">Sua resposta: ${userAnswerText}</span><br>
+                            <span style="color:var(--correct-border);">Correta: ${question.options[question.correctIndex]}</span>
+                        </div>`;
+                }
+            });
+            reviewContainer.innerHTML += errorHTML;
+        }
+
+        changeApplicationView('result');
+    }
+    
+    // Inicia a aplicação
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>
