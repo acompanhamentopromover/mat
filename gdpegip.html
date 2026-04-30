@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matemática: Grandezas Proporcionais - Promover</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* --- VARIÁVEIS DE COR E TEMA: GRANDEZAS (Ciano e Laranja) --- */
+        :root {
+            --bg-color: #F0F9FF; 
+            --text-color: #0C4A6E; 
+            --border-color: #0369A1; 
+            --white: #FFFFFF;
+            
+            --theme-light: #E0F2FE; 
+            --theme-medium: #38BDF8; 
+            --theme-dark: #0284C7; 
+            --theme-contrast: #F97316; /* Laranja para Inversamente Proporcional */
+            --theme-accent: #10B981; /* Verde para Diretamente Proporcional */
+            --theme-text-active: #FFFFFF;
+            
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #E11D48;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px 120px 15px;
+            background-image: radial-gradient(var(--theme-light) 2px, transparent 2px);
+            background-size: 25px 25px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05) rotate(-3deg); color: var(--theme-contrast); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+        .pulse-effect { animation: pulse 2.5s infinite; display: inline-block; }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        .container { width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 25px; }
+        .logo-header { display: flex; flex-direction: column; align-items: center; padding: 15px 0 25px 0; text-align: center; }
+        .css-logo { font-size: 1.5rem; font-weight: 900; color: var(--theme-text-active); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 24px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); margin-bottom: 15px; transform: rotate(-2deg); }
+        h1 { font-size: 2rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: -0.5px; line-height: 1.1; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); }
+        .subtitle { font-size: 1rem; color: var(--white); font-weight: 700; margin-top: 5px; background: var(--theme-contrast); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--border-color); }
+
+        .toggle-container { background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; box-shadow: 4px 4px 0px var(--border-color); position: sticky; top: 15px; z-index: 50; }
+        .toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; transition: all 0.2s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); border: 2px solid var(--border-color); box-shadow: 2px 2px 0px var(--border-color); }
+
+        .view-section { display: none; animation: fadeIn 0.3s ease; flex-direction: column; gap: 35px; }
+        .view-section.active { display: flex; }
+
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 16px 20px 16px 55px; border: 3px solid var(--border-color); border-radius: 12px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+        #no-results { text-align: center; color: var(--wrong-border); font-weight: 800; display: none; background: var(--wrong-bg); padding: 15px; border: 3px solid var(--wrong-border); border-radius: 8px; }
+
+        .content-group { display: flex; flex-direction: column; position: relative; padding-top: 15px; }
+        .section-badge { display: inline-flex; align-items: center; gap: 10px; background-color: var(--theme-dark); color: var(--white); font-size: 1.1rem; font-weight: 800; padding: 8px 20px; border-radius: 8px; border: 3px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); text-transform: uppercase; position: absolute; top: -5px; left: 15px; z-index: 10; transform: rotate(-1.5deg); }
+        .theory-box { display: flex; flex-direction: column; padding: 35px 25px 25px 35px; border-radius: 12px; background-color: var(--white); border: 3px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); font-weight: 500; font-size: 1rem; line-height: 1.7; position: relative; overflow: hidden; gap: 20px; border-left: 14px solid var(--theme-medium); }
+        .theory-box h3 { font-size: 1.35rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        
+        .visual-area { background: var(--bg-color); border: 3px dashed var(--theme-medium); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; margin: 15px 0; overflow: hidden;}
+        
+        .inline-example { display: block; width: fit-content; max-width: 100%; margin-top: 6px; margin-bottom: 6px; padding: 12px 20px; background-color: var(--theme-light); border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.1rem; color: var(--theme-dark); font-weight: 800; letter-spacing: 0.5px; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); text-align: center;}
+        
+        .highlight-box { background-color: #FEF3C7; border: 3px solid var(--border-color); border-left: 8px solid var(--theme-contrast); padding: 18px 20px; border-radius: 8px; font-size: 0.95rem; color: #92400E; font-weight: 600; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); }
+        .highlight-box.green { background-color: #ECFDF5; border-left-color: #10B981; color: #064E3B; }
+        .highlight-box.orange { background-color: #FFF7ED; border-left-color: #F97316; color: #9A3412; }
+
+        .btn-action { width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 10px; }
+        .btn-action:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .btn-resume { background-color: #F59E0B; color: #000; border-color: #000; box-shadow: 6px 6px 0px #000; display: none; }
+
+        .difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil { background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar { display: none; }
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+        .map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .quiz-question-card { border: 4px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 30px; border-radius: 16px; background: var(--white); }
+        .quiz-question-counter { font-size: 0.85rem; font-weight: 900; color: var(--theme-dark); letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .quiz-question-text { font-size: 1.15rem; margin-top: 8px; color: var(--text-color); font-weight: 800; line-height: 1.5; margin-bottom: 20px;}
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 18px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-contrast); }
+        .opt-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.05rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 25px; background-color: var(--white); border: 3px solid var(--border-color); border-radius: 12px; padding: 25px; animation: slideUp 0.3s ease-out; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .feedback-item { margin-bottom: 10px; font-size: 0.95rem; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); line-height: 1.5; font-weight: 500; }
+        .feedback-item.correct-opt { background: var(--correct-bg); border-color: var(--correct-border); color: #059669; font-weight: 700; box-shadow: 3px 3px 0px var(--correct-border); }
+        .feedback-item.wrong-opt { background: #F1F5F9; border-color: #94A3B8; color: #475569; border-style: dashed; margin-top: 8px; }
+
+        .result-card { background: white; border: 4px solid var(--border-color); border-radius: 16px; padding: 40px 20px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 2.5rem; margin: 15px 0; letter-spacing: 5px; }
+        .percentage-big { font-size: 5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-contrast); }
+        
+        .result-summary-box { padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 3px solid; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
+        .result-summary-box.success { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .result-summary-box.error { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .error-log-item { margin-bottom: 15px; padding: 20px; background: var(--bg-color); border-radius: 12px; border: 3px dashed var(--theme-medium); text-align: left;}
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: center; gap: 20px; z-index: 100; box-shadow: 0px -4px 10px rgba(0,0,0,0.05); }
+        .nav-btn { padding: 15px 30px; border-radius: 12px; font-weight: 900; border: 3px solid var(--border-color); cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase; background: white; color: var(--text-color); font-size: 1rem; transition: transform 0.1s; }
+        .nav-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 0px 0px 0px transparent; }
+        .btn-next { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); border-color: var(--border-color); }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
+        .math-eq { display: inline-flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 900; gap: 10px; margin: 10px 0;}
+        .math-frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 5px; }
+        .math-frac span:first-child { border-bottom: 3px solid currentColor; padding: 2px 8px; width: 100%; text-align: center; }
+        .math-frac span:last-child { padding: 2px 8px; width: 100%; text-align: center; }
+        .q-svg-container { display: flex; justify-content: center; margin: 15px 0; background: var(--white); border-radius: 8px; padding: 10px; border: 2px dashed #94A3B8; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="logo-header">
+            <div class="css-logo"><span class="pulse-effect">⚖️</span> PROMOVER</div>
+            <h1>Matemática / Ensino Fundamental</h1>
+            <p class="subtitle">Grandezas Diretamente e Inversamente Proporcionais</p>
+        </header>
+
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="btnExp" onclick="changeApplicationView('explanation')">📘 Teoria</button>
+            <button class="toggle-btn" id="btnPrac" onclick="changeApplicationView('practice')">🧠 Prática (35)</button>
+        </div>
+
+        <main id="viewExplanation" class="view-section active">
+            
+            <div class="search-container">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar... (ex: Grandezas, Direta, Inversa, Regra de Três)">
+            </div>
+            <div id="no-results"><p>😕 Termo não encontrado na teoria.</p></div>
+
+            <section class="content-group">
+                <div class="section-badge">📏 1. O que é uma Grandeza?</div>
+                <article class="theory-box search-target">
+                    <h3>Tudo o que se pode medir</h3>
+                    <p>Em matemática e física, uma <strong>Grandeza</strong> é tudo aquilo que pode ser medido, contado ou pesado. </p>
+                    <p><strong>Exemplos:</strong> Tempo (horas), Velocidade (km/h), Distância (metros), Preço (euros/reais), Número de operários, Quantidade de fatias de pizza.</p>
+                    <p><em>Emoções como "Alegria" ou "Amor" NÃO são grandezas porque não as podemos medir numa balança!</em></p>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge" style="background-color: var(--theme-accent);">📈 2. Grandezas Diretamente Proporcionais (GDP)</div>
+                <article class="theory-box search-target" style="border-left-color: var(--theme-accent);">
+                    <h3 style="color: var(--theme-accent);">As Duas Sobem Juntas!</h3>
+                    <p>Duas grandezas são <strong>Diretamente Proporcionais</strong> quando o aumento de uma provoca o aumento da outra na <strong>mesma proporção</strong> (ou se uma diminui, a outra diminui igualmente).</p>
+                    
+                    <div class="visual-area">
+                        <svg viewBox="0 0 200 150" width="100%" height="auto" style="max-width: 200px;">
+                            <!-- Eixos -->
+                            <line x1="20" y1="130" x2="180" y2="130" stroke="#1E293B" stroke-width="2" marker-end="url(#arrow-axis)"/>
+                            <line x1="20" y1="130" x2="20" y2="20" stroke="#1E293B" stroke-width="2" marker-end="url(#arrow-axis)"/>
+                            <!-- Reta Crescente -->
+                            <line x1="20" y1="130" x2="160" y2="30" stroke="#10B981" stroke-width="4"/>
+                            
+                            <text x="170" y="145" font-size="12" font-weight="bold" fill="#0F172A">Unidades</text>
+                            <text x="5" y="15" font-size="12" font-weight="bold" fill="#0F172A">Preço</text>
+                            
+                            <defs>
+                                <marker id="arrow-axis" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1E293B"/></marker>
+                            </defs>
+                        </svg>
+                        <p style="font-size: 0.85rem; font-weight: 700; color: var(--theme-dark); margin-top: 10px;">O Gráfico de uma GDP é sempre uma <strong>Linha Reta</strong> que passa pela origem (0,0).</p>
+                    </div>
+
+                    <div class="highlight-box green">
+                        <strong>O Exemplo do Supermercado:</strong><br>
+                        Se 1 maçã custa R$ 2,00...<br>
+                        Se eu comprar <strong>o dobro</strong> (2 maçãs), vou pagar <strong>o dobro</strong> (R$ 4,00).<br>
+                        <em>A divisão (razão) entre elas é sempre constante: 2/1 = 4/2 = 2.</em>
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge" style="background-color: var(--theme-contrast);">📉 3. Grandezas Inversamente Proporcionais (GIP)</div>
+                <article class="theory-box search-target" style="border-left-color: var(--theme-contrast);">
+                    <h3 style="color: var(--theme-contrast);">A Gangorra: Uma Sobe, Outra Desce</h3>
+                    <p>Duas grandezas são <strong>Inversamente Proporcionais</strong> quando o aumento de uma provoca a diminuição da outra na <strong>mesma proporção</strong>.</p>
+                    
+                    <div class="visual-area">
+                        <svg viewBox="0 0 200 150" width="100%" height="auto" style="max-width: 200px;">
+                            <!-- Eixos -->
+                            <line x1="20" y1="130" x2="180" y2="130" stroke="#1E293B" stroke-width="2" marker-end="url(#arrow-axis)"/>
+                            <line x1="20" y1="130" x2="20" y2="20" stroke="#1E293B" stroke-width="2" marker-end="url(#arrow-axis)"/>
+                            <!-- Curva (Hipérbole) -->
+                            <path d="M 30 30 Q 50 110 160 120" fill="none" stroke="#F97316" stroke-width="4"/>
+                            
+                            <text x="160" y="145" font-size="12" font-weight="bold" fill="#0F172A">Velocidade</text>
+                            <text x="5" y="15" font-size="12" font-weight="bold" fill="#0F172A">Tempo</text>
+                        </svg>
+                        <p style="font-size: 0.85rem; font-weight: 700; color: var(--theme-dark); margin-top: 10px;">O Gráfico de uma GIP é sempre uma curva chamada <strong>Hipérbole</strong>.</p>
+                    </div>
+
+                    <div class="highlight-box orange">
+                        <strong>O Exemplo da Viagem:</strong><br>
+                        Para ir a uma cidade a 50 km/h, levo 2 horas.<br>
+                        Se eu for <strong>o dobro</strong> mais rápido (100 km/h), o tempo da viagem cai pela <strong>metade</strong> (1 hora).<br>
+                        <em>A multiplicação (produto) entre elas é sempre constante: 50 × 2 = 100 × 1 = 100.</em>
+                    </div>
+                </article>
+            </section>
+
+            <section class="content-group">
+                <div class="section-badge">✖️ 4. Como Resolver? (Regra de Três Simples)</div>
+                <article class="theory-box search-target">
+                    <h3>O Truque das Setas</h3>
+                    <p>Para resolver problemas de proporção, montamos as frações lado a lado e usamos um truque visual para saber como multiplicar:</p>
+                    
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 30px; margin-top: 15px; margin-bottom: 15px;">
+                        
+                        <!-- Regra Direta -->
+                        <div style="background: white; border-radius: 8px; padding: 15px; border: 3px solid var(--theme-accent); display: flex; flex-direction: column; align-items: center;">
+                            <span style="font-weight: 900; color: var(--theme-accent); margin-bottom: 10px;">SE FOR DIRETA (GDP)</span>
+                            <div class="math-eq" style="margin: 0;">
+                                <div class="math-frac"><span>1</span><span>2</span></div>
+                                <svg width="40" height="40" viewBox="0 0 40 40" style="margin: 0 -10px; z-index: 1;">
+                                    <line x1="5" y1="5" x2="35" y2="35" stroke="#10B981" stroke-width="4" marker-end="url(#arrow-green)"/>
+                                    <line x1="5" y1="35" x2="35" y2="5" stroke="#10B981" stroke-width="4" marker-end="url(#arrow-green)"/>
+                                    <defs>
+                                        <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#10B981"/></marker>
+                                    </defs>
+                                </svg>
+                                <div class="math-frac"><span>2</span><span style="color: var(--theme-accent);">x</span></div>
+                            </div>
+                            <span style="font-size: 0.9rem; font-weight: 700; margin-top: 10px;">Multiplica em CRUZ ("X")</span>
+                            <span style="font-size: 0.85rem;">1·x = 2·2 ➔ x = 4</span>
+                        </div>
+                        
+                        <!-- Regra Inversa -->
+                        <div style="background: white; border-radius: 8px; padding: 15px; border: 3px solid var(--theme-contrast); display: flex; flex-direction: column; align-items: center;">
+                            <span style="font-weight: 900; color: var(--theme-contrast); margin-bottom: 10px;">SE FOR INVERSA (GIP)</span>
+                            <div class="math-eq" style="margin: 0;">
+                                <div class="math-frac"><span>50</span><span>100</span></div>
+                                <svg width="40" height="40" viewBox="0 0 40 40" style="margin: 0 5px;">
+                                    <line x1="0" y1="10" x2="40" y2="10" stroke="#F97316" stroke-width="4" marker-end="url(#arrow-orange)"/>
+                                    <line x1="0" y1="30" x2="40" y2="30" stroke="#F97316" stroke-width="4" marker-end="url(#arrow-orange)"/>
+                                    <defs>
+                                        <marker id="arrow-orange" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#F97316"/></marker>
+                                    </defs>
+                                </svg>
+                                <div class="math-frac"><span>2</span><span style="color: var(--theme-contrast);">x</span></div>
+                            </div>
+                            <span style="font-size: 0.9rem; font-weight: 700; margin-top: 10px;">Multiplica A DIREITO (Reto)</span>
+                            <span style="font-size: 0.85rem;">100·x = 50·2 ➔ 100x = 100 ➔ x = 1</span>
+                        </div>
+
+                    </div>
+                </article>
+            </section>
+
+            <button class="btn-action" onclick="changeApplicationView('practice')">
+                Iniciar a Avaliação (35 Questões) ➜
+            </button>
+            <button class="btn-action btn-resume" id="btnResumeQuiz" onclick="changeApplicationView('practice')">
+                Retomar Exame em Andamento 🔄
+            </button>
+        </main>
+
+        <main id="viewPractice" class="view-section">
+            <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+                <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo</h2>
+                <p style="color: var(--theme-dark); font-size: 0.95rem; font-weight:600;">
+                    35 questões sobre interpretação de Grandezas e cálculos com Regra de Três. Acerte <strong>80% (28/35)</strong> para dominar!
+                </p>
+            </div>
+            
+            <div class="question-map" id="qMap"></div>
+            <div id="quizContainer" style="margin-bottom: 40px;"></div>
+        </main>
+
+        <main id="viewResult" class="view-section">
+            <div class="result-card">
+                <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+                <div class="stars-container" id="finalStars">⭐⭐⭐</div>
+                <div class="percentage-big" id="finalPercent">0%</div>
+                <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 35</p>
+                <div id="review-container" style="text-align: left; margin-top: 20px;"></div>
+            </div>
+            <div id="action-buttons"></div>
+        </main>
+
+    </div>
+
+    <footer class="quiz-footer" id="quizFooter">
+        <button class="nav-btn btn-prev" id="btnPrev" onclick="navigateQuestion(-1)">Anterior</button>
+        <button class="nav-btn btn-next" id="btnNext" onclick="navigateQuestion(1)">Próxima ➡️</button>
+    </footer>
+
+<script>
+    /* --- ESTRUTURA DE DADOS (BASE DE QUESTÕES - Grandezas) --- */
+    const questionsDatabase = [
+        { level: "Fácil", text: "O que é considerado uma 'Grandeza' na matemática e na física?", options: ["Apenas números inteiros positivos.", "Qualquer emoção ou sentimento humano.", "Tudo aquilo que pode ser contado, medido, pesado ou comparado numericamente.", "Apenas medidas de distância como metros e quilômetros."], correctIndex: 2, explanation: { correctText: "Grandezas são valores físicos mensuráveis. Preço, velocidade, volume, tempo, quantidade de maçãs... tudo isso pode ser medido e calculado.", otherOptions: [] } },
+        { level: "Fácil", text: "Qual das opções abaixo NÃO é um exemplo de grandeza matemática?", options: ["Velocidade de um carro.", "Temperatura da água.", "Felicidade de um estudante.", "Peso de um pacote de arroz."], correctIndex: 2, explanation: { correctText: "Felicidade é um sentimento subjetivo, não pode ser medido com uma fita métrica, relógio ou balança. Logo, não entra nos cálculos matemáticos.", otherOptions: [] } },
+        { level: "Fácil", text: "Duas grandezas são classificadas como DIRETAMENTE Proporcionais (GDP) quando:", options: ["Se uma grandeza aumenta, a outra diminui na mesma proporção.", "Se uma grandeza aumenta, a outra aumenta também, sempre na MESMA proporção.", "Uma delas permanece sempre com o valor zero.", "Elas não possuem relação lógica entre si."], correctIndex: 1, explanation: { correctText: "Diretamente proporcionais andam juntas! Se eu dobro a quantidade de pães que compro, o preço a pagar também dobra.", otherOptions: [] } },
+        { level: "Fácil", text: "Duas grandezas são classificadas como INVERSAMENTE Proporcionais (GIP) quando:", options: ["Se uma grandeza aumenta (dobra), a outra DIMINUI na mesma proporção (cai pela metade).", "Se uma aumenta, a outra aumenta ao quadrado.", "Ambas diminuem para zero.", "A soma das duas grandezas é sempre igual a 100."], correctIndex: 0, explanation: { correctText: "É o efeito gangorra! Um exemplo clássico: se aumento a velocidade do carro, o tempo da viagem diminui. São inversas.", otherOptions: [] } },
+        { level: "Médio", text: "Relação do dia a dia: O 'Número de pães comprados' e o 'Preço total a pagar' são grandezas:", options: ["Inversamente proporcionais.", "Diretamente proporcionais.", "Não proporcionais.", "Inversamente proporcionais ao quadrado."], correctIndex: 1, explanation: { correctText: "Mais pães = Maior preço. Como ambas as setas sobem juntas, a relação é DIRETAMENTE proporcional.", otherOptions: [] } },
+        { level: "Médio", text: "A 'Velocidade Média de um trem' e o 'Tempo que ele leva para chegar ao destino' são grandezas:", options: ["Inversamente proporcionais.", "Diretamente proporcionais.", "Não proporcionais.", "Diretamente constantes."], correctIndex: 0, explanation: { correctText: "Se o trem for mais rápido (Maior Velocidade), ele chegará mais cedo (Menor Tempo). Como uma sobe e a outra desce, são INVERSAMENTE proporcionais.", otherOptions: [] } },
+        { level: "Médio", text: "O 'Número de pedreiros trabalhando numa obra' e o 'Tempo (dias) necessário para terminar a obra' são grandezas:", options: ["Diretamente proporcionais.", "Inversamente proporcionais.", "Não proporcionais.", "Exponenciais."], correctIndex: 1, explanation: { correctText: "Mais gente a trabalhar = Menos dias para acabar a obra. Uma seta sobe, a outra desce. São Inversamente Proporcionais.", otherOptions: [] } },
+        { level: "Fácil", text: "A 'Idade de uma pessoa' e a 'Altura da pessoa' em centímetros são grandezas:", options: ["Diretamente proporcionais.", "Inversamente proporcionais.", "NÃO são proporcionais.", "Exatamente iguais."], correctIndex: 2, explanation: { correctText: "Atenção à rasteira! Embora tu cresças ao ficar mais velho na infância, isso não é uma proporção matemática exata (ter 20 anos não significa ter o dobro da altura de quem tem 10). E depois de adulto a altura para de mudar, mas a idade continua a subir. NÃO são proporcionais.", otherOptions: [] } },
+        { level: "Fácil", text: "Ao observar um gráfico no teste de matemática, você nota que o desenho é uma LINHA RETA que parte do zero (origem) e sobe como uma ladeira. Este gráfico representa grandezas:", options: ["Inversamente proporcionais.", "Diretamente proporcionais.", "Aleatórias.", "Exponenciais reversas."], correctIndex: 1, explanation: { correctText: "A linha reta que parte do zero (0,0) é a 'impressão digital' das Grandezas Diretamente Proporcionais.", otherOptions: [] } },
+        { level: "Médio", text: "No mesmo teste, o segundo gráfico mostra uma CURVA que desce escorregando e nunca toca exatamente nos eixos (uma Hipérbole). Este gráfico representa grandezas:", options: ["Inversamente proporcionais.", "Diretamente proporcionais.", "Linearmente constantes.", "Não proporcionais."], correctIndex: 0, explanation: { correctText: "A curva em forma de 'escorregador' (Hipérbole equilátera) é a prova visual de que as grandezas são Inversamente Proporcionais (se X cresce, Y cai rapidamente).", otherOptions: [] } },
+        { level: "Médio", text: `Para resolver um problema de grandezas DIRETAMENTE proporcionais usando a Regra de Três, qual é a operação geométrica das setas na hora de multiplicar?<br>
+            <div class="q-svg-container">
+                <svg width="120" height="80" viewBox="0 0 120 80">
+                    <text x="20" y="30" font-size="16" font-weight="bold">A</text>
+                    <text x="80" y="30" font-size="16" font-weight="bold">B</text>
+                    <text x="20" y="70" font-size="16" font-weight="bold">C</text>
+                    <text x="80" y="70" font-size="16" font-weight="bold">x</text>
+                </svg>
+            </div>`, options: ["Multiplica-se os valores na horizontal (a direito). Ex: A · B.", "Multiplica-se os valores em CRUZ ('X'). Ex: A · x = B · C.", "Soma-se todos os valores e divide por 2.", "Eleva-se tudo ao quadrado."], correctIndex: 1, explanation: { correctText: "Nas grandezas DIRETAS, a regra é multiplicar sempre 'cruzado', formando um X perfeito entre os números das colunas.", otherOptions: [] } },
+        { level: "Médio", text: `Se o problema for de grandezas INVERSAMENTE proporcionais (gangorra), como se multiplica os valores montados na Regra de Três?<br>
+            <div class="q-svg-container">
+                <svg width="120" height="80" viewBox="0 0 120 80">
+                    <text x="20" y="30" font-size="16" font-weight="bold">A</text>
+                    <text x="80" y="30" font-size="16" font-weight="bold">B</text>
+                    <text x="20" y="70" font-size="16" font-weight="bold">C</text>
+                    <text x="80" y="70" font-size="16" font-weight="bold">x</text>
+                </svg>
+            </div>`, options: ["Multiplica-se em CRUZ.", "Soma-se a primeira coluna.", "Multiplica-se A DIREITO (linha horizontal reta). Ex: A · B = C · x.", "Corta-se a linha de cima."], correctIndex: 2, explanation: { correctText: "Nas grandezas INVERSAS, as setas não se cruzam! Você multiplica a linha de cima com a linha de cima, e a de baixo com a de baixo (A · B = C · x).", otherOptions: [] } },
+        { level: "Fácil", text: "Problema Prático: Se 3 cadernos custam R$ 12,00. Quanto custarão 6 cadernos?", options: ["R$ 6,00", "R$ 15,00", "R$ 24,00", "R$ 36,00"], correctIndex: 2, explanation: { correctText: "São Diretamente Proporcionais (mais cadernos = mais dinheiro). Como o número de cadernos dobrou (de 3 para 6), o preço também dobra (de 12 para 24).", otherOptions: [] } },
+        { level: "Médio", text: "Problema Prático: Uma receita de bolo para 4 pessoas usa 200 gramas de farinha. Para fazer esse bolo para 10 pessoas, quantas gramas de farinha serão necessárias?", options: ["400 gramas.", "500 gramas.", "600 gramas.", "800 gramas."], correctIndex: 1, explanation: { correctText: "Diretamente Proporcional! 4 pessoas = 200g. 10 pessoas = x. Cruzando: 4x = 200 · 10 ➔ 4x = 2000 ➔ x = 2000 / 4 = 500g.", otherOptions: [] } },
+        { level: "Difícil", text: "Problema Prático: Se 5 operários constroem um muro em 12 dias. Quantos dias levariam 10 operários para construir exatamente o mesmo muro?", options: ["24 dias.", "12 dias.", "6 dias.", "3 dias."], correctIndex: 2, explanation: { correctText: "Atenção: Inversamente Proporcional! Mais operários = MENOS dias. Como dobrei os operários (5 para 10), o tempo cai pela metade (12 para 6). Cálculo: 5 · 12 = 10 · x ➔ 60 = 10x ➔ x = 6.", otherOptions: [] } },
+        { level: "Médio", text: "Problema Prático: Um carro a uma velocidade média de 60 km/h faz uma viagem em 4 horas. Se a velocidade aumentar para 80 km/h, qual será o tempo da viagem?", options: ["5 horas.", "3 horas.", "2 horas.", "6 horas."], correctIndex: 1, explanation: { correctText: "Velocidade e Tempo = INVERSO. Multiplica a direito: 60 · 4 = 80 · x ➔ 240 = 80x ➔ x = 240 / 80 = 3 horas.", otherOptions: [] } },
+        { level: "Fácil", text: "Numa torneira, a quantidade de água desperdiçada é DIRETAMENTE proporcional ao tempo que ela fica aberta. Se em 1 minuto pingam 5 litros, em 10 minutos pingarão:", options: ["10 litros.", "25 litros.", "50 litros.", "100 litros."], correctIndex: 2, explanation: { correctText: "Diretamente proporcional: Basta multiplicar por 10. 5 litros x 10 = 50 litros desperdiçados.", otherOptions: [] } },
+        { level: "Médio", text: "A distância percorrida por um carro e a quantidade de gasolina gasta na viagem são grandezas:", options: ["Diretamente proporcionais.", "Inversamente proporcionais.", "Não proporcionais.", "Nenhuma das anteriores."], correctIndex: 0, explanation: { correctText: "Quanto MAIOR a distância que viajas, MAIOR a quantidade de gasolina que o carro queima. As duas sobem juntas: Diretamente proporcionais.", otherOptions: [] } },
+        { level: "Médio", text: "A quantidade de ração num abrigo de cães dá para alimentar 20 cães durante 15 dias. Se chegarem mais 10 cães ao abrigo (totalizando 30 cães), a ração vai durar:", options: ["Mais dias (22 dias).", "Exatamente o mesmo tempo (15 dias).", "Menos dias (10 dias).", "Zero dias."], correctIndex: 2, explanation: { correctText: "Mais cães = a comida acaba mais rápido (INVERSO). 20 cães · 15 dias = 30 cães · x. ➔ 300 = 30x ➔ x = 300 / 30 = 10 dias.", otherOptions: [] } },
+        { level: "Difícil", text: "Uma fábrica tem máquinas que produzem 500 camisas por dia trabalhando 8 horas por dia. Se a fábrica reduzir a carga para 4 horas por dia, a produção de camisas cairá para:", options: ["1000 camisas.", "500 camisas.", "250 camisas.", "100 camisas."], correctIndex: 2, explanation: { correctText: "Menos horas trabalhando = MENOS camisas produzidas. As duas setas caem, logo são DIRETAMENTE proporcionais! Como o tempo caiu pela metade, a produção cai pela metade (250).", otherOptions: [] } },
+        { level: "Fácil", text: "Para grandezas DIRETAMENTE proporcionais (y e x), qual regra matemática define a constante de proporcionalidade (k)?", options: ["A soma das grandezas é constante (x + y = k).", "A divisão (razão) das grandezas é constante (y / x = k).", "A multiplicação das grandezas é constante (x · y = k).", "A diferença é constante (y - x = k)."], correctIndex: 1, explanation: { correctText: "Nas grandezas diretas, a divisão é constante. Ex: Se pago R$ 10 por 5 pães, 10/5 = 2. R$ 20 por 10 pães, 20/10 = 2. A constante (k) é sempre 2.", otherOptions: [] } },
+        { level: "Médio", text: "Para grandezas INVERSAMENTE proporcionais (y e x), qual regra matemática define a constante (k)?", options: ["A soma das grandezas é constante.", "A divisão das grandezas é constante.", "A multiplicação (produto) das grandezas é sempre constante (x · y = k).", "As grandezas anulam-se para zero."], correctIndex: 2, explanation: { correctText: "A multiplicação é fixa! Exemplo de viagem de 100km: Vel 50 km/h · 2h = 100. Vel 100 km/h · 1h = 100. O produto é sempre a distância fixa (k=100).", otherOptions: [] } },
+        { level: "Difícil", text: "Se a grandeza A é diretamente proporcional à grandeza B. Quando a grandeza A é multiplicada por 3, o que deve acontecer matematicamente à grandeza B?", options: ["Ela é dividida por 3.", "Ela é multiplicada por 3, para manter a divisão constante.", "Ela permanece igual.", "Ela soma-se com 3."], correctIndex: 1, explanation: { correctText: "Proporção Direta: o que acontece a uma, acontece EXATAMENTE igual à outra. Se uma triplica, a outra triplica.", otherOptions: [] } },
+        { level: "Fácil", text: "Verdadeiro ou Falso: 'O tamanho do sapato de uma pessoa e a nota que ela tira na prova de matemática são grandezas diretamente proporcionais'.", options: ["Verdadeiro, pés grandes dão boas notas.", "Falso, são grandezas inversamente proporcionais.", "Falso, não existe nenhuma relação de proporcionalidade (ou correlação matemática lógica) entre calçado e inteligência.", "Verdadeiro apenas no inverno."], correctIndex: 2, explanation: { correctText: "Nem todos os números do mundo estão interligados. Muitas coisas não são grandezas com relação matemática de causa e efeito.", otherOptions: [] } },
+        { level: "Médio", text: "Lendo uma tabela: Uma máquina imprime 10 folhas em 2 minutos. 20 folhas em 4 minutos. 30 folhas em 6 minutos. A relação entre folhas e minutos é:", options: ["Diretamente proporcional, pois a razão Folhas/Minuto é sempre constante (10/2 = 5, 20/4 = 5).", "Inversamente proporcional, pois um sobe e o outro cai.", "Exponencial quadrática.", "Não tem proporção."], correctIndex: 0, explanation: { correctText: "Ambos os valores estão a subir e a divisão (razão) entre eles resulta sempre no mesmo número (5 folhas por minuto).", otherOptions: [] } },
+        { level: "Médio", text: "Três torneiras idênticas enchem um tanque em 10 horas. Se tivéssemos 5 torneiras idênticas abertas ao mesmo tempo, elas encheriam o tanque em:", options: ["15 horas.", "10 horas.", "6 horas.", "4 horas."], correctIndex: 2, explanation: { correctText: "Mais torneiras deitando água = MENOS tempo para encher o tanque (INVERSO). Linha reta: 3 torneiras · 10 h = 5 torneiras · x ➔ 30 = 5x ➔ x = 30 / 5 = 6 horas.", otherOptions: [] } },
+        { level: "Difícil", text: "Uma herança de R$ 1.200,00 será dividida entre dois irmãos de 10 e 14 anos, em partes DIRETAMENTE proporcionais às suas idades. Como proceder logicamente?", options: ["O mais velho recebe tudo.", "Divide-se os 1200 por 2 (600 para cada).", "Soma-se as idades (10+14=24 'partes' totais). Divide-se a herança pelas partes (1200/24 = 50 reais por cada ano de vida). O de 10 anos recebe 500, o de 14 recebe 700.", "Soma-se a idade e diminui na herança."], correctIndex: 2, explanation: { correctText: "Este é o método clássico de 'Partilha Proporcional'. Descobres quanto vale uma 'fatia' (R$ 50) e multiplicas pela idade de cada um. 10x50 = 500. 14x50 = 700. A soma dá exatamente os R$ 1200.", otherOptions: [] } },
+        { level: "Médio", text: "A sombra de um poste ao meio-dia mede 2 metros. A sombra de um prédio ao lado mede 10 metros. Sabendo que o poste tem 4 metros de altura, qual é a altura do prédio?", options: ["20 metros.", "15 metros.", "10 metros.", "8 metros."], correctIndex: 0, explanation: { correctText: "Sombras e Alturas (Triângulos Semelhantes) são sempre DIRETAMENTE proporcionais. Se o prédio tem uma sombra 5 vezes maior (de 2m para 10m), a altura dele é 5 vezes maior que o poste (4 x 5 = 20m).", otherOptions: [] } },
+        { level: "Difícil", text: "Uma mangueira enche um balde de 20 Litros em 5 minutos. Uma torneira gotejante precisa de grandezas proporcionais para saber o gasto num mês. A relação Vazão (L/min) e Volume (L) é:", options: ["Inversamente proporcional.", "Diretamente proporcional.", "Constante zero.", "Não proporcional."], correctIndex: 1, explanation: { correctText: "Quanto mais tempo a mangueira fica aberta (minutos), MAIOR será o Volume (Litros) de água no balde. Como ambas sobem, são diretas.", otherOptions: [] } },
+        { level: "Difícil", text: "Problema clássico final: 4 tratores limpam um terreno em 15 horas. No entanto, um trator quebrou antes de começar. Quantas horas os tratores restantes levarão para limpar o terreno?", options: ["12 horas.", "15 horas.", "20 horas.", "30 horas."], correctIndex: 2, explanation: { correctText: "Passo 1: Restam 3 tratores. Passo 2: Menos tratores = MAIS horas (Inverso). Equação em linha reta: 4 tratores · 15h = 3 tratores · x ➔ 60 = 3x ➔ x = 20 horas.", otherOptions: [] } },
+        { level: "Fácil", text: "Analise a relação: O número de pessoas em uma fila de mercado e o tempo necessário para que todas sejam atendidas. Estas grandezas são:", options: ["Inversamente proporcionais.", "Diretamente proporcionais.", "Constantes nulas.", "Não proporcionais."], correctIndex: 1, explanation: { correctText: "Quanto MAIS pessoas na fila, MAIS tempo será necessário para atender todo mundo. Como as duas grandezas sobem juntas, são diretamente proporcionais.", otherOptions: [] } },
+        { level: "Fácil", text: "Analise a relação: O número de atendentes em uma central de atendimento e o tempo para um cliente ser atendido. Estas grandezas são:", options: ["Diretamente proporcionais.", "Inversamente proporcionais.", "Iguais.", "Exponenciais."], correctIndex: 1, explanation: { correctText: "Quanto MAIS atendentes trabalhando, MENOS tempo o cliente fica na fila de espera. Uma sobe e a outra desce, portanto, são inversamente proporcionais.", otherOptions: [] } },
+        { level: "Médio", text: "Analise as seguintes situações e indique qual delas representa grandezas INVERSAMENTE proporcionais:", options: ["Quantidade de máquinas em uma indústria e a produção de produtos.", "Velocidade média de um carro e a distância percorrida (num tempo fixo).", "Número de pessoas numa fila e o tempo de atendimento.", "Número de pintores trabalhando e o tempo para pintar uma parede."], correctIndex: 3, explanation: { correctText: "Mais pintores trabalhando juntos resultam em MENOS tempo necessário para terminar a parede. É uma relação inversa (gangorra). As outras opções descrevem grandezas diretamente proporcionais.", otherOptions: [] } },
+        { level: "Difícil", text: "João quer dividir sua coleção de 662 selos em partes INVERSAMENTE proporcionais às idades de seus sobrinhos Júlio (14 anos), Uriel (15 anos) e Renato (27 anos). Quantos selos cada um vai receber, respectivamente?", options: ["Júlio: 270, Uriel: 252, Renato: 140", "Júlio: 140, Uriel: 252, Renato: 270", "Júlio: 331, Uriel: 200, Renato: 131", "Júlio: 200, Uriel: 200, Renato: 262"], correctIndex: 0, explanation: { correctText: "Divisão inversa (1/14, 1/15, 1/27). O MMC de 14, 15 e 27 é 1890. As frações ficam 135/1890, 126/1890, 70/1890. Somando as partes: 135k + 126k + 70k = 331k. Igualando ao total: 331k = 662 ➔ k = 2. Multiplicando pelas partes: Júlio = 135 · 2 = 270; Uriel = 126 · 2 = 252; Renato = 70 · 2 = 140.", otherOptions: [] } },
+        { level: "Difícil", text: "Três digitadores produziram um total de 382 páginas em partes INVERSAMENTE proporcionais às suas respectivas idades: 28, 32 e 36 anos. Determine a quantidade de páginas que o digitador MAIS NOVO (28 anos) digitou.", options: ["112 páginas", "126 páginas", "144 páginas", "191 páginas"], correctIndex: 2, explanation: { correctText: "Divisão inversa (1/28, 1/32, 1/36). O MMC é 2016. As frações viram 72/2016, 63/2016, 56/2016. Soma das partes: 72k + 63k + 56k = 191k. Igualando: 191k = 382 ➔ k = 2. O mais novo (28 anos) recebe a maior parte (72). Páginas: 72 · 2 = 144.", otherOptions: [] } }
+    ];
+
+    const STORAGE_KEY = 'promover_mat_grandezas_progress';
+    
+    let quizState = {
+        currentIndex: 0,
+        userAnswers: new Array(questionsDatabase.length).fill(null),
+        confettiAnimationId: null
+    };
+
+    function loadSavedProgress() {
+        try {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && Array.isArray(parsed) && parsed.length === questionsDatabase.length) {
+                    quizState.userAnswers = parsed;
+                    
+                    let lastAnswered = -1;
+                    for (let i = parsed.length - 1; i >= 0; i--) {
+                        if (parsed[i] !== null) {
+                            lastAnswered = i;
+                            break;
+                        }
+                    }
+
+                    if (lastAnswered < questionsDatabase.length - 1) {
+                        quizState.currentIndex = lastAnswered + 1;
+                    } else {
+                        quizState.currentIndex = questionsDatabase.length - 1;
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao carregar progresso:", e);
+        }
+    }
+
+    function saveProgress() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(quizState.userAnswers)); } catch (e) {}
+    }
+
+    function resetFullProgress() {
+        if(confirm("Tem certeza que deseja reiniciar o teste do zero?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            quizState.userAnswers = new Array(questionsDatabase.length).fill(null);
+            quizState.currentIndex = 0;
+            changeApplicationView('practice');
+        }
+    }
+
+    function initializeSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const contentGroups = document.querySelectorAll('.content-group');
+        const noResultsMsg = document.getElementById('no-results');
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function(event) {
+            const searchTerm = event.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            let totalVisibleElements = 0;
+            
+            contentGroups.forEach(group => {
+                const groupContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const isMatch = groupContent.includes(searchTerm);
+                
+                group.style.display = isMatch ? 'flex' : 'none';
+                if (isMatch) totalVisibleElements++;
+            });
+            
+            noResultsMsg.style.display = totalVisibleElements === 0 ? 'block' : 'none';
+        });
+    }
+
+    function changeApplicationView(viewName) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        views.forEach(viewId => document.getElementById(viewId).classList.remove('active'));
+        
+        const quizFooter = document.getElementById('quizFooter');
+        if (quizFooter) quizFooter.style.display = 'none';
+
+        if (viewName === 'explanation') {
+            document.getElementById('viewExplanation').classList.add('active');
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (viewName === 'practice') {
+            document.getElementById('viewPractice').classList.add('active');
+            if (quizFooter) quizFooter.style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            
+            renderCurrentQuestion();
+            renderNavigationMap();
+        } else if (viewName === 'result') {
+            document.getElementById('viewResult').classList.add('active');
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function getDifficultyBadgeClass(level) {
+        if (level === 'Fácil') return 'dif-facil';
+        if (level === 'Médio') return 'dif-medio';
+        return 'dif-dificil';
+    }
+
+    function buildOptionsHTML(question, selectedAnswerIndex) {
+        const alphabet = ['A', 'B', 'C', 'D'];
+        return question.options.map((optionText, optionIndex) => {
+            let cssClass = '';
+            if (selectedAnswerIndex !== null) {
+                if (optionIndex === question.correctIndex) cssClass = 'correct';
+                else if (optionIndex === selectedAnswerIndex) cssClass = 'wrong';
+                else cssClass = 'disabled';
+            }
+            const isDisabled = selectedAnswerIndex !== null ? 'disabled' : '';
+            return `
+                <button class="option-btn ${cssClass}" onclick="handleOptionSelection(${optionIndex})" ${isDisabled}>
+                    <div class="opt-circle">${alphabet[optionIndex]}</div>
+                    <div>${optionText}</div>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function buildFeedbackHTML(question, selectedAnswerIndex) {
+        const isCorrect = selectedAnswerIndex === question.correctIndex;
+        const titleClass = isCorrect ? 'success' : 'error';
+        const titleText = isCorrect ? '✅ Resposta Correta!' : '❌ Ops! Trocou a Proporção?';
+        
+        return `
+            <div class="feedback-box show">
+                <div class="feedback-title ${titleClass}" style="color: ${isCorrect ? 'var(--correct-border)' : 'var(--wrong-border)'}">${titleText}</div>
+                <div class="feedback-item correct-opt"><strong>A Resposta Correta:</strong> ${question.options[question.correctIndex]}</div>
+                <div style="margin-top:15px;font-size:1rem;color:var(--text-color);margin-bottom:15px;font-weight:600;">${question.explanation.correctText}</div>
+            </div>
+        `;
+    }
+
+    function renderCurrentQuestion() {
+        const container = document.getElementById('quizContainer');
+        if (!container) return;
+
+        const question = questionsDatabase[quizState.currentIndex];
+        const selectedAnswerIndex = quizState.userAnswers[quizState.currentIndex];
+        const badgeClass = getDifficultyBadgeClass(question.level);
+        
+        let feedbackHTML = selectedAnswerIndex !== null ? buildFeedbackHTML(question, selectedAnswerIndex) : '';
+
+        container.innerHTML = `
+            <div class="quiz-question-card">
+                <div class="quiz-question-counter">
+                    <span class="difficulty-badge ${badgeClass}" style="margin:0;">${question.level}</span>
+                    <span>QUESTÃO ${quizState.currentIndex + 1} DE ${questionsDatabase.length}</span>
+                </div>
+                <h2 class="quiz-question-text">${question.text}</h2>
+                <div class="options-list">
+                    ${buildOptionsHTML(question, selectedAnswerIndex)}
+                </div>
+                ${feedbackHTML}
+            </div>
+        `;
+        updateNavigationButtons();
+    }
+
+    function handleOptionSelection(selectedIndex) {
+        if (quizState.userAnswers[quizState.currentIndex] !== null) return;
+        
+        quizState.userAnswers[quizState.currentIndex] = selectedIndex;
+        saveProgress();
+
+        const isCorrect = selectedIndex === questionsDatabase[quizState.currentIndex].correctIndex;
+        if (isCorrect) startSuccessAnimation();
+        else triggerErrorShakeEffect();
+        
+        renderCurrentQuestion();
+        renderNavigationMap();
+    }
+
+    function triggerErrorShakeEffect() {
+        const container = document.getElementById('quizContainer');
+        if (container) { 
+            container.classList.remove('shake-effect'); 
+            void container.offsetWidth; 
+            container.classList.add('shake-effect'); 
+            setTimeout(() => container.classList.remove('shake-effect'), 500); 
+        }
+    }
+
+    function startSuccessAnimation() {
+        stopSuccessAnimation();
+        const end = Date.now() + 1500;
+        function animateFrame() {
+            if(window.confetti) {
+                confetti({ particleCount: 5, spread: 55, colors: ['#10B981', '#F97316', '#0284C7', '#38BDF8'], angle: 60, origin: { x: 0, y: 0.6 } });
+                confetti({ particleCount: 5, spread: 55, colors: ['#10B981', '#F97316', '#0284C7', '#38BDF8'], angle: 120, origin: { x: 1, y: 0.6 } });
+            }
+            if (Date.now() < end) quizState.confettiAnimationId = requestAnimationFrame(animateFrame);
+        }
+        animateFrame();
+    }
+
+    function stopSuccessAnimation() {
+        if (window.confetti && typeof confetti.reset === 'function') confetti.reset(); 
+        if (quizState.confettiAnimationId) {
+            cancelAnimationFrame(quizState.confettiAnimationId);
+            quizState.confettiAnimationId = null;
+        }
+    }
+
+    function renderNavigationMap() {
+        const mapContainer = document.getElementById('qMap');
+        if (!mapContainer) return;
+        mapContainer.innerHTML = questionsDatabase.map((question, index) => {
+            const isCurrent = index === quizState.currentIndex;
+            const userAnswer = quizState.userAnswers[index];
+            const hasAnswered = userAnswer !== null;
+            const isCorrect = userAnswer === question.correctIndex;
+            
+            let cssClass = 'map-dot';
+            if (isCurrent) cssClass += ' active';
+            if (hasAnswered) cssClass += isCorrect ? ' answered-correct' : ' answered-wrong';
+            return `<div class="${cssClass}" onclick="goToQuestion(${index})">${index + 1}</div>`;
+        }).join('');
+        
+        setTimeout(() => { 
+            const activeDot = mapContainer.querySelector('.map-dot.active'); 
+            if (activeDot) activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); 
+        }, 50);
+    }
+
+    function goToQuestion(targetIndex) { 
+        stopSuccessAnimation();
+        quizState.currentIndex = targetIndex; 
+        renderCurrentQuestion(); 
+        renderNavigationMap(); 
+    }
+    
+    function navigateQuestion(directionOffset) { 
+        const nextIndex = quizState.currentIndex + directionOffset; 
+        if (nextIndex >= 0 && nextIndex < questionsDatabase.length) goToQuestion(nextIndex); 
+    }
+
+    function updateNavigationButtons() {
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        if (btnPrev) btnPrev.disabled = (quizState.currentIndex === 0);
+        if (btnNext) {
+            if (quizState.currentIndex === questionsDatabase.length - 1) { 
+                btnNext.textContent = "Finalizar Avaliação"; 
+                btnNext.onclick = finishQuiz; 
+            } else { 
+                btnNext.textContent = "Próxima ➡️"; 
+                btnNext.onclick = () => navigateQuestion(1); 
+            }
+        }
+    }
+
+    function finishQuiz() {
+        const unansweredCount = quizState.userAnswers.filter(answer => answer === null).length;
+        if (unansweredCount > 0) {
+            if (!confirm(`Faltam responder ${unansweredCount} questões. Tem a certeza de que quer terminar?`)) return;
+        }
+        stopSuccessAnimation();
+
+        const correctAnswersCount = quizState.userAnswers.filter((answer, index) => answer === questionsDatabase[index].correctIndex).length;
+        const totalQuestions = questionsDatabase.length;
+        const percentageScore = Math.round((correctAnswersCount / totalQuestions) * 100);
+        const isApproved = percentageScore >= 80;
+        
+        document.getElementById('finalPercent').textContent = `${percentageScore}%`;
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correctAnswersCount} de ${totalQuestions}`;
+        
+        let stars = "🌑";
+        if (percentageScore === 100) stars = "⭐⭐⭐⭐⭐";
+        else if (percentageScore >= 80) stars = "⭐⭐⭐⭐";
+        else if (percentageScore >= 60) stars = "⭐⭐⭐";
+        else if (percentageScore >= 40) stars = "⭐⭐";
+        else if (percentageScore > 0) stars = "⭐";
+        document.getElementById('finalStars').textContent = stars;
+
+        const actionButtonsContainer = document.getElementById('action-buttons');
+        const reviewContainer = document.getElementById('review-container');
+        
+        if (isApproved) {
+            reviewContainer.innerHTML = `<div class="result-summary-box success"><strong>🎉 MESTRE DAS PROPORÇÕES!</strong> Não caíste na armadilha da Gangorra. Sabes exatamente quando cruzar as setas na regra de três!</div>`;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR E REPETIR PARA 100%</button>`;
+        } else {
+            reviewContainer.innerHTML = `<div class="result-summary-box error"><strong>⚠️ CUIDADO COM AS SETAS!</strong> Avaliado abaixo da meta (80%). Lembra-te: Se as setas de crescimento estão ao contrário (Inversa), deves multiplicar "em linha reta" e não "em cruz".</div>`;
+            actionButtonsContainer.innerHTML = `<button class="btn-action" onclick="resetFullProgress()">🔄 LIMPAR E REFAZER AVALIAÇÃO</button>`;
+        }
+        
+        if (correctAnswersCount < totalQuestions) {
+            let errorHTML = '<h4 style="margin-top:15px; margin-bottom:15px;">Correções:</h4>';
+            questionsDatabase.forEach((question, index) => {
+                const userAnswerIndex = quizState.userAnswers[index];
+                if (userAnswerIndex !== question.correctIndex) {
+                    const userAnswerText = userAnswerIndex === null ? "Em branco" : question.options[userAnswerIndex];
+                    let plainQuestionText = question.text.replace(/<div class="q-svg-container">[\s\S]*?<\/div>/gi, ' [Desenho Omitido] ');
+                    errorHTML += `
+                        <div class="error-log-item">
+                            <strong>Q${index + 1}: ${plainQuestionText}</strong><br>
+                            <span style="color:var(--wrong-border);">Sua resposta: ${userAnswerText}</span><br>
+                            <span style="color:var(--correct-border);">Correta: ${question.options[question.correctIndex]}</span>
+                        </div>`;
+                }
+            });
+            reviewContainer.innerHTML += errorHTML;
+        }
+
+        changeApplicationView('result');
+    }
+    
+    // Inicia a aplicação
+    loadSavedProgress();
+    initializeSearch();
+    changeApplicationView('explanation');
+</script>
+</body>
+</html>
