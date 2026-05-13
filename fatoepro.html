@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Produtos Notáveis e Fatoração - Promover</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+:root {
+/* Tema Matemática (Exatas) - Sóbreo e Autoridade */
+--bg-color: #F8FAFC;
+--text-color: #0F172A;
+--border-color: #0F172A;
+--white: #FFFFFF;
+--theme-light: #E0F2FE;
+--theme-medium: #0284C7;
+--theme-dark: #0F172A;
+--theme-contrast: #0284C7;
+--theme-accent: #38BDF8;
+--theme-text-active: #FFFFFF;
+
+/* NÃO ALTERAR AS CORES ABAIXO */
+--correct-bg: #D1FAE5;
+--correct-border: #059669;
+--wrong-bg: #FFE4E6;
+--wrong-border: #BE123C;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+font-family: 'Poppins', sans-serif; background-color: var(--bg-color); color: var(--text-color);
+display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; padding-bottom: 100px;
+background-image: linear-gradient(var(--theme-light) 1px, transparent 1px), linear-gradient(90deg, var(--theme-light) 1px, transparent 1px);
+background-size: 20px 20px;
+}
+
+@keyframes shake {
+0% { transform: translateX(0); }
+25% { transform: translateX(-6px); }
+50% { transform: translateX(6px); }
+75% { transform: translateX(-6px); }
+100% { transform: translateX(0); }
+}
+.shake-effect { animation: shake 0.4s ease-in-out; }
+@keyframes fadeIn { from {opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.pulse-effect { animation: pulse 1s infinite; display: inline-block; }
+@keyframes pulse {
+0% { transform: scale(1); }
+15% { transform: scale(1.15); color: var(--theme-contrast); }
+30% { transform: scale(1); }
+45% { transform: scale(1.15); color: var(--theme-contrast); }
+100% { transform: scale(1); }
+}
+
+.logo-header { width: 100%; max-width: 600px; display: flex; justify-content: center; flex-direction: column; align-items: center; padding: 20px 0 10px 0; }
+.css-logo { font-size: 1.6rem; font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 20px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); text-align: center; margin-bottom: 15px; }
+h1 { font-size: 1.8rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); text-align: center; }
+.subtitle { font-size: 0.95rem; color: var(--theme-contrast); font-weight: 700; text-align: center; }
+
+.container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+
+.toggle-container { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 50px; padding: 4px; display: flex; margin-bottom: 10px; box-shadow: 3px 3px 0px var(--border-color); }
+.toggle-btn {flex: 1; border: none; background: none; padding: 12px 0; border-radius: 40px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; color: var(--theme-dark); cursor: pointer; transition: all 0.3s ease; }
+.toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); box-shadow: 0px 2px 5px rgba(0,0,0,0.2); }
+
+.view-section { display: none; animation: fadeIn 0.4s ease; flex-direction: column; gap: 20px; }
+
+.search-container { position: relative; width: 100%; }
+.search-input { width: 100%; padding: 15px 20px 15px 50px; border: 2px solid var(--border-color); border-radius: 50px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+.search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+.search-icon {position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; opacity: 0.7; }
+#no-results { text-align: center; color: var(--theme-dark); font-weight: 600; display: none; }
+
+.content-group {display: flex; flex-direction: column; gap: 12px; }
+.section-badge { display: inline-block; padding: 8px 16px; background-color: var(--theme-dark); color: var(--white); font-size: 0.9rem; font-weight: 700; border-radius: 8px; border: 2px solid var(--border-color); box-shadow: 3px 3px 0px rgba(0,0,0,0.2); text-transform: uppercase; align-self: flex-start; margin-bottom: 5px; }
+.theory-box { display: flex; flex-direction: column; padding: 20px; border-radius: 16px; background-color: var(--white); border: 2px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); font-weight: 500; font-size: 0.95rem; line-height: 1.6; position: relative; overflow: hidden; gap: 15px; }
+.theory-box::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background-color: var(--theme-contrast); border-right: 2px solid var(--border-color); }
+.theory-box h3 {font-size: 1.2rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; display: flex; align-items: center; gap: 8px;}
+
+.visual-area { background: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 8px; padding: 15px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 20px; font-weight: bold; font-size: 1.5rem; color: var(--theme-contrast); text-align: center; }
+.highlight-box { background-color: #E0F2FE; border-left: 4px solid var(--theme-contrast); padding: 15px; border-radius: 6px; font-size: 0.9rem; color: #075985; }
+.highlight-box.warning { background-color: #FEF2F2; border-left-color: #BE123C; color: #881337; }
+
+.difficulty-badge {display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+.dif-facil {background: #D1FAE5; color: #065F46; }
+.dif-medio { background: #FEF08A; color: #713F12; }
+.dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+.question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+.question-map::-webkit-scrollbar {display: none; }
+.map-dot { min-width: 35px; height: 35px; border: 2px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+.map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 2px 2px 0px var(--theme-contrast); transform: scale(1.1); }
+.map-dot.answered-correct {background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+.map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+.option-btn { display: flex; align-items: center; width: 100%; padding: 16px; background-color: var(--white); border: 2px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 600; text-align: left; color: var(--text-color); }
+.option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+.opt-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+
+.option-btn.correct {background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 2px 2px 0px var(--correct-border); }
+.option-btn.correct .opt-circle {background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+.option-btn.wrong {background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+.option-btn.wrong .opt-circle {background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+.option-btn.disabled {pointer-events: none; opacity: 0.7; }
+
+.feedback-box { display: block; margin-top: 20px; background-color: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 12px; padding: 20px; animation: slideUp 0.3s ease-out; }
+.feedback-title { font-weight: 900; text-transform: uppercase; font-size: 0.95rem; margin-bottom: 10px; display:flex; align-items:center; gap:8px; color: var(--theme-dark); }
+.feedback-item { margin-bottom: 8px; font-size: 0.85rem; padding-left: 10px; border-left: 3px solid #CBD5E1; line-height: 1.5; color: #0F172A; }
+.feedback-item.correct-opt {border-left-color: var(--correct-border); font-weight: 700; color: var(--correct-border); background: var(--correct-bg); padding: 10px; border-radius: 0 6px 6px 0; }
+.feedback-item.wrong-opt {border-left-color: var(--wrong-border); color: #7F1D1D; }
+
+.result-card {background: white; border: 3px solid var(--border-color); border-radius: 20px; padding: 30px; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+.stars-container { font-size: 3.5rem; margin: 10px 0; letter-spacing: 5px; }
+.percentage-big {font-size: 4.5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 10px 0; text-shadow: 3px 3px 0px var(--theme-contrast); }
+
+.btn-action { width: 100%; padding: 18px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; box-shadow: 4px 4px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 20px; }
+.btn-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+
+.quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-color); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100; }
+.nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 800; border: 2px solid var(--border-color); cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase;}
+.btn-next { background-color: var(--theme-dark); color: white; }
+.btn-prev { background-color: white; color: var(--text-color); }
+</style>
+</head>
+<body>
+
+<div class="container">
+<header class="logo-header">
+<div class="css-logo"><span class="pulse-effect">🚀</span> PROMOVER</div>
+<h1>MATEMÁTICA / 8º ANO</h1>
+<p class="subtitle">PRODUTOS NOTÁVEIS E FATORAÇÃO</p>
+</header>
+
+<div class="toggle-container">
+<button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">Teoria</button>
+<button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">Prática (30)</button>
+</div>
+
+<div id="viewExplanation" class="view-section" style="display: flex;">
+<div class="search-container">
+<span class="search-icon" aria-hidden="true">🔍</span>
+<input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar conceito...">
+</div>
+<div id="no-results"><p>Termo não encontrado.</p></div>
+
+<div class="content-group">
+    <span class="section-badge">O Básico Indispensável</span>
+    <div class="theory-box">
+        <h3>Os Três Produtos Notáveis</h3>
+        <p>São multiplicações algébricas que aparecem tanto que ganharam "fórmulas rápidas". Decorar isso poupa tempo valioso.</p>
+        <div class="visual-area">
+            <div>
+                <p style="font-size:1rem; color:var(--theme-dark);">Quadrado da Soma:</p>
+                (a + b)² = a² + 2ab + b²
+            </div>
+            <div>
+                <p style="font-size:1rem; color:var(--theme-dark);">Quadrado da Diferença:</p>
+                (a - b)² = a² - 2ab + b²
+            </div>
+            <div>
+                <p style="font-size:1rem; color:var(--theme-dark);">Soma pela Diferença:</p>
+                (a + b)·(a - b) = a² - b²
+            </div>
+        </div>
+        <div class="highlight-box warning">
+            <strong>O PECADO CAPITAL DA ÁLGEBRA:</strong><br>
+            Achar que (a + b)² é igual a a² + b². ISSO É UM CRIME MATEMÁTICO! Você NUNCA pode esquecer o termo do meio (+ 2ab). 
+        </div>
+    </div>
+</div>
+
+<div class="content-group">
+    <span class="section-badge">Caminho Inverso</span>
+    <div class="theory-box">
+        <h3>Fatoração: Desfazendo o Produto</h3>
+        <p>Fatorar é transformar uma soma/subtração algébrica em uma <strong>multiplicação</strong>. É fazer o caminho de volta.</p>
+        <div class="highlight-box">
+            <strong>1. Fator Comum em Evidência:</strong> Puxe para fora quem se repete.<br>
+            Ex: <em>ax + ay = a(x + y)</em>
+        </div>
+        <div class="highlight-box">
+            <strong>2. Agrupamento:</strong> Evidência dupla, feita em "grupinhos".<br>
+            Ex: <em>ax + bx + ay + by = x(a+b) + y(a+b) = (a+b)(x+y)</em>
+        </div>
+        <div class="highlight-box">
+            <strong>3. Diferença de Quadrados:</strong> O caminho inverso de (a+b)(a-b).<br>
+            Ex: <em>x² - 25 = (x + 5)(x - 5)</em>
+        </div>
+    </div>
+</div>
+
+<button class="btn-action" onclick="setMode('practice')">
+Iniciar Diagnóstico (30 Q) →
+</button>
+</div>
+
+<div id="viewPractice" class="view-section">
+<div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+<h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo</h2>
+<p style="color: #0F172A; font-size: 0.95rem; font-weight:600;">
+30 questões rigorosas. Acerte <strong>80% (24/30)</strong> para provar seu domínio. Leia a correção de cada erro!
+</p>
+</div>
+<div class="question-map" id="qMap"></div>
+<div id="quizContainer" style="margin-bottom: 100px;"></div>
+</div>
+
+<div id="viewResult" class="view-section">
+<div class="result-card">
+<h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+<div class="stars-container" id="finalStars">★</div>
+<div class="percentage-big" id="finalPercent">0%</div>
+<p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+<div id="review-container"></div>
+</div>
+<div id="action-buttons"></div>
+</div>
+</div>
+
+<footer class="quiz-footer" id="quizFooter">
+<button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+<button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+</footer>
+
+<script>
+const searchInput = document.getElementById('searchInput');
+const contentGroups = document.querySelectorAll('.content-group');
+const noResultsMsg = document.getElementById('no-results');
+
+searchInput.addEventListener('input', function(e) {
+const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+let totalVisible = 0;
+
+contentGroups.forEach(group => {
+const textContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+if (textContent.includes(term)) {
+group.style.display = 'flex';
+totalVisible++;
+} else {
+group.style.display = 'none';
+}
+});
+noResultsMsg.style.display = totalVisible === 0 ? 'block' : 'none';
+});
+
+// MOTOR DE QUESTÕES RIGOROSAS
+const questions = [
+// ----- FÁCEIS (10) -----
+{
+id: 1, level: "Fácil",
+text: "Desenvolvendo o produto notável (x + 5)², obtemos qual resultado?",
+options: ["x² + 25", "x² + 5x + 25", "x² + 10x + 25", "2x + 10"],
+correct: 2,
+explanation: {
+correct: "Quadrado do 1º (x²) + duas vezes o 1º pelo 2º (2·x·5 = 10x) + quadrado do 2º (5² = 25).",
+options: ["O pecado capital da álgebra! Você esqueceu do termo central (+10x).", "Você apenas multiplicou x por 5. É preciso multiplicar por 2 da fórmula (2ab).", "Certa", "Isso não é uma potência, você só multiplicou a base pelo expoente. Errado!"]
+}
+},
+{
+id: 2, level: "Fácil",
+text: "Qual é a expansão correta para o quadrado da diferença (y - 3)²?",
+options: ["y² - 9", "y² - 6y + 9", "y² + 6y - 9", "y² - 6y - 9"],
+correct: 1,
+explanation: {
+correct: "Quadrado do 1º (y²) - duas vezes o 1º pelo 2º (-6y) + o quadrado do 2º que fica positivo (+9).",
+options: ["O pecado capital com sinal negativo. Faltou o termo central (-6y).", "Certa", "Errou o sinal! É a diferença, então o termo do meio é negativo.", "O último termo (-3)² fica sempre positivo (+9)."]
+}
+},
+{
+id: 3, level: "Fácil",
+text: "O resultado da multiplicação (a + 7)·(a - 7) é equivalente a:",
+options: ["a² - 14a + 49", "a² + 49", "2a - 14", "a² - 49"],
+correct: 3,
+explanation: {
+correct: "Produto da soma pela diferença é sempre o quadrado do primeiro (a²) menos o quadrado do segundo (7²=49).",
+options: ["Você confundiu com o quadrado da diferença (a - 7)².", "Errou o sinal. A regra é clara: quadrado do 1º MENOS o quadrado do 2º.", "Você somou os termos em vez de multiplicá-los.", "Certa"]
+}
+},
+{
+id: 4, level: "Fácil",
+text: "Qual o fator comum em evidência na expressão algébrica 4x + 12?",
+options: ["x(4 + 12)", "2(2x + 6)", "4(x + 3)", "4x(1 + 3)"],
+correct: 2,
+explanation: {
+correct: "O maior número que divide 4 e 12 é o 4. Colocando o 4 em evidência sobra: 4(x + 3).",
+options: ["O x não aparece no 12, ele não pode ser evidenciado.", "Não está errado matematicamente, mas o 2 não é o MAIOR fator comum. O 4 é melhor.", "Certa", "Não tem x no termo 12 para você colocá-lo em evidência."]
+}
+},
+{
+id: 5, level: "Fácil",
+text: "Fatore a expressão y² + 5y retirando o fator comum em evidência:",
+options: ["y(y + 5)", "5(y² + 1)", "y(y + 5y)", "y(y - 5)"],
+correct: 0,
+explanation: {
+correct: "A letra 'y' se repete nos dois termos. Ao dividir y² por y sobra y, e 5y por y sobra 5.",
+options: ["Certa", "O 5 não se repete no y², ele não é fator comum.", "Se você multiplicar y por 5y, vai obter 5y², não 5y. Errado.", "Errou o sinal básico da expressão original que era positiva."]
+}
+},
+{
+id: 6, level: "Fácil",
+text: "Desenvolva (2x + 1)².",
+options: ["4x² + 1", "4x² + 4x + 1", "2x² + 4x + 1", "4x² + 2x + 1"],
+correct: 1,
+explanation: {
+correct: "(2x)² resulta em 4x². O termo central é 2·(2x)·1 = 4x. E 1² = 1.",
+options: ["Pecado capital. Esqueceu o termo central.", "Certa", "Você esqueceu de elevar o 2 ao quadrado no primeiro termo.", "Faltou multiplicar o termo central por 2 (da fórmula). 2·2x·1 = 4x."]
+}
+},
+{
+id: 7, level: "Fácil",
+text: "Identifique a forma fatorada do trinômio x² + 2x + 1.",
+options: ["(x + 1)²", "(x - 1)²", "(x + 2)²", "x(x + 2) + 1"],
+correct: 0,
+explanation: {
+correct: "Este é um Trinômio Quadrado Perfeito. As raízes das pontas são x e 1. (x+1)².",
+options: ["Certa", "O sinal do meio é +, não -. Logo, é quadrado da soma.", "O quadrado de (x+2) geraria 4x no meio e 4 no final.", "Embora dê o mesmo resultado, isso não é a forma fatorada completa."]
+}
+},
+{
+id: 8, level: "Fácil",
+text: "Expanda o produto: (x + 10)·(x - 10)",
+options: ["x² - 20x + 100", "x² - 100", "x² + 100", "x - 100"],
+correct: 1,
+explanation: {
+correct: "Produto da soma pela diferença. Quadrado do 1º (x²) menos o quadrado do 2º (10² = 100).",
+options: ["Essa seria a expansão de (x - 10)². Confusão clássica.", "Certa", "Regra básica: (a+b)(a-b) = a² - b². O sinal do meio é sempre negativo.", "Cadê o quadrado do x? Faltou elevar."]
+}
+},
+{
+id: 9, level: "Fácil",
+text: "Colocando o fator comum em evidência na expressão 10a² - 5a, obtemos:",
+options: ["5(2a² - a)", "10a(a - 0.5)", "5a(2a - 1)", "a(10a - 5)"],
+correct: 2,
+explanation: {
+correct: "O fator comum é 5a. 10a² dividido por 5a sobra 2a. E -5a por 5a sobra -1.",
+options: ["A fatoração está incompleta. O 'a' também repete e deve ir pra evidência.", "Misturar decimais em fatoração algébrica comum não é a prática padrão.", "Certa", "Incompleto! O número 5 também é fator comum divisor."]
+}
+},
+{
+id: 10, level: "Fácil",
+text: "Fatorar o polinômio x² - 16 usando diferença de quadrados gera:",
+options: ["(x - 4)²", "(x + 16)(x - 16)", "(x + 4)(x - 4)", "(x - 8)(x + 2)"],
+correct: 2,
+explanation: {
+correct: "As raízes são x e 4. A regra de diferença de quadrados gera (x+4)(x-4).",
+options: ["Isso daria x² - 8x + 16. O termo central estragou tudo.", "A raiz de 16 é 4, e não 16. Atenção à radiciação básica.", "Certa", "Essa fatoração está errada e daria x² - 6x - 16."]
+}
+},
+
+// ----- MÉDIAS (10) -----
+{
+id: 11, level: "Médio",
+text: "Qual é a forma fatorada do polinômio mx + nx + my + ny por agrupamento?",
+options: ["(m+n)(x+y)", "(mx)(ny)", "x(m+n) + y", "(m+y)(n+x)"],
+correct: 0,
+explanation: {
+correct: "Agrupando o x: x(m+n). Agrupando o y: y(m+n). O termo (m+n) repete, gerando (m+n)(x+y).",
+options: ["Certa", "Isso é uma salada de multiplicações que não tem nada a ver com a soma original.", "Fatoração incompleta, você parou no meio do caminho.", "Se você aplicar a distributiva aqui, não volta pra expressão original."]
+}
+},
+{
+id: 12, level: "Médio",
+text: "Desenvolvendo (3x - 2y)², obtemos qual polinômio?",
+options: ["9x² - 4y²", "9x² - 12xy + 4y²", "9x² - 6xy + 4y²", "3x² - 12xy + 2y²"],
+correct: 1,
+explanation: {
+correct: "(3x)² = 9x². O termo do meio é 2·(3x)·(-2y) = -12xy. O final é (-2y)² = +4y².",
+options: ["Pecado capital, mais uma vez! Esqueceu o bendito termo central.", "Certa", "Faltou multiplicar por 2 o termo central. 3x·2y já é 6xy, vezes 2 dá 12xy.", "Faltou elevar os coeficientes das pontas ao quadrado (3 virar 9 e 2 virar 4)."]
+}
+},
+{
+id: 13, level: "Médio",
+text: "O trinômio 4a² + 12ab + 9b² é perfeito. Qual a sua forma fatorada?",
+options: ["(2a + 3b)²", "(4a + 9b)²", "(2a - 3b)²", "(2a + 3b)(2a - 3b)"],
+correct: 0,
+explanation: {
+correct: "Raiz de 4a² = 2a. Raiz de 9b² = 3b. O termo central bate: 2·(2a)·(3b) = 12ab.",
+options: ["Certa", "Você pegou os números cru sem tirar a raiz quadrada deles.", "A expressão original só tem sinais de '+', então é quadrado da soma.", "Isso geraria 4a² - 9b², sumiria com o 12ab."]
+}
+},
+{
+id: 14, level: "Médio",
+text: "Fatore completamente a expressão 2x² - 18.",
+options: ["(2x + 9)(x - 2)", "2(x² - 9)", "2(x + 3)(x - 3)", "(2x - 3)²"],
+correct: 2,
+explanation: {
+correct: "Passo 1: Evidência no 2, sobra 2(x² - 9). Passo 2: x² - 9 é diferença de quadrados: (x+3)(x-3).",
+options: ["A distributiva não voltaria pro número correto. Invenção total.", "Incompleto! Você fez só o 1º passo e esqueceu a diferença de quadrados.", "Certa", "A expansão disso daria 4x² - 12x + 9. Passou longe."]
+}
+},
+{
+id: 15, level: "Médio",
+text: "A área de um quadrado é representada pelo polinômio x² - 14x + 49. Qual a medida do lado desse quadrado?",
+options: ["x + 7", "x - 7", "x - 49", "2x - 14"],
+correct: 1,
+explanation: {
+correct: "A área é o lado ao quadrado. x² - 14x + 49 é o desenvolvimento de (x - 7)².",
+options: ["Se o lado fosse (x+7), o termo central da área seria +14x e não -14x.", "Certa", "Raiz quadrada de 49 é 7, não 49. Cuidado com a desatenção.", "Isso não faz o menor sentido geométrico para área de quadrado."]
+}
+},
+{
+id: 16, level: "Médio",
+text: "Aplicando agrupamento em ab - ac + 5b - 5c, qual a resposta?",
+options: ["a(b - c) + 5(b - c)", "(a + 5)(b - c)", "(a - 5)(b + c)", "ab(5 - c)"],
+correct: 1,
+explanation: {
+correct: "a(b - c) + 5(b - c). O (b - c) está em comum. Evidenciando, fica (a + 5)(b - c).",
+options: ["Você não terminou a fatoração! O objetivo é virar uma única multiplicação.", "Certa", "Você errou as regras de sinais na hora de fatorar os grupos.", "Isso não é agrupamento, e a distributiva não bate com a pergunta."]
+}
+},
+{
+id: 17, level: "Médio",
+text: "O que sobra quando simplificamos (a+b)² - (a-b)²?",
+options: ["2a² + 2b²", "0", "4ab", "2ab"],
+correct: 2,
+explanation: {
+correct: "(a²+2ab+b²) - (a²-2ab+b²) = a² - a² + 2ab - (-2ab) + b² - b² = 4ab.",
+options: ["Você esqueceu de distribuir o sinal de menos no segundo parêntese.", "Você cortou até o termo central (2ab), que tinha sinal inverso.", "Certa", "Você esqueceu de somar os dois termos centrais gerados pelas duas expansões."]
+}
+},
+{
+id: 18, level: "Médio",
+text: "Fatore a diferença de quadrados: 25x² - 16y²",
+options: ["(5x - 4y)²", "(5x - 4y)(5x + 4y)", "(25x - 16y)(25x + 16y)", "5(x² - y²)"],
+correct: 1,
+explanation: {
+correct: "Raiz de 25x² é 5x. Raiz de 16y² é 4y. Resulta no produto da soma pela diferença.",
+options: ["Isso daria 25x² - 40xy + 16y². Erro crasso.", "Certa", "Você não extraiu a raiz quadrada dos números, apenas das letras.", "Matematicamente impossível. 5 não é fator comum de 25 e 16."]
+}
+},
+{
+id: 19, level: "Médio",
+text: "Qual é o valor numérico de 101² - 99² sem usar calculadora longa?",
+options: ["400", "200", "401", "2020"],
+correct: 0,
+explanation: {
+correct: "Diferença de quadrados! (101+99)·(101-99) = (200)·(2) = 400. Mágica da álgebra.",
+options: ["Certa", "Você apenas somou as bases, faltou multiplicar pela diferença (que é 2).", "Puro chute. A diferença não gera número ímpar se termina de multiplicar por 2.", "Erro de conta básica ou invenção de zeros."]
+}
+},
+{
+id: 20, level: "Médio",
+text: "Qual a fatoração do polinômio x³ + 2x² + 5x + 10?",
+options: ["x(x² + 5) + 2(x + 5)", "(x² + 5)(x + 2)", "(x² + 2)(x + 5)", "x²(x + 10)"],
+correct: 1,
+explanation: {
+correct: "Agrupamento: no 1º bloco x²(x+2). No 2º bloco 5(x+2). Resultado: (x² + 5)(x + 2).",
+options: ["Você fatorou mal o primeiro bloco e a conta não bateu.", "Certa", "Você agrupou errado. O x² multiplicava o (x+2), não o 5.", "Errou a essência do agrupamento."]
+}
+},
+
+// ----- DIFÍCEIS (10) -----
+{
+id: 21, level: "Difícil",
+text: "Simplifique a fração algébrica (x² - 25) / (x² - 10x + 25), assumindo x ≠ 5.",
+options: ["(x + 5) / (x - 5)", "1", "-1", "(x - 5) / (x + 5)"],
+correct: 0,
+explanation: {
+correct: "Numerador: (x+5)(x-5). Denominador: (x-5)². Cortando o (x-5), sobra (x+5)/(x-5).",
+options: ["Certa", "Você simplesmente 'cortou tudo'. Pecado gravíssimo em frações algébricas.", "Sinais não geram -1 dessa forma mágica.", "Você inverteu o resultado da simplificação. O (x+5) estava em cima."]
+}
+},
+{
+id: 22, level: "Difícil",
+text: "Fatore completamente a expressão x⁴ - 81.",
+options: ["(x² - 9)²", "(x² + 9)(x² - 9)", "(x - 3)⁴", "(x² + 9)(x + 3)(x - 3)"],
+correct: 3,
+explanation: {
+correct: "1º vira (x²+9)(x²-9). O x²-9 fatora de novo virando (x+3)(x-3).",
+options: ["O quadrado da diferença não gera x⁴ - 81.", "Incompleto! O (x² - 9) ainda precisava ser fatorado de novo.", "Potência à quarta não funciona com distribuição simples.", "Certa"]
+}
+},
+{
+id: 23, level: "Difícil",
+text: "Dado que x + y = 10 e x·y = 21, determine o valor de x² + y².",
+options: ["100", "79", "58", "121"],
+correct: 2,
+explanation: {
+correct: "Da fórmula (x+y)² = x² + 2xy + y². Temos 10² = (x² + y²) + 2·(21). 100 = (x²+y²) + 42. Logo, 58.",
+options: ["Você aplicou o pecado capital achando que (x+y)² = x² + y².", "Erro na aritmética do despejo da equação.", "Certa", "Confundiu a subtração dos 42 por soma."]
+}
+},
+{
+id: 24, level: "Difícil",
+text: "Qual é o termo que deve ser ADICIONADO ao binômio 4x² + 25 para formar um Trinômio Quadrado Perfeito?",
+options: ["+ 10x", "+ 20x", "+ 100x", "+ 5x"],
+correct: 1,
+explanation: {
+correct: "As raízes são 2x e 5. O termo central é 2·(2x)·5 = 20x.",
+options: ["Você só multiplicou as pontas (2x * 5) e esqueceu do '2' da fórmula.", "Certa", "Você pegou o 25 em vez da raiz (5) para multiplicar.", "Tirou valores do nada. Lembre da fórmula 2ab."]
+}
+},
+{
+id: 25, level: "Difícil",
+text: "Fatore a expressão polinomial 3a³ - 3ab².",
+options: ["3a(a - b)²", "3(a³ - ab²)", "3a(a + b)(a - b)", "a(3a² - 3b²)"],
+correct: 2,
+explanation: {
+correct: "Evidência: 3a(a² - b²). O parêntese é diferença de quadrados: 3a(a+b)(a-b).",
+options: ["A expansão disso geraria -6a²b no meio. Incorreto.", "Incompleto. Você parou no primeiro passo básico.", "Certa", "Fatorou apenas a letra 'a' e esqueceu do '3' e da diferença de quadrados."]
+}
+},
+{
+id: 26, level: "Difícil",
+text: "Qual é a forma fatorada completa de 16x⁴ - 1?",
+options: ["(4x² + 1)(2x + 1)(2x - 1)", "(4x² - 1)(4x² + 1)", "(2x - 1)⁴", "(16x² + 1)(x² - 1)"],
+correct: 0,
+explanation: {
+correct: "Vira (4x²+1)(4x²-1). O (4x²-1) fatora de novo pra (2x+1)(2x-1).",
+options: ["Certa", "Fatoração incompleta. Você esqueceu de fatorar o (4x² - 1).", "Regra básica: não se eleva direto a 4.", "Radiciação mal feita no coeficiente 16."]
+}
+},
+{
+id: 27, level: "Difícil",
+text: "Sabendo que a - b = 5 e a² - b² = 45, qual é o valor de a + b?",
+options: ["9", "40", "15", "50"],
+correct: 0,
+explanation: {
+correct: "Sabemos que a² - b² = (a+b)(a-b). Logo, 45 = (a+b) · 5. Portanto, a+b = 9.",
+options: ["Certa", "Você tentou subtrair 45 - 5. O raciocínio é multiplicativo.", "Você dividiu errado ou chutou o resultado.", "Você somou 45 + 5. Errado."]
+}
+},
+{
+id: 28, level: "Difícil",
+text: "Na simplificação da expressão (x³ - xy²) / (x² + 2xy + y²), considerando o denominador não nulo, obtemos:",
+options: ["x(x - y) / (x + y)", "x / (x + y)", "(x - y) / (x + y)", "x² / (x + y)"],
+correct: 0,
+explanation: {
+correct: "Cima fatora pra x(x²-y²) = x(x+y)(x-y). Baixo é (x+y)². Corta (x+y), sobra x(x-y)/(x+y).",
+options: ["Certa", "Esqueceu o fator (x-y) no numerador após cortar.", "Esqueceu o 'x' que foi colocado em evidência no início.", "Operou incorretamente as potências. Cortar não é subtrair expoentes direto."]
+}
+},
+{
+id: 29, level: "Difícil",
+text: "Fatore: (a + 2)² - 9.",
+options: ["(a - 1)(a - 7)", "(a + 5)(a - 1)", "(a + 11)(a - 7)", "(a + 2 - 9)²"],
+correct: 1,
+explanation: {
+correct: "Diferença de quadrados onde o 1º termo é (a+2) e o 2º é 3. Fica (a+2+3)(a+2-3) = (a+5)(a-1).",
+options: ["Você errou os sinais das contas internas.", "Certa", "Você somou o quadrado e tirou raiz errada.", "Pecado algébrico gravíssimo achar que a raiz espalha dessa forma."]
+}
+},
+{
+id: 30, level: "Difícil",
+text: "A expressão a² + b² + c² + 2ab + 2ac + 2bc é a expansão exata de:",
+options: ["(a + b + c)²", "(a² + b² + c²)", "a(b+c)²", "Nenhuma das anteriores"],
+correct: 0,
+explanation: {
+correct: "Esta é a clássica expansão do quadrado do trinômio (a+b+c)².",
+options: ["Certa", "Faltaram as misturas das multiplicações cruzadas (os 2ab, 2ac...).", "A expansão disso gera algo completamente diferente.", "É o quadrado do trinômio perfeito."]
+}
+}
+];
+
+// --- SISTEMA DE SALVAMENTO (LOCALSTORAGE) E LÓGICA ---
+const storageKey = 'promover_quiz_' + document.title.replace(/\s+/g, '_');
+let currentQuestion = 0;
+
+let savedAnswers = localStorage.getItem(storageKey);
+let userAnswers = savedAnswers ? JSON.parse(savedAnswers) : new Array(questions.length).fill(null);
+
+function setMode(mode) {
+const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+views.forEach(v => document.getElementById(v).style.display = 'none');
+document.getElementById('quizFooter').style.display = 'none';
+
+if(mode === 'explanation') {
+document.getElementById('viewExplanation').style.display = 'flex';
+document.getElementById('btnExp').classList.add('active');
+document.getElementById('btnPrac').classList.remove('active');
+} else if (mode === 'practice') {
+document.getElementById('viewPractice').style.display = 'block';
+document.getElementById('quizFooter').style.display = 'flex';
+document.getElementById('btnExp').classList.remove('active');
+document.getElementById('btnPrac').classList.add('active');
+renderQuestion();
+renderMap();
+} else if (mode === 'result') {
+document.getElementById('viewResult').style.display = 'block';
+document.getElementById('quizFooter').style.display = 'none';
+}
+window.scrollTo(0,0);
+}
+
+function renderQuestion() {
+if(questions.length === 0) return;
+const q = questions[currentQuestion];
+const container = document.getElementById('quizContainer');
+const letters = ['A', 'B', 'C', 'D'];
+const ans = userAnswers[currentQuestion];
+let badgeClass = '';
+
+if(q.level === 'Fácil') badgeClass = 'dif-facil';
+else if(q.level === 'Médio') badgeClass = 'dif-medio';
+else badgeClass = 'dif-dificil';
+
+container.innerHTML = `
+<div class="card-content" style="border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); padding: 15px; border-radius: 12px; background: white;">
+<span class="difficulty-badge ${badgeClass}">${q.level}</span>
+<div style="margin-bottom: 20px;">
+<span style="font-size: 0.8rem; font-weight: 800; color: var(--theme-dark);">QUESTÃO ${currentQuestion + 1} DE ${questions.length}</span>
+<h2 style="font-size: 1.15rem; margin-top: 5px; color: var(--text-color); font-weight: 900;">${q.text}</h2>
+</div>
+<div class="options-list">
+${q.options.map((opt, i) => {
+let cls = '';
+if (ans !== null) {
+if (i === q.correct) cls = 'correct';
+else if (i === ans) cls = 'wrong';
+else cls = 'disabled';
+}
+return `
+<button class="option-btn ${cls}" onclick="handleAnswer(${i})" ${ans !== null ? 'disabled' : ''}>
+<div class="opt-circle">${letters[i]}</div>
+<div>${opt}</div>
+</button>
+`}).join('')}
+</div>
+${ans !== null ? `
+<div class="feedback-box">
+<div class="feedback-title" style="color:${ans === q.correct ? 'var(--correct-border)' : 'var(--wrong-border)'}">
+${ans === q.correct ? '☑ Raciocínio Aprovado!' : '☒ Ops! Falha Detectada:'}
+</div>
+<div class="feedback-item correct-opt"><strong>A Verdade Direta e Certa:</strong> ${q.options[q.correct]}</div>
+<div style="margin-top:10px; font-size:0.95rem; color:var(--text-color); margin-bottom:15px; font-weight:600;">
+${q.explanation.correct}
+</div>
+<div style="margin-top:15px; border-top:1px dashed var(--theme-light); padding-top:10px;">
+<small style="color:var(--theme-dark);"><strong>Diagnóstico das Rasteiras e Distratores:</strong></small>
+${q.explanation.options.map((exp, i) => i !== q.correct ? `<div class="feedback-item wrong-opt" style="margin-top:8px;"><strong>${letters[i]})</strong> ${exp}</div>` : '').join('')}
+</div>
+</div>
+` : ''}
+</div>
+`;
+updateNav();
+}
+
+function handleAnswer(idx) {
+if (userAnswers[currentQuestion] !== null) return;
+userAnswers[currentQuestion] = idx;
+localStorage.setItem(storageKey, JSON.stringify(userAnswers));
+
+if (idx === questions[currentQuestion].correct) {
+const duration = 1500;
+const end = Date.now() + duration;
+(function frame() {
+confetti({ particleCount: 5, angle: 60, spread: 55, origin: {x: 0, y: 0.6 }, colors: ['#10B981', '#059669', '#34D399', '#047857'] });
+confetti({ particleCount: 5, angle: 120, spread: 55, origin: {x: 1, y: 0.6}, colors: ['#10B981', '#059669', '#34D399', '#047857'] });
+if (Date.now() < end) { requestAnimationFrame(frame); }
+}());
+} else {
+const quizContainer = document.getElementById('quizContainer');
+quizContainer.classList.remove('shake-effect');
+void quizContainer.offsetWidth;
+quizContainer.classList.add('shake-effect');
+setTimeout(() => quizContainer.classList.remove('shake-effect'), 500);
+}
+renderQuestion();
+renderMap();
+}
+
+function renderMap() {
+if(questions.length === 0) return;
+const map = document.getElementById('qMap');
+map.innerHTML = questions.map((q, i) => {
+let cls = 'map-dot';
+if (i === currentQuestion) cls += ' active';
+if (userAnswers[i] !== null) {
+cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+}
+return `<div class="${cls}" onclick="goTo(${i})">${i + 1}</div>`;
+}).join('');
+
+setTimeout(() => {
+const activeDot = map.querySelector('.map-dot.active');
+if (activeDot) {
+activeDot.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center' });
+}
+}, 50);
+}
+
+function goTo(i) {
+if (window.confetti) confetti.reset();
+currentQuestion = i;
+renderQuestion();
+renderMap();
+}
+
+function changeQuestion(d) {
+let n = currentQuestion + d;
+if (n >= 0 && n < questions.length) goTo(n);
+}
+
+function updateNav() {
+document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+const next = document.getElementById('btnNext');
+
+if (currentQuestion === questions.length - 1) {
+next.textContent = "Finalizar Diagnóstico";
+next.onclick = finish;
+} else {
+next.textContent = "Avançar";
+next.onclick = () => changeQuestion(1);
+}
+}
+
+function finish() {
+let correct = userAnswers.filter((a, i) => a === questions[i].correct).length;
+let percent = Math.round((correct / questions.length) * 100);
+
+if (window.confetti) confetti.reset();
+
+document.getElementById('finalPercent').textContent = percent + "%";
+document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${questions.length} questões.`;
+document.getElementById('finalStars').textContent = percent >= 80 ? "★★★" : percent >= 60 ? "★★☆" : "★☆☆";
+
+let summary = '<div style="text-align:left; margin-top:20px;">';
+
+if (percent < 80) {
+summary += `
+<div style="background:var(--wrong-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--wrong-border); color:var(--wrong-border);">
+<strong>! Domínio Insuficiente!</strong> O seu desempenho não atingiu a nota de corte (80%). Atingir a pontuação mínima é obrigatório nesta prova. Revise a teoria com rigor antes de tentar novamente.
+</div>`;
+document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()">Limpar Histórico e Refazer Prova</button>';
+} else {
+summary += `
+<div style="background:var(--correct-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--correct-border); color:var(--correct-border);">
+<strong>Excelente Desempenho!</strong> Você demonstrou uma base sólida, clínica e exata sobre os conceitos avaliados. A sua aprovação técnica está garantida neste módulo.
+</div>`;
+document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()">Refazer Prova (Zerar Histórico)</button>';
+}
+
+if (correct < questions.length) {
+summary += '<h4 style="margin-bottom:10px; color:var(--text-color);">Relatório de Falhas e Correções:</h4>';
+questions.forEach((q, i) => {
+if(userAnswers[i] !== q.correct && userAnswers[i] !== null) {
+summary += `
+<div style="margin-bottom:10px; padding:15px; background:var(--white); border-radius:8px; border:2px dashed var(--theme-dark);">
+<strong style="color:var(--theme-dark);">Q${i+1}:</strong> ${q.text}<br>
+<span style="color:var(--wrong-border); font-size:0.9rem; font-weight:600; display:block; margin-top:5px;">Seu Erro: ${q.options[userAnswers[i]]}</span>
+<span style="color:var(--correct-border); font-size:0.9rem; font-weight:600; display:block; margin-top:2px;">A Verdade: ${q.options[q.correct]}</span>
+</div>`;
+}
+});
+}
+
+summary += '</div>';
+document.getElementById('review-container').innerHTML = summary;
+setMode('result');
+}
+
+function reset() {
+localStorage.removeItem(storageKey);
+userAnswers = new Array(questions.length).fill(null);
+currentQuestion = 0;
+setMode('practice');
+}
+
+setMode(userAnswers.some(ans => ans !== null) ? 'practice' : 'explanation');
+</script>
+</body>
+</html>
