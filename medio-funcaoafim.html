@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Função Afim - Promover</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+:root {
+  /* TEMA: Álgebra e Funções (Tons de Índigo e Roxo Escuro) */
+  --bg-color: #F8FAFC;
+  --text-color: #0F172A;
+  --border-color: #1E293B;
+  --white: #FFFFFF;
+  
+  --theme-light: #E0E7FF;
+  --theme-medium: #818CF8;
+  --theme-dark: #3730A3;
+  --theme-contrast: #4F46E5;
+  --theme-accent: #4338CA;
+  --theme-text-active: #FFFFFF;
+
+  /* NÃO ALTERAR AS CORES ABAIXO */
+  --correct-bg: #D1FAE5;
+  --correct-border: #059669;
+  --wrong-bg: #FFE4E6;
+  --wrong-border: #BE123C;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Poppins', sans-serif; 
+  background-color: var(--bg-color); 
+  color: var(--text-color);
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  min-height: 100vh; 
+  padding: 20px; 
+  padding-bottom: 100px;
+  background-image: linear-gradient(var(--theme-light) 1px, transparent 1px),
+  linear-gradient(90deg, var(--theme-light) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-6px); }
+  100% { transform: translateX(0); }
+}
+.shake-effect { animation: shake 0.4s ease-in-out; }
+@keyframes fadeIn { from {opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.pulse-effect { animation: pulse 1s infinite; display: inline-block; }
+@keyframes pulse {
+  0% { transform: scale(1); }
+  15% { transform: scale(1.15); color: var(--theme-contrast); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.15); color: var(--theme-contrast); }
+  100% { transform: scale(1); }
+}
+
+.logo-header { width: 100%; max-width: 600px; display: flex; justify-content: center; flex-direction: column; align-items: center; padding: 20px 0 10px 0; }
+.css-logo { font-size: 1.6rem; font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 20px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); text-align: center; margin-bottom: 15px; }
+h1 { font-size: 1.8rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); text-align: center; }
+.subtitle { font-size: 0.95rem; color: var(--theme-dark); font-weight: 600; text-align: center; }
+
+.container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+
+.toggle-container { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 50px; padding: 4px; display: flex; margin-bottom: 10px; box-shadow: 3px 3px 0px var(--border-color); }
+.toggle-btn {flex: 1; border: none; background: none; padding: 12px 0; border-radius: 40px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; color: var(--theme-dark); cursor: pointer; transition: all 0.3s ease; }
+.toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); box-shadow: 0px 2px 5px rgba(0,0,0,0.2); }
+
+.view-section { display: none; animation: fadeIn 0.4s ease; flex-direction: column; gap: 20px; }
+
+.search-container { position: relative; width: 100%; }
+.search-input { width: 100%; padding: 15px 20px 15px 50px; border: 2px solid var(--border-color); border-radius: 50px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+.search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+.search-icon {position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; opacity: 0.7; }
+#no-results { text-align: center; color: var(--theme-dark); font-weight: 600; display: none; }
+
+.content-group {display: flex; flex-direction: column; gap: 12px; }
+.section-badge { display: inline-block; padding: 8px 16px; background-color: var(--theme-dark); color: var(--white); font-size: 0.9rem; font-weight: 700; border-radius: 8px; border: 2px solid var(--border-color); box-shadow: 3px 3px 0px rgba(0,0,0,0.2); text-transform: uppercase; align-self: flex-start; margin-bottom: 5px; }
+
+.theory-box { display: flex; flex-direction: column; padding: 20px; border-radius: 16px; background-color: var(--white); border: 2px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); font-weight: 500; font-size: 0.95rem; line-height: 1.6; position: relative; overflow: hidden; gap: 15px; }
+.theory-box::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background-color: var(--theme-contrast); border-right: 2px solid var(--border-color); }
+.theory-box h3 {font-size: 1.2rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; display: flex; align-items: center; gap: 8px;}
+
+.visual-area { background: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 8px; padding: 15px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 20px; font-weight: bold; font-size: 1.5rem; color: var(--theme-contrast); text-align: center; }
+.highlight-box { background-color: var(--theme-light); border-left: 4px solid var(--theme-contrast); padding: 15px; border-radius: 6px; font-size: 0.9rem; color: var(--theme-dark); }
+.highlight-box.warning { background-color: #FEF2F2; border-left-color: #BE123C; color: #881337; }
+
+.difficulty-badge {display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+.dif-facil {background: #D1FAE5; color: #065F46; }
+.dif-medio { background: #FEF08A; color: #713F12; }
+.dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+.question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+.question-map::-webkit-scrollbar {display: none; }
+.map-dot { min-width: 35px; height: 35px; border: 2px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+.map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 2px 2px 0px var(--theme-contrast); transform: scale(1.1); }
+.map-dot.answered-correct {background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+.map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+.option-btn { display: flex; align-items: center; width: 100%; padding: 16px; background-color: var(--white); border: 2px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 600; text-align: left; color: var(--text-color); }
+.option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+.opt-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+
+.option-btn.correct {background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 2px 2px 0px var(--correct-border); }
+.option-btn.correct .opt-circle {background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+.option-btn.wrong {background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+.option-btn.wrong .opt-circle {background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+.option-btn.disabled {pointer-events: none; opacity: 0.7; }
+
+.feedback-box { display: block; margin-top: 20px; background-color: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 12px; padding: 20px; animation: slideUp 0.3s ease-out; }
+.feedback-title { font-weight: 900; text-transform: uppercase; font-size: 0.95rem; margin-bottom: 10px; display:flex; align-items:center; gap:8px; color: var(--theme-dark); }
+.feedback-item { margin-bottom: 8px; font-size: 0.85rem; padding-left: 10px; border-left: 3px solid #CBD5E1; line-height: 1.5; color: #0F172A; }
+.feedback-item.correct-opt {border-left-color: var(--correct-border); font-weight: 700; color: var(--correct-border); background: var(--correct-bg); padding: 10px; border-radius: 0 6px 6px 0; }
+.feedback-item.wrong-opt {border-left-color: var(--wrong-border); color: #7F1D1D; }
+
+.result-card {background: white; border: 3px solid var(--border-color); border-radius: 20px; padding: 30px; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+.stars-container { font-size: 3.5rem; margin: 10px 0; letter-spacing: 5px; }
+.percentage-big {font-size: 4.5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 10px 0; text-shadow: 3px 3px 0px var(--theme-contrast); }
+
+.btn-action { width: 100%; padding: 18px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; box-shadow: 4px 4px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 20px; }
+.btn-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+
+.quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-color); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100; }
+.nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 800; border: 2px solid var(--border-color); cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase;}
+.btn-next { background-color: var(--theme-dark); color: white; }
+.btn-prev { background-color: white; color: var(--text-color); }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header class="logo-header">
+    <div class="css-logo"><span class="pulse-effect">⚡</span> PROMOVER</div>
+    <h1>MATEMÁTICA / 1º ANO EM</h1>
+    <p class="subtitle">Função Afim (Função do 1º Grau)</p>
+  </header>
+
+  <div class="toggle-container">
+    <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">Teoria</button>
+    <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">Prática (15)</button>
+  </div>
+
+  <div id="viewExplanation" class="view-section" style="display: flex;">
+    <div class="search-container">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar conceito (ex: coeficiente)...">
+    </div>
+    <div id="no-results"><p>Termo não encontrado.</p></div>
+
+    <div class="content-group">
+      <span class="section-badge">Anatomia da Função</span>
+      <div class="theory-box">
+        <h3>A Estrutura: f(x) = ax + b</h3>
+        <p>Toda função afim é uma relação linear de causa e efeito. Para cada variação no <strong>x</strong>, temos uma variação constante no <strong>y</strong>.</p>
+        
+        <div class="visual-area" style="gap:10px; flex-direction:column;">
+          <svg width="280" height="80" viewBox="0 0 280 80">
+            <text x="30" y="45" font-size="28" font-family="sans-serif" font-weight="900" fill="#0F172A">f(x) = </text>
+            <text x="110" y="45" font-size="28" font-family="sans-serif" font-weight="900" fill="#BE123C">a</text>
+            <text x="130" y="45" font-size="28" font-family="sans-serif" font-weight="900" fill="#0F172A">x + </text>
+            <text x="180" y="45" font-size="28" font-family="sans-serif" font-weight="900" fill="#059669">b</text>
+            
+            <line x1="118" y1="50" x2="118" y2="70" stroke="#BE123C" stroke-width="2"/>
+            <text x="60" y="78" font-size="10" font-family="sans-serif" font-weight="bold" fill="#BE123C">Taxa de Variação</text>
+            
+            <line x1="188" y1="50" x2="188" y2="70" stroke="#059669" stroke-width="2"/>
+            <text x="150" y="78" font-size="10" font-family="sans-serif" font-weight="bold" fill="#059669">Valor Fixo (Termo Indep.)</text>
+          </svg>
+        </div>
+
+        <ul style="margin-left: 20px;">
+          <li><strong style="color:#BE123C;">Coeficiente Angular (a):</strong> Define a inclinação. Se <em>a > 0</em>, a função é crescente. Se <em>a < 0</em>, é decrescente. É o ritmo em que a reta sobe ou desce.</li>
+          <li><strong style="color:#059669;">Coeficiente Linear (b):</strong> O ponto exato onde a reta <strong>corta o eixo Y</strong> (quando x = 0).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="content-group">
+      <span class="section-badge">O Gráfico</span>
+      <div class="theory-box">
+        <h3>A Reta no Plano Cartesiano</h3>
+        <p>O gráfico de uma função afim é SEMPRE uma reta não paralela aos eixos. Veja o comportamento dependendo do sinal do <strong>a</strong>:</p>
+        
+        <div class="visual-area">
+          <svg width="250" height="150" viewBox="0 0 250 150">
+            <!-- Eixos Cartesianos -->
+            <line x1="20" y1="130" x2="230" y2="130" stroke="#1E293B" stroke-width="2" marker-end="url(#arrow)"/>
+            <line x1="125" y1="20" x2="125" y2="140" stroke="#1E293B" stroke-width="2" marker-start="url(#arrowReverse)"/>
+            <text x="235" y="135" font-size="12" font-weight="bold">x</text>
+            <text x="110" y="15" font-size="12" font-weight="bold">y</text>
+            
+            <!-- Função Crescente (a > 0) em Azul -->
+            <line x1="40" y1="140" x2="110" y2="40" stroke="#3730A3" stroke-width="3"/>
+            <text x="50" y="40" font-size="11" font-weight="bold" fill="#3730A3">a &gt; 0 (Sobe)</text>
+            
+            <!-- Função Decrescente (a < 0) em Vermelho -->
+            <line x1="140" y1="40" x2="210" y2="140" stroke="#BE123C" stroke-width="3"/>
+            <text x="150" y="40" font-size="11" font-weight="bold" fill="#BE123C">a &lt; 0 (Desce)</text>
+
+            <!-- Marcas de Interseção (Crescente) -->
+            <circle cx="125" cy="18" r="0" fill="none"/> <!-- Just to balance -->
+          </svg>
+        </div>
+
+        <div class="highlight-box">
+          <strong>Raiz (ou Zero) da Função:</strong><br>
+          É o valor de <em>x</em> que faz <em>f(x) = 0</em>. Visualmente, é onde a reta <strong>corta o eixo X</strong>.<br>
+          Fórmula rápida: <strong>x = -b / a</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-group">
+      <span class="section-badge">Atenção no Contexto</span>
+      <div class="theory-box">
+        <h3>Modelagem de Problemas Reais</h3>
+        <p>A Função Afim aparece muito no ENEM em problemas de finanças, transportes e física (MRU):</p>
+        <ol style="margin-left: 20px; line-height:1.8;">
+          <li><strong>Salário de Vendedor:</strong> <em>Fixo + Comissão por Venda</em>. Ex: f(x) = 1500 + 50x. (O "a" é 50, o "b" é 1500).</li>
+          <li><strong>Conta de Água/Luz:</strong> <em>Taxa básica + Valor por consumo</em>.</li>
+          <li><strong>Táxi/Uber:</strong> <em>Bandeirada (fixo) + Valor por Km rodado</em>.</li>
+        </ol>
+        <div class="highlight-box warning">
+          <strong>⚠️ Alerta de Rasteira:</strong> Nunca confunda o coeficiente angular com o linear no texto. O que se repete/multiplica é sempre o <strong>a</strong>. O valor que você paga mesmo se x for zero é o <strong>b</strong>.
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-action" onclick="setMode('practice')">
+      Iniciar Diagnóstico (15 Q) →
+    </button>
+  </div>
+
+  <div id="viewPractice" class="view-section">
+    <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+      <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo</h2>
+      <p style="color: #0F172A; font-size: 0.95rem; font-weight:600;">
+        15 questões para separar quem entende de quem decorou. Acerte <strong>80% (12/15)</strong> para provar seu domínio.
+      </p>
+    </div>
+
+    <div class="question-map" id="qMap"></div>
+    <div id="quizContainer" style="margin-bottom: 100px;"></div>
+  </div>
+
+  <div id="viewResult" class="view-section">
+    <div class="result-card">
+      <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+      <div class="stars-container" id="finalStars">★</div>
+      <div class="percentage-big" id="finalPercent">0%</div>
+      <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 15</p>
+      <div id="review-container"></div>
+    </div>
+    <div id="action-buttons"></div>
+  </div>
+</div>
+
+<footer class="quiz-footer" id="quizFooter">
+  <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+  <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+</footer>
+
+<script>
+const searchInput = document.getElementById('searchInput');
+const contentGroups = document.querySelectorAll('.content-group');
+const noResultsMsg = document.getElementById('no-results');
+
+searchInput.addEventListener('input', function(e) {
+  const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  let totalVisible = 0;
+  
+  contentGroups.forEach(group => {
+    const textContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (textContent.includes(term)) {
+      group.style.display = 'flex';
+      totalVisible++;
+    } else {
+      group.style.display = 'none';
+    }
+  });
+  
+  noResultsMsg.style.display = totalVisible === 0 ? 'block' : 'none';
+});
+
+// Banco de Questões - 15 Questões Cirúrgicas sobre Função Afim
+const questions = [
+  // --- FÁCEIS (1 a 5) ---
+  {
+    id: 1, level: "Fácil",
+    text: "Na função f(x) = -3x + 5, quais são os valores dos coeficientes angular (a) e linear (b), respectivamente?",
+    options: ["a = 5, b = -3", "a = -3, b = 5", "a = 3, b = -5", "a = -3x, b = 5"],
+    correct: 1,
+    explanation: {
+      correct: "O coeficiente angular (a) é quem multiplica o x (-3), e o linear (b) é o termo independente (5).",
+      options: ["Você inverteu. O 'a' sempre acompanha o x, não importa a ordem.", "Certa", "Você errou os sinais. Não ignore o sinal negativo.", "O 'a' é apenas o número, ele não inclui a incógnita x."]
+    }
+  },
+  {
+    id: 2, level: "Fácil",
+    text: "Dada a função f(x) = 4x - 7, qual é o valor numérico de f(3)?",
+    options: ["12", "-11", "5", "19"],
+    correct: 2,
+    explanation: {
+      correct: "Substitua o x por 3: f(3) = 4(3) - 7 = 12 - 7 = 5.",
+      options: ["Você calculou apenas 4 * 3 e esqueceu de subtrair o 7.", "Você calculou -4(3) em vez de +4(3).", "Certa", "Você somou 12 + 7 em vez de subtrair."]
+    }
+  },
+  {
+    id: 3, level: "Fácil",
+    text: "A função f(x) = 8 - 2x é crescente ou decrescente? E por quê?",
+    options: ["Crescente, pois o 8 é positivo.", "Decrescente, pois o coeficiente a é -2 (negativo).", "Crescente, pois a ordem está invertida.", "Decrescente, pois o coeficiente b é -2."],
+    correct: 1,
+    explanation: {
+      correct: "O que define o crescimento da reta é o sinal de 'a' (quem acompanha x). Como a = -2, ela é decrescente.",
+      options: ["O coeficiente linear (8) não define se a reta sobe ou desce.", "Certa", "A ordem dos termos não altera a matemática. Quem manda é o sinal que acompanha o x.", "O coeficiente linear 'b' nesta função é 8, não -2."]
+    }
+  },
+  {
+    id: 4, level: "Fácil",
+    text: "O gráfico da função f(x) = 5x - 9 intercepta o eixo Y em qual ponto?",
+    options: ["(0, 5)", "(0, -9)", "(-9, 0)", "(5, 0)"],
+    correct: 1,
+    explanation: {
+      correct: "A reta sempre corta o eixo Y no valor de 'b' (onde x = 0). Portanto, intercepta em (0, -9).",
+      options: ["Você confundiu com o coeficiente angular (a).", "Certa", "Você colocou o valor no eixo X. Interceptar o eixo Y exige que a primeira coordenada seja zero.", "Totalmente incorreto. Este ponto nem pertence à reta."]
+    }
+  },
+  {
+    id: 5, level: "Fácil",
+    text: "Qual é a raiz (ou zero) da função f(x) = 2x - 10?",
+    options: ["-5", "10", "5", "-10"],
+    correct: 2,
+    explanation: {
+      correct: "Igualamos a função a zero: 2x - 10 = 0 → 2x = 10 → x = 5.",
+      options: ["Você errou o sinal ao passar o -10 para o outro lado da equação.", "Isto é o oposto do coeficiente linear, não a raiz.", "Certa", "Este é o coeficiente linear (onde corta o eixo Y), não a raiz."]
+    }
+  },
+  
+  // --- MÉDIAS (6 a 10) ---
+  {
+    id: 6, level: "Médio",
+    text: "Um taxista cobra um valor fixo de R$ 6,00 (bandeirada) mais R$ 2,50 por quilômetro rodado. Qual a função que representa o valor a pagar P(x) por x quilômetros?",
+    options: ["P(x) = 6x + 2,50", "P(x) = 8,50x", "P(x) = 2,50x + 6", "P(x) = (6 + 2,50)x"],
+    correct: 2,
+    explanation: {
+      correct: "O que varia (a) é 2,50 por km. O fixo (b) é 6. Logo, P(x) = 2,50x + 6.",
+      options: ["Você associou a variável x à bandeirada, que é um valor fixo.", "Você somou os valores. Isso significa que a bandeirada também seria cobrada por quilômetro.", "Certa", "A bandeirada não se multiplica pela distância."]
+    }
+  },
+  {
+    id: 7, level: "Médio",
+    text: "Encontre a raiz da função f(x) = -3x + 12.",
+    options: ["4", "-4", "12", "15"],
+    correct: 0,
+    explanation: {
+      correct: "Resolvendo: -3x + 12 = 0 → -3x = -12 → x = 4.",
+      options: ["Certa", "Errou o jogo de sinais (-12 / -3 = +4).", "Este é o coeficiente linear, onde a reta intercepta o eixo Y.", "Você somou os coeficientes sem base lógica."]
+    }
+  },
+  {
+    id: 8, level: "Médio",
+    text: "O gráfico de uma função afim passa pelos pontos A(0, 4) e B(2, 10). Qual é a lei de formação dessa função?",
+    options: ["f(x) = 3x + 4", "f(x) = 4x + 2", "f(x) = 2x + 10", "f(x) = 5x + 4"],
+    correct: 0,
+    explanation: {
+      correct: "O ponto (0,4) diz que b=4. Para achar a, usamos a taxa: a = (10-4) / (2-0) = 6/2 = 3. Logo, f(x) = 3x + 4.",
+      options: ["Certa", "Você pegou o 4 como taxa e 2 como fixo. Não faz sentido.", "Você usou as coordenadas do ponto B como coeficientes.", "Você dividiu 10 por 2 ignorando o ponto A."]
+    }
+  },
+  {
+    id: 9, level: "Médio",
+    text: "Uma função afim corta o eixo Y no ponto 5 e o eixo X no ponto -2. Qual é a sua equação?",
+    options: ["f(x) = -2x + 5", "f(x) = 2,5x + 5", "f(x) = -2,5x - 2", "f(x) = 5x - 2"],
+    correct: 1,
+    explanation: {
+      correct: "Corta y no 5, logo b = 5. Corta x no -2 (raiz). f(-2) = 0 → a(-2) + 5 = 0 → -2a = -5 → a = 2,5. Função: 2,5x + 5.",
+      options: ["Você assumiu que a raiz era o coeficiente angular. Erro conceitual.", "Certa", "O coeficiente linear b é 5, não -2. E a reta deve ser crescente.", "Você inverteu a raiz com o coeficiente linear."]
+    }
+  },
+  {
+    id: 10, level: "Médio",
+    text: "O valor de uma máquina deprecia linearmente com o tempo. Hoje ela vale R$ 50.000, e em 5 anos valerá R$ 30.000. Qual a taxa de depreciação anual (coeficiente a)?",
+    options: ["-4000", "4000", "-20000", "10000"],
+    correct: 0,
+    explanation: {
+      correct: "Variação de valor = 30000 - 50000 = -20000. Variação de tempo = 5 anos. Taxa (a) = -20000 / 5 = -4000 reais/ano.",
+      options: ["Certa", "A depreciação é perda de valor, portanto a taxa deve ser negativa (reta decrescente).", "Esta é a perda total em 5 anos, não a taxa anual.", "Cálculo aleatório dividido incorretamente."]
+    }
+  },
+
+  // --- DIFÍCEIS (11 a 15) ---
+  {
+    id: 11, level: "Difícil",
+    text: "Sabendo que f(1) = 5 e f(-1) = 1, determine a lei da função f(x).",
+    options: ["f(x) = 3x + 2", "f(x) = 2x + 3", "f(x) = -2x + 7", "f(x) = x + 4"],
+    correct: 1,
+    explanation: {
+      correct: "Montando o sistema: a + b = 5 e -a + b = 1. Somando as equações: 2b = 6 → b = 3. Substituindo: a + 3 = 5 → a = 2. Logo, 2x + 3.",
+      options: ["Se f(x) = 3x+2, então f(-1) = -3+2 = -1 (Errado, deveria ser 1).", "Certa", "Se a é negativo, f(1) seria menor que f(-1). Isso quebra a lógica do problema.", "Se f(x)=x+4, f(-1) = 3 (Errado, deveria ser 1)."]
+    }
+  },
+  {
+    id: 12, level: "Difícil",
+    text: "Qual é o ponto de interseção (x, y) entre as retas f(x) = 2x + 1 e g(x) = -x + 7?",
+    options: ["(2, 5)", "(3, 7)", "(2, 7)", "(3, 4)"],
+    correct: 0,
+    explanation: {
+      correct: "Igualamos f(x) e g(x): 2x + 1 = -x + 7 → 3x = 6 → x = 2. Substituindo x=2 em f(x): y = 2(2) + 1 = 5. Ponto (2, 5).",
+      options: ["Certa", "Este ponto não pertence à reta f(x).", "O valor de y está incorreto para ambas as funções quando x=2.", "O cálculo do x foi errado se você achou 3."]
+    }
+  },
+  {
+    id: 13, level: "Difícil",
+    text: "Plano A: Assinatura de R$ 40 + R$ 0,50 por gigabyte. Plano B: Assinatura de R$ 20 + R$ 1,50 por gigabyte. A partir de quantos gigabytes o Plano A se torna mais barato que o B?",
+    options: ["10", "15", "20", "25"],
+    correct: 2,
+    explanation: {
+      correct: "Igualando para achar o ponto de equilíbrio: 40 + 0,5x = 20 + 1,5x → 20 = 1x → x = 20. Acima de 20 GB, o A (menor taxa variável) vence.",
+      options: ["Em 10GB, A custa 45 e B custa 35 (A é mais caro).", "Em 15GB, A custa 47,5 e B custa 42,5 (A continua mais caro).", "Certa", "25 é um valor acima do equilíbrio, mas a quebra exata ocorre no 20."]
+    }
+  },
+  {
+    id: 14, level: "Difícil",
+    text: "Seja a função f(x) = (2k - 8)x + 5. Qual deve ser o valor de k para que essa função seja decrescente?",
+    options: ["k > 4", "k = 4", "k < 4", "k < 0"],
+    correct: 2,
+    explanation: {
+      correct: "Para ser decrescente, o coeficiente angular 'a' deve ser negativo. Ou seja: 2k - 8 < 0 → 2k < 8 → k < 4.",
+      options: ["Se k > 4, a função será crescente (a > 0).", "Se k = 4, a função vira f(x)=5, que é constante, não decrescente.", "Certa", "k < 0 satisfaz, mas a condição geral exige apenas k < 4 (ex: k=3 funciona)."]
+    }
+  },
+  {
+    id: 15, level: "Difícil",
+    text: "Estudo do sinal: Para quais valores de x temos que a função f(x) = -4x + 12 é estritamente positiva (f(x) > 0)?",
+    options: ["x > 3", "x < 3", "x > -3", "x < -3"],
+    correct: 1,
+    explanation: {
+      correct: "Inequação: -4x + 12 > 0 → -4x > -12. Multiplicando por -1 (inverte o sinal): 4x < 12 → x < 3.",
+      options: ["Você esqueceu de inverter o sinal da desigualdade ao lidar com o -4.", "Certa", "Erro grave com os sinais na hora da divisão algébrica.", "Duplo erro de sinais na álgebra da inequação."]
+    }
+  }
+];
+
+// --- SISTEMA DE SALVAMENTO E LÓGICA DO MOTOR ---
+const storageKey = 'promover_quiz_funcao_afim';
+let currentQuestion = 0;
+let savedAnswers = localStorage.getItem(storageKey);
+let userAnswers = savedAnswers ? JSON.parse(savedAnswers) : new Array(questions.length).fill(null);
+
+function setMode(mode) {
+  const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+  views.forEach(v => document.getElementById(v).style.display = 'none');
+  document.getElementById('quizFooter').style.display = 'none';
+  
+  if(mode === 'explanation') {
+    document.getElementById('viewExplanation').style.display = 'flex';
+    document.getElementById('btnExp').classList.add('active');
+    document.getElementById('btnPrac').classList.remove('active');
+  } else if (mode === 'practice') {
+    document.getElementById('viewPractice').style.display = 'block';
+    document.getElementById('quizFooter').style.display = 'flex';
+    document.getElementById('btnExp').classList.remove('active');
+    document.getElementById('btnPrac').classList.add('active');
+    renderQuestion();
+    renderMap();
+  } else if (mode === 'result') {
+    document.getElementById('viewResult').style.display = 'block';
+    document.getElementById('quizFooter').style.display = 'none';
+    window.scrollTo(0,0);
+  }
+}
+
+function renderQuestion() {
+  if(questions.length === 0) return;
+  const q = questions[currentQuestion];
+  const container = document.getElementById('quizContainer');
+  const letters = ['A', 'B', 'C', 'D'];
+  const ans = userAnswers[currentQuestion];
+  
+  let badgeClass = '';
+  if(q.level === 'Fácil') badgeClass = 'dif-facil';
+  else if(q.level === 'Médio') badgeClass = 'dif-medio';
+  else badgeClass = 'dif-dificil';
+  
+  container.innerHTML = `
+    <div class="card-content" style="border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); padding: 15px; border-radius: 12px; background: white;">
+      <span class="difficulty-badge ${badgeClass}">${q.level}</span>
+      <div style="margin-bottom: 20px;">
+        <span style="font-size: 0.8rem; font-weight: 800; color: var(--theme-dark);">QUESTÃO ${currentQuestion + 1} DE ${questions.length}</span>
+        <h2 style="font-size: 1.15rem; margin-top: 5px; color: var(--text-color); font-weight: 900;">${q.text}</h2>
+      </div>
+      <div class="options-list">
+        ${q.options.map((opt, i) => {
+          let cls = '';
+          if (ans !== null) {
+            if (i === q.correct) cls = 'correct';
+            else if (i === ans) cls = 'wrong';
+            else cls = 'disabled';
+          }
+          return `
+            <button class="option-btn ${cls}" onclick="handleAnswer(${i})" ${ans !== null ? 'disabled' : ''}>
+              <div class="opt-circle">${letters[i]}</div>
+              <div>${opt}</div>
+            </button>
+          `;
+        }).join('')}
+      </div>
+      
+      ${ans !== null ? `
+        <div class="feedback-box">
+          <div class="feedback-title" style="color:${ans === q.correct ? 'var(--correct-border)' : 'var(--wrong-border)'}">
+            ${ans === q.correct ? '☑ Análise Correta.' : '⚠️ Falha de Raciocínio:'}
+          </div>
+          <div class="feedback-item correct-opt"><strong>O Correto:</strong> ${q.options[q.correct]}</div>
+          <div style="margin-top:10px; font-size:0.95rem; color:var(--text-color); margin-bottom:15px; font-weight:600;">
+            ${q.explanation.correct}
+          </div>
+          <div style="margin-top:15px; border-top:1px dashed var(--theme-light); padding-top:10px;">
+            <small style="color:var(--theme-dark);"><strong>Diagnóstico dos Distratores:</strong></small>
+            ${q.explanation.options.map((exp, i) => i !== q.correct ? `<div class="feedback-item wrong-opt" style="margin-top:8px;"><strong>${letters[i]})</strong> ${exp}</div>` : '').join('')}
+          </div>
+        </div>
+      ` : ''}
+    </div>
+  `;
+  updateNav();
+}
+
+function handleAnswer(idx) {
+  if (userAnswers[currentQuestion] !== null) return;
+  userAnswers[currentQuestion] = idx;
+  localStorage.setItem(storageKey, JSON.stringify(userAnswers));
+  
+  if (idx === questions[currentQuestion].correct) {
+    const duration = 1500;
+    const end = Date.now() + duration;
+    (function frame() {
+      confetti({ particleCount: 5, angle: 60, spread: 55, origin: {x: 0, y: 0.6 }, colors: ['#4F46E5', '#4338CA', '#3730A3', '#818CF8'] });
+      confetti({ particleCount: 5, angle: 120, spread: 55, origin: {x: 1, y: 0.6}, colors: ['#4F46E5', '#4338CA', '#3730A3', '#818CF8'] });
+      if (Date.now() < end) { requestAnimationFrame(frame); }
+    }());
+  } else {
+    const quizContainer = document.getElementById('quizContainer');
+    quizContainer.classList.remove('shake-effect');
+    void quizContainer.offsetWidth; // Trigger reflow
+    quizContainer.classList.add('shake-effect');
+    setTimeout(() => quizContainer.classList.remove('shake-effect'), 500);
+  }
+  renderQuestion();
+  renderMap();
+}
+
+function renderMap() {
+  if(questions.length === 0) return;
+  const map = document.getElementById('qMap');
+  map.innerHTML = questions.map((q, i) => {
+    let cls = 'map-dot';
+    if (i === currentQuestion) cls += ' active';
+    if (userAnswers[i] !== null) {
+      cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+    }
+    return `<div class="${cls}" onclick="goTo(${i})">${i+1}</div>`;
+  }).join('');
+  
+  setTimeout(() => {
+    const activeDot = map.querySelector('.map-dot.active');
+    if (activeDot) {
+      activeDot.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }, 50);
+}
+
+function goTo(i) {
+  if (window.confetti) confetti.reset();
+  currentQuestion = i;
+  renderQuestion();
+  renderMap();
+}
+
+function changeQuestion(d) {
+  let n = currentQuestion + d;
+  if (n >= 0 && n < questions.length) goTo(n);
+}
+
+function updateNav() {
+  document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+  const next = document.getElementById('btnNext');
+  
+  if (currentQuestion === questions.length - 1) {
+    next.textContent = "Finalizar Diagnóstico";
+    next.onclick = finish;
+  } else {
+    next.textContent = "Avançar";
+    next.onclick = () => changeQuestion(1);
+  }
+}
+
+function finish() {
+  let correct = userAnswers.filter((a, i) => a === questions[i].correct).length;
+  let percent = Math.round((correct/questions.length) * 100);
+  
+  if (window.confetti) confetti.reset();
+  document.getElementById('finalPercent').textContent = percent + "%";
+  document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${questions.length} questões.`;
+  document.getElementById('finalStars').textContent = percent >= 80 ? "⭐⭐⭐" : percent >= 60 ? "⭐⭐" : "⭐";
+  
+  let summary = '<div style="text-align:left; margin-top:20px;">';
+  
+  if (percent < 80) {
+    summary += `<div style="background:var(--wrong-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--wrong-border); color:var(--wrong-border);">
+      <strong>⚠️ Domínio Insuficiente!</strong> Desempenho abaixo da nota de corte (80%). Função Afim exige atenção aos sinais e compreensão de taxa de variação. Refaça a teoria, pare de errar sinal negativo e tente novamente.
+    </div>`;
+    document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()">Limpar Histórico e Refazer Prova</button>';
+  } else {
+    summary += `<div style="background:var(--correct-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--correct-border); color:var(--correct-border);">
+      <strong>🏆 Precisão Aceitável!</strong> Você provou ter base sólida sobre coeficientes, análise gráfica e modelagem de problemas.
+    </div>`;
+    document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()">Refazer Prova (Zerar Histórico)</button>';
+  }
+  
+  if (correct < questions.length) {
+    summary += '<h4 style="margin-bottom:10px; color:var(--text-color);">Revisão das Falhas:</h4>';
+    questions.forEach((q, i) => {
+      if(userAnswers[i] !== q.correct && userAnswers[i] !== null) {
+        summary += `
+          <div style="margin-bottom:10px; padding:15px; background:var(--white); border-radius:8px; border:2px dashed var(--theme-dark);">
+            <strong style="color:var(--theme-dark);">Q${i+1}:</strong> ${q.text}<br>
+            <span style="color:var(--wrong-border); font-size:0.9rem; font-weight:600; display:block; margin-top:5px;">O que você marcou: ${q.options[userAnswers[i]]}</span>
+            <span style="color:var(--correct-border); font-size:0.9rem; font-weight:600; display:block; margin-top:2px;">A resposta exata: ${q.options[q.correct]}</span>
+          </div>`;
+      }
+    });
+  }
+  
+  summary += '</div>';
+  document.getElementById('review-container').innerHTML = summary;
+  setMode('result');
+}
+
+function reset() {
+  localStorage.removeItem(storageKey);
+  userAnswers = new Array(questions.length).fill(null);
+  currentQuestion = 0;
+  setMode('practice');
+}
+
+// Inicialização inteligente e segura do estado
+window.onload = () => {
+  const hasAnswers = userAnswers.some(ans => ans !== null);
+  const isFinished = userAnswers.every(ans => ans !== null);
+
+  if (isFinished && questions.length > 0) {
+    // Se já respondeu tudo, vai direto pro relatório
+    finish();
+  } else if (hasAnswers) {
+    // Se parou no meio, acha a primeira questão não respondida e pula pra ela
+    const firstUnanswered = userAnswers.findIndex(ans => ans === null);
+    if (firstUnanswered !== -1) {
+      currentQuestion = firstUnanswered;
+    }
+    setMode('practice');
+  } else {
+    // Se está zerado, começa pela teoria
+    setMode('explanation');
+  }
+};
+</script>
+
+</body>
+</html>
