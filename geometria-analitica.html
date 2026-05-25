@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distância entre Pontos - Promover</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+:root {
+  /* Cores temáticas MODERNIZADAS */
+  --bg-color: #F0F4F8; /* Fundo mais suave e moderno */
+  --text-color: #1E293B; /* Texto principal escuro para contraste */
+  --border-color: #0F172A; /* Bordas fortes para delimitar */
+  --white: #FFFFFF;
+  
+  --theme-light: #E2E8F0;
+  --theme-medium: #38BDF8; /* Azul Turquesa vibrante */
+  --theme-dark: #2563EB; /* Azul Royal forte */
+  --theme-contrast: #F59E0B; /* Âmbar para chamar atenção */
+  --theme-accent: #1E40AF;
+  --theme-text-active: #FFFFFF;
+
+  /* Cores de Validação (INALTERADO DO MOTOR) */
+  --correct-bg: #D1FAE5;
+  --correct-border: #059669;
+  --wrong-bg: #FFE4E6;
+  --wrong-border: #BE123C;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Poppins', sans-serif; 
+  background-color: var(--bg-color); 
+  color: var(--text-color);
+  display: flex; flex-direction: column; align-items: center; min-height: 100vh; 
+  padding: 20px; padding-bottom: 100px;
+  background-image: radial-gradient(var(--theme-light) 2px, transparent 2px);
+  background-size: 30px 30px; /* Padrão de fundo em pontilhado moderno */
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-6px); }
+  100% { transform: translateX(0); }
+}
+
+.shake-effect { animation: shake 0.4s ease-in-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.pulse-effect { animation: pulse 1s infinite; display: inline-block; }
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  15% { transform: scale(1.15); color: var(--theme-contrast); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.15); color: var(--theme-contrast); }
+  100% { transform: scale(1); }
+}
+
+.logo-header { 
+  width: 100%; max-width: 650px; display: flex; justify-content: center;
+  flex-direction: column; align-items: center; padding: 30px 0 20px 0; 
+}
+
+.css-logo { 
+  font-size: 1.8rem; font-weight: 900; color: var(--white); text-transform: uppercase; 
+  letter-spacing: -1px; border: 3px solid var(--border-color); padding: 10px 25px;
+  border-radius: 16px; background: var(--theme-dark); box-shadow: 5px 5px 0px var(--theme-contrast); 
+  text-align: center; margin-bottom: 15px; 
+}
+
+h1 { 
+  font-size: 1.9rem; font-weight: 900; color: var(--text-color); text-transform: uppercase;
+  letter-spacing: 1px; text-shadow: 2px 2px 0px rgba(0,0,0,0.05); text-align: center; line-height: 1.2;
+}
+
+.subtitle { 
+  font-size: 1.1rem; color: var(--theme-dark); font-weight: 700; text-align: center; margin-top: 5px;
+}
+
+.container { 
+  width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 20px;
+}
+
+.toggle-container { 
+  background-color: var(--white); border: 2px solid var(--border-color);
+  border-radius: 50px; padding: 6px; display: flex; margin-bottom: 15px; box-shadow: 4px 4px 0px var(--border-color); 
+}
+
+.toggle-btn {
+  flex: 1; border: none; background: none; padding: 14px 0; border-radius: 40px;
+  font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--theme-dark);
+  cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.toggle-btn.active { 
+  background-color: var(--theme-dark); color: var(--theme-text-active);
+  box-shadow: 0px 4px 10px rgba(37, 99, 235, 0.4); 
+}
+
+.view-section { 
+  display: none; animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1); flex-direction: column; gap: 24px;
+}
+
+.search-container { position: relative; width: 100%; }
+
+.search-input { 
+  width: 100%; padding: 18px 20px 18px 55px; border: 2px solid var(--border-color); 
+  border-radius: 16px; background-color: var(--white); font-family: 'Poppins', sans-serif; 
+  font-size: 1rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); 
+  outline: none; transition: all 0.2s ease; 
+}
+
+.search-input:focus { 
+  transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); 
+}
+
+.search-icon {
+  position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; opacity: 0.8; 
+}
+
+#no-results { text-align: center; color: var(--theme-dark); font-weight: 700; display: none; background: var(--white); padding: 20px; border-radius: 12px; border: 2px dashed var(--theme-dark); }
+
+.content-group { display: flex; flex-direction: column; gap: 12px; }
+
+.section-badge { 
+  display: inline-block; padding: 8px 18px; background-color: var(--theme-dark); 
+  color: var(--white); font-size: 0.95rem; font-weight: 800; border-radius: 10px;
+  border: 2px solid var(--border-color); box-shadow: 3px 3px 0px var(--theme-contrast); 
+  text-transform: uppercase; align-self: flex-start; letter-spacing: 0.5px;
+}
+
+/* CAIXAS TEÓRICAS E EXEMPLOS */
+.theory-box { 
+  display: flex; flex-direction: column; padding: 25px; border-radius: 16px;
+  background-color: var(--white); border: 2px solid var(--border-color); 
+  box-shadow: 4px 4px 0px var(--border-color); font-weight: 500; font-size: 1rem; 
+  line-height: 1.7; position: relative; overflow: hidden; gap: 15px; 
+}
+
+.theory-box::before { 
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 8px;
+  background-color: var(--theme-medium); border-right: 2px solid var(--border-color); 
+}
+
+.theory-box h3 {
+  font-size: 1.3rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; 
+  display: flex; align-items: center; gap: 10px;
+}
+
+.example-container {
+  background: #F8FAFC; border: 2px dashed #94A3B8; border-radius: 12px; padding: 20px;
+  display: flex; flex-direction: column; gap: 15px; align-items: center;
+}
+
+.example-text { width: 100%; text-align: left; font-size: 0.95rem; }
+.example-svg-box { 
+  background: white; border: 2px solid var(--border-color); border-radius: 8px; 
+  padding: 10px; box-shadow: 3px 3px 0px rgba(0,0,0,0.05); width: 100%; max-width: 300px;
+}
+
+.formula-box {
+  background-color: var(--theme-dark); color: white; padding: 20px; border-radius: 12px;
+  text-align: center; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--theme-contrast);
+}
+
+.formula-box span { font-size: 1.4rem; font-weight: 900; letter-spacing: 1px; }
+.formula-desc { font-size: 0.85rem; font-weight: 600; opacity: 0.9; margin-top: 5px; }
+
+.highlight-box { 
+  background-color: #EFF6FF; border-left: 4px solid var(--theme-dark);
+  padding: 15px; border-radius: 6px; font-size: 0.95rem; color: #1E3A8A; font-weight: 600;
+}
+
+.highlight-box.warning { background-color: #FFFBEB; border-left-color: #F59E0B; color: #92400E; }
+
+/* REGRAS DO MOTOR DE QUIZ */
+.difficulty-badge {
+  display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; 
+  font-weight: 900; text-transform: uppercase; margin-bottom: 12px; 
+  border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); 
+}
+.dif-facil { background: #D1FAE5; color: #065F46; }
+.dif-medio { background: #FEF08A; color: #713F12; }
+.dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+.question-map { 
+  display: flex; gap: 10px; overflow-x: auto; padding: 10px 5px; margin-bottom: 25px; 
+  white-space: nowrap; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; 
+}
+.question-map::-webkit-scrollbar { display: none; }
+
+.map-dot { 
+  min-width: 40px; height: 40px; border: 2px solid var(--border-color);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center; 
+  font-weight: 800; font-size: 0.9rem; color: var(--theme-dark); background: white; 
+  cursor: pointer; transition: all 0.2s; 
+}
+.map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 3px 3px 0px var(--theme-contrast); transform: scale(1.15); }
+.map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+.map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+.option-btn { 
+  display: flex; align-items: center; width: 100%; padding: 18px;
+  background-color: var(--white); border: 2px solid var(--border-color); border-radius: 14px;
+  margin-bottom: 14px; cursor: pointer; transition: all 0.15s ease; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); 
+  font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600;
+  text-align: left; color: var(--text-color); line-height: 1.4;
+}
+.option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--theme-medium); border-color: var(--theme-dark); }
+.opt-circle { 
+  width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border-color); 
+  margin-right: 15px; display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 1.1rem; flex-shrink: 0; background: var(--bg-color); color: var(--theme-dark); 
+}
+.option-btn.correct { background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 3px 3px 0px var(--correct-border); }
+.option-btn.correct .opt-circle { background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+.option-btn.wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.95; box-shadow: none; }
+.option-btn.wrong .opt-circle { background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+.option-btn.disabled { pointer-events: none; opacity: 0.6; }
+
+.feedback-box { 
+  display: block; margin-top: 25px; background-color: #F8FAFC; border: 2px dashed var(--theme-dark); 
+  border-radius: 16px; padding: 25px; animation: slideUp 0.3s ease-out; 
+}
+.feedback-title { 
+  font-weight: 900; text-transform: uppercase; font-size: 1.1rem;
+  margin-bottom: 12px; display:flex; align-items:center; gap:8px; color: var(--theme-dark); 
+}
+.feedback-item { 
+  margin-bottom: 10px; font-size: 0.95rem; padding-left: 12px; border-left: 4px solid #CBD5E1; 
+  line-height: 1.6; color: #0F172A; 
+}
+.feedback-item.correct-opt { border-left-color: var(--correct-border); font-weight: 700; color: var(--correct-border); background: var(--correct-bg); padding: 12px; border-radius: 0 8px 8px 0; }
+.feedback-item.wrong-opt { border-left-color: var(--wrong-border); color: #7F1D1D; }
+
+.result-card {
+  background: white; border: 3px solid var(--border-color); border-radius: 24px; 
+  padding: 40px 30px; box-shadow: 8px 8px 0px var(--border-color); margin-bottom: 30px; text-align: center; 
+}
+.stars-container { font-size: 4rem; margin: 15px 0; letter-spacing: 8px; }
+.percentage-big { font-size: 5.5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 15px 0; text-shadow: 4px 4px 0px var(--theme-medium); }
+
+.btn-action { 
+  width: 100%; padding: 20px; background-color: var(--theme-dark); color: white; 
+  border: 3px solid var(--border-color); border-radius: 16px; font-size: 1.15rem; font-weight: 900; 
+  cursor: pointer; box-shadow: 5px 5px 0px var(--theme-contrast); transition: all 0.15s;
+  text-transform: uppercase; margin-top: 25px; letter-spacing: 1px;
+}
+.btn-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+
+.quiz-footer { 
+  position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--white); 
+  border-top: 3px solid var(--border-color); padding: 15px 20px; display: none;
+  justify-content: space-between; align-items: center; z-index: 100; box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+}
+.nav-btn { 
+  padding: 14px 28px; border-radius: 12px; font-weight: 800; border: 2px solid var(--border-color); 
+  cursor: pointer; box-shadow: 3px 3px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase;
+}
+.btn-next { background-color: var(--theme-dark); color: white; }
+.btn-prev { background-color: var(--bg-color); color: var(--text-color); }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header class="logo-header">
+    <div class="css-logo"><span class="pulse-effect">🎯</span> PROMOVER</div>
+    <h1>MATEMÁTICA / 9º ANO</h1>
+    <p class="subtitle">Distância entre Pontos no Plano Cartesiano</p>
+  </header>
+
+  <div class="toggle-container">
+    <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">Teoria</button>
+    <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">Prática (15)</button>
+  </div>
+
+  <div id="viewExplanation" class="view-section" style="display: flex;">
+    <div class="search-container">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar conceito...">
+    </div>
+    <div id="no-results"><p>Termo não encontrado.</p></div>
+
+    <!-- CAIXA 1: INTRODUÇÃO E FÓRMULA -->
+    <div class="content-group">
+      <span class="section-badge">1. A Regra de Ouro</span>
+      <div class="theory-box">
+        <h3>O que é a Distância?</h3>
+        <p>A distância entre dois pontos no plano cartesiano é a medida do segmento de reta que os liga. A forma universal de a calcular deriva do famoso <strong>Teorema de Pitágoras</strong>.</p>
+        
+        <div class="formula-box">
+          <span>d = √[ (x₂ - x₁)² + (y₂ - y₁)² ]</span>
+          <div class="formula-desc">d = distância | x e y = coordenadas dos pontos</div>
+        </div>
+        
+        <div class="highlight-box warning">
+          💡 <strong>Dica de Ouro:</strong> A distância é uma medida de comprimento. Portanto, o resultado final será <strong>sempre positivo</strong> ou zero (nunca negativo).
+        </div>
+      </div>
+    </div>
+
+    <!-- CAIXA 2: EXEMPLO HORIZONTAL -->
+    <div class="content-group">
+      <span class="section-badge">2. Casos Simples: Eixos Alinhados</span>
+      <div class="theory-box">
+        <h3>Exemplo A: Alinhamento Horizontal</h3>
+        <div class="example-container">
+          <div class="example-text">
+            <p>Se dois pontos têm a mesma altura (o mesmo valor de <strong>y</strong>), basta subtrair os valores de <strong>x</strong>.</p>
+            <p>Pontos: <strong>A(2, 4)</strong> e <strong>B(8, 4)</strong>.</p>
+            <p>Cálculo direto: <strong>8 - 2 = 6</strong>.</p>
+          </div>
+          <div class="example-svg-box">
+            <svg width="100%" height="150" viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
+              <defs><pattern id="grid1" width="30" height="30" patternUnits="userSpaceOnUse"><rect width="30" height="30" fill="none" stroke="#E2E8F0" stroke-width="1"/></pattern></defs>
+              <rect width="300" height="150" fill="url(#grid1)" />
+              <line x1="30" y1="120" x2="270" y2="120" stroke="#1E293B" stroke-width="2"/> <!-- Eixo X -->
+              <line x1="30" y1="30" x2="30" y2="120" stroke="#1E293B" stroke-width="2"/> <!-- Eixo Y -->
+              <!-- Linha de Distancia -->
+              <line x1="90" y1="60" x2="270" y2="60" stroke="#2563EB" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="90" cy="60" r="6" fill="#F59E0B" stroke="#1E293B" stroke-width="2"/>
+              <circle cx="270" cy="60" r="6" fill="#F59E0B" stroke="#1E293B" stroke-width="2"/>
+              <text x="85" y="45" font-size="14" font-weight="bold" fill="#1E293B">A(2,4)</text>
+              <text x="260" y="45" font-size="14" font-weight="bold" fill="#1E293B">B(8,4)</text>
+              <text x="160" y="80" font-size="16" font-weight="bold" fill="#2563EB">d = 6</text>
+            </svg>
+          </div>
+        </div>
+
+        <h3 style="margin-top:10px;">Exemplo B: Alinhamento Vertical</h3>
+        <div class="example-container">
+          <div class="example-text">
+            <p>Se os pontos partilham a mesma base (o mesmo valor de <strong>x</strong>), subtraímos os valores de <strong>y</strong>.</p>
+            <p>Pontos: <strong>C(3, 1)</strong> e <strong>D(3, 6)</strong>.</p>
+            <p>Cálculo direto: <strong>6 - 1 = 5</strong>.</p>
+          </div>
+          <div class="example-svg-box">
+            <svg width="100%" height="150" viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
+              <defs><pattern id="grid2" width="30" height="30" patternUnits="userSpaceOnUse"><rect width="30" height="30" fill="none" stroke="#E2E8F0" stroke-width="1"/></pattern></defs>
+              <rect width="300" height="150" fill="url(#grid2)" />
+              <line x1="120" y1="20" x2="120" y2="140" stroke="#2563EB" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="120" cy="140" r="6" fill="#F59E0B" stroke="#1E293B" stroke-width="2"/>
+              <circle cx="120" cy="20" r="6" fill="#F59E0B" stroke="#1E293B" stroke-width="2"/>
+              <text x="135" y="145" font-size="14" font-weight="bold" fill="#1E293B">C(3,1)</text>
+              <text x="135" y="25" font-size="14" font-weight="bold" fill="#1E293B">D(3,6)</text>
+              <text x="70" y="85" font-size="16" font-weight="bold" fill="#2563EB">d = 5</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAIXA 3: EXEMPLO DIAGONAL -->
+    <div class="content-group">
+      <span class="section-badge">3. Caso Geral: Diagonal (Pitágoras)</span>
+      <div class="theory-box">
+        <h3>Exemplo C: Aplicando a Fórmula</h3>
+        <p>Quando os pontos não partilham coordenadas iguais, formamos um <strong>triângulo retângulo</strong>.</p>
+        <div class="example-container">
+          <div class="example-text">
+            <p>Pontos: <strong>E(1, 2)</strong> e <strong>F(5, 5)</strong>.</p>
+            <ul style="margin-left: 20px; margin-top: 5px;">
+              <li>Distância em x (Base): <strong>5 - 1 = 4</strong></li>
+              <li>Distância em y (Altura): <strong>5 - 2 = 3</strong></li>
+            </ul>
+            <p style="margin-top: 10px;">Aplicando a fórmula: <strong>d = √(4² + 3²) = √(16 + 9) = √25 = 5</strong>.</p>
+          </div>
+          <div class="example-svg-box">
+            <svg width="100%" height="180" viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+              <defs><pattern id="grid3" width="30" height="30" patternUnits="userSpaceOnUse"><rect width="30" height="30" fill="none" stroke="#E2E8F0" stroke-width="1"/></pattern></defs>
+              <rect width="300" height="180" fill="url(#grid3)" />
+              
+              <!-- Triângulo Retângulo -->
+              <polygon points="60,150 210,150 210,60" fill="#DBEAFE" stroke="#93C5FD" stroke-width="2"/>
+              
+              <!-- Catetos (tracejados) -->
+              <line x1="60" y1="150" x2="210" y2="150" stroke="#1E40AF" stroke-width="3" stroke-dasharray="6,4"/>
+              <line x1="210" y1="150" x2="210" y2="60" stroke="#1E40AF" stroke-width="3" stroke-dasharray="6,4"/>
+              
+              <!-- Hipotenusa (Distância) -->
+              <line x1="60" y1="150" x2="210" y2="60" stroke="#BE123C" stroke-width="4" stroke-linecap="round"/>
+              
+              <!-- Pontos -->
+              <circle cx="60" cy="150" r="6" fill="#F59E0B" stroke="#1E293B" stroke-width="2"/>
+              <circle cx="210" cy="60" r="6" fill="#F59E0B" stroke="#1E293B" stroke-width="2"/>
+              
+              <!-- Textos -->
+              <text x="15" y="155" font-size="14" font-weight="bold" fill="#1E293B">E(1,2)</text>
+              <text x="220" y="55" font-size="14" font-weight="bold" fill="#1E293B">F(5,5)</text>
+              <text x="125" y="170" font-size="14" font-weight="bold" fill="#1E40AF">Δx = 4</text>
+              <text x="220" y="110" font-size="14" font-weight="bold" fill="#1E40AF">Δy = 3</text>
+              <text x="110" y="90" font-size="16" font-weight="bold" fill="#BE123C">d = 5</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-action" onclick="setMode('practice')">
+      Iniciar Diagnóstico Prático (15 Q) →
+    </button>
+  </div>
+
+  <div id="viewPractice" class="view-section">
+    <div style="margin-bottom: 20px; background-color: var(--white); padding: 20px; border-radius: 16px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+      <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo 🔥</h2>
+      <p style="color: #475569; font-size: 1rem; font-weight:600;">
+        15 questões objetivas. Deves atingir <strong>80% (12 acertos)</strong> para garantir a aprovação. Lê a explicação após cada resposta!
+      </p>
+    </div>
+    
+    <div class="question-map" id="qMap"></div>
+    <div id="quizContainer" style="margin-bottom: 120px;"></div>
+  </div>
+
+  <div id="viewResult" class="view-section">
+    <div class="result-card">
+      <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+      <div class="stars-container" id="finalStars"></div>
+      <div class="percentage-big" id="finalPercent">0%</div>
+      <p style="font-size:1.2rem; font-weight:700; color:#475569;" id="finalScoreText">Você acertou 0 de 15</p>
+      <div id="review-container"></div>
+    </div>
+    <div id="action-buttons"></div>
+  </div>
+
+</div>
+
+<footer class="quiz-footer" id="quizFooter">
+  <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+  <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+</footer>
+
+<script>
+  // SISTEMA DE PESQUISA
+  const searchInput = document.getElementById('searchInput');
+  const contentGroups = document.querySelectorAll('.content-group');
+  const noResultsMsg = document.getElementById('no-results');
+
+  searchInput.addEventListener('input', function(e) {
+    const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    let totalVisible = 0;
+    contentGroups.forEach(group => {
+      const textContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      if (textContent.includes(term)) {
+        group.style.display = 'flex';
+        totalVisible++;
+      } else {
+        group.style.display = 'none';
+      }
+    });
+    noResultsMsg.style.display = totalVisible === 0 ? 'block' : 'none';
+  });
+
+  // O ARRAY DE 15 QUESTÕES RIGOROSAS
+  const questions = [
+    // --- FÁCEIS ---
+    {
+      id: 1, level: "Fácil",
+      text: "Se dois pontos estão na mesma linha vertical, como A(2, 1) e B(2, 8), como calculas a sua distância de forma mais rápida?",
+      options: ["Uso a fórmula de Pitágoras completa.", "Subtraio as coordenadas y (8 - 1).", "Subtraio as coordenadas x (2 - 2).", "Somo todas as coordenadas."],
+      correct: 1,
+      explanation: {
+        correct: "Exato! Se o 'x' é igual, os pontos estão alinhados verticalmente. Basta subtrair o 'y' maior pelo 'y' menor.",
+        options: [
+          "Distrator A: Funciona, mas não é a forma mais 'rápida' num alinhamento.",
+          "Certa",
+          "Distrator C: 2-2 dá zero, o que indicaria que os pontos são o mesmo.",
+          "Distrator D: Somar coordenadas nunca resulta numa distância."
+        ]
+      }
+    },
+    {
+      id: 2, level: "Fácil",
+      text: "A distância entre a origem do plano cartesiano (0,0) e o ponto P(0, 10) é de:",
+      options: ["0 unidades", "10 unidades", "100 unidades", "Infinita"],
+      correct: 1,
+      explanation: {
+        correct: "Os pontos estão sobre o eixo Y. A distância é o deslocamento direto do 0 ao 10, logo, 10 unidades.",
+        options: [
+          "Distrator A: 0 significaria que P está na própria origem.",
+          "Certa",
+          "Distrator C: 100 é o quadrado da distância. Esqueceste a raiz.",
+          "Distrator D: Todo ponto definido no plano tem uma distância finita à origem."
+        ]
+      }
+    },
+    {
+      id: 3, level: "Fácil",
+      text: "Calcula a distância entre M(5, 3) e N(9, 3).",
+      options: ["3", "4", "5", "8"],
+      correct: 1,
+      explanation: {
+        correct: "O valor de y é igual (3). Logo, calculamos a distância em x: 9 - 5 = 4.",
+        options: [
+          "Distrator A: 3 é o valor constante de Y, não a distância.",
+          "Certa",
+          "Distrator C: Subtraiu erradamente 9 - 3 ou inventou o valor.",
+          "Distrator D: Somou os valores 5 + 3."
+        ]
+      }
+    },
+    {
+      id: 4, level: "Fácil",
+      text: "Na fórmula da distância: d = √[(x₂ - x₁)² + (y₂ - y₁)²]. O que significa a parte (x₂ - x₁)?",
+      options: ["A distância diagonal.", "A distância total elevada ao quadrado.", "O comprimento vertical do triângulo.", "O comprimento horizontal da base do triângulo."],
+      correct: 3,
+      explanation: {
+        correct: "A diferença entre os eixos x (Δx) representa a variação horizontal, ou seja, a 'base' do triângulo retângulo imaginário.",
+        options: [
+          "Distrator A: A distância diagonal é representada pelo 'd' final.",
+          "Distrator B: Isso seria (d²).",
+          "Distrator C: O comprimento vertical é dado pelos 'y's (Δy).",
+          "Certa"
+        ]
+      }
+    },
+    {
+      id: 5, level: "Fácil",
+      text: "Sobre o resultado da distância cartesiana entre dois pontos distintos, é SEMPRE verdadeiro afirmar que:",
+      options: ["Pode ser um número negativo.", "É um valor estritamente positivo (maior que zero).", "Depende de qual quadrante os pontos estão.", "Será sempre um número inteiro."],
+      correct: 1,
+      explanation: {
+        correct: "Sendo pontos distintos, a distância é uma grandeza geométrica real, medindo comprimento. Por isso, será sempre maior que zero.",
+        options: [
+          "Distrator A: Medidas de comprimento/distância não podem ser negativas.",
+          "Certa",
+          "Distrator C: A fórmula garante que os sinais são irrelevantes devido à elevação ao quadrado.",
+          "Distrator D: Pode ser uma raiz não exata, como √2."
+        ]
+      }
+    },
+    // --- MÉDIOS ---
+    {
+      id: 6, level: "Médio",
+      text: "Determina a distância entre os pontos A(1, 2) e B(4, 6).",
+      options: ["3", "4", "5", "7"],
+      correct: 2,
+      explanation: {
+        correct: "Variação X = (4-1) = 3. Variação Y = (6-2) = 4. Aplicando a raiz de Pitágoras: √(3² + 4²) = √(9+16) = √25 = 5.",
+        options: [
+          "Distrator A: Calculou apenas a variação de X.",
+          "Distrator B: Calculou apenas a variação de Y.",
+          "Certa",
+          "Distrator D: Somou as variações (3+4) em vez de aplicar os quadrados."
+        ]
+      }
+    },
+    {
+      id: 7, level: "Médio",
+      text: "Um mapa mostra um drone em D(-2, 1) e uma caixa em C(6, 7). Qual a distância entre o drone e a caixa?",
+      illustration: `<svg width="240" height="160" viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg">
+        <defs><pattern id="grid_q7" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="none" stroke="#E2E8F0" stroke-width="1"/></pattern></defs>
+        <rect width="240" height="160" fill="url(#grid_q7)" />
+        <line x1="60" y1="20" x2="60" y2="140" stroke="#94A3B8" stroke-width="2"/>
+        <line x1="20" y1="120" x2="220" y2="120" stroke="#94A3B8" stroke-width="2"/>
+        <line x1="40" y1="110" x2="180" y2="40" stroke="#2563EB" stroke-width="3" stroke-dasharray="6,4"/>
+        <circle cx="40" cy="110" r="6" fill="#F59E0B" stroke="#1E293B" stroke-width="2"/>
+        <text x="15" y="130" font-size="12" font-weight="bold" fill="#1E293B">D(-2,1)</text>
+        <circle cx="180" cy="40" r="6" fill="#F59E0B" stroke="#1E293B" stroke-width="2"/>
+        <text x="185" y="35" font-size="12" font-weight="bold" fill="#1E293B">C(6,7)</text>
+      </svg>`,
+      options: ["6", "8", "10", "14"],
+      correct: 2,
+      explanation: {
+        correct: "Δx = 6 - (-2) = 8. Δy = 7 - 1 = 6. Distância = √(8² + 6²) = √(64 + 36) = √100 = 10.",
+        options: [
+          "Distrator A: Apenas o valor da variação vertical (Δy).",
+          "Distrator B: Apenas o valor da variação horizontal (Δx).",
+          "Certa",
+          "Distrator D: Somou linearmente 8 + 6 sem aplicar a fórmula correta."
+        ]
+      }
+    },
+    {
+      id: 8, level: "Médio",
+      text: "Qual é a distância do ponto P(5, -12) até à origem (0,0)?",
+      options: ["-7", "7", "13", "17"],
+      correct: 2,
+      explanation: {
+        correct: "À origem, a fórmula simplifica-se: d = √(x² + y²) = √(5² + (-12)²) = √(25 + 144) = √169 = 13.",
+        options: [
+          "Distrator A: Subtraiu os valores originais e aceitou distância negativa.",
+          "Distrator B: Fez 12 - 5, raciocínio ilógico.",
+          "Certa",
+          "Distrator D: Somou em módulo 12 + 5 ignorando Pitágoras."
+        ]
+      }
+    },
+    {
+      id: 9, level: "Médio",
+      text: "Se um segmento de reta tem extremos A(3, -2) e B(3, -8), o seu comprimento é:",
+      options: ["-6", "6", "10", "36"],
+      correct: 1,
+      explanation: {
+        correct: "X é igual. O comprimento vertical é a diferença modular de y: |-8 - (-2)| = |-6| = 6.",
+        options: [
+          "Distrator A: Distâncias nunca são negativas.",
+          "Certa",
+          "Distrator C: Erro aritmético básico na subtração.",
+          "Distrator D: Elevou a diferença ao quadrado mas esqueceu de tirar a raiz."
+        ]
+      }
+    },
+    {
+      id: 10, level: "Médio",
+      text: "Calcula a distância entre T(-3, -4) e S(-6, -8).",
+      options: ["5", "7", "12", "25"],
+      correct: 0,
+      explanation: {
+        correct: "Δx = -6 - (-3) = -3. Δy = -8 - (-4) = -4. d = √((-3)² + (-4)²) = √(9+16) = √25 = 5.",
+        options: [
+          "Certa",
+          "Distrator B: Somou em módulo 3 + 4, errando a aplicação da fórmula.",
+          "Distrator C: Somou os valores das coordenadas ao calhas.",
+          "Distrator D: Encontrou o valor da soma dos quadrados mas esqueceu a raiz."
+        ]
+      }
+    },
+    {
+      id: 11, level: "Difícil",
+      text: "Um triângulo tem vértices em P(0,0), Q(0,8) e R(6,0). Qual é a medida do perímetro deste triângulo?",
+      illustration: `<svg width="200" height="180" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+        <defs><pattern id="grid_q11" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="none" stroke="#E2E8F0" stroke-width="1"/></pattern></defs>
+        <rect width="200" height="180" fill="url(#grid_q11)" />
+        <line x1="40" y1="20" x2="40" y2="160" stroke="#1E293B" stroke-width="2"/>
+        <line x1="20" y1="140" x2="180" y2="140" stroke="#1E293B" stroke-width="2"/>
+        <polygon points="40,140 40,60 100,140" fill="#DBEAFE" stroke="#2563EB" stroke-width="3"/>
+        <circle cx="40" cy="140" r="5" fill="#BE123C"/>
+        <text x="5" y="155" font-size="12" font-weight="bold" fill="#1E293B">P(0,0)</text>
+        <circle cx="40" cy="60" r="5" fill="#BE123C"/>
+        <text x="5" y="55" font-size="12" font-weight="bold" fill="#1E293B">Q(0,8)</text>
+        <circle cx="100" cy="140" r="5" fill="#BE123C"/>
+        <text x="105" y="155" font-size="12" font-weight="bold" fill="#1E293B">R(6,0)</text>
+      </svg>`,
+      options: ["10", "14", "24", "48"],
+      correct: 2,
+      explanation: {
+        correct: "Lados: PQ=8, PR=6, QR=√(6²+8²)=10. O perímetro é a soma dos três lados: 8 + 6 + 10 = 24.",
+        options: [
+          "Distrator A: 10 é apenas o tamanho da hipotenusa, não o perímetro total.",
+          "Distrator B: Somou apenas os catetos (8+6) esquecendo-se da hipotenusa.",
+          "Certa",
+          "Distrator D: Multiplicou 6x8. Confundiu área do retângulo com perímetro."
+        ]
+      }
+    },
+    {
+      id: 12, level: "Difícil",
+      text: "Os pontos A(-1, 2) e B(x, 2) estão distanciados 7 unidades um do outro. Sabendo que x é um número positivo, o valor de x é:",
+      options: ["5", "6", "7", "8"],
+      correct: 1,
+      explanation: {
+        correct: "Se o Y é igual (2), a distância é puramente horizontal. Do -1 tens de caminhar 7 unidades para a direita (positivo): -1 + 7 = 6.",
+        options: [
+          "Distrator A: Subtraiu erradamente 7 - 2.",
+          "Certa",
+          "Distrator C: Escolheu o valor da própria distância como coordenada.",
+          "Distrator D: Somou 7 ao invés da distância, mas considerando o '1' como positivo (1+7)."
+        ]
+      }
+    },
+    {
+      id: 13, level: "Difícil",
+      text: "O ponto médio de uma reta é M(2, 2) e um extremo é A(0, 0). O comprimento total dessa reta é:",
+      options: ["√8", "2√8", "4", "4√2"],
+      correct: 3,
+      explanation: {
+        correct: "A distância do M a A é √(2²+2²) = √8 = 2√2. O comprimento total é o dobro: 2 * 2√2 = 4√2.",
+        options: [
+          "Distrator A: É apenas a distância do centro ao extremo (metade do caminho).",
+          "Distrator B: Numericamente correto mas não simplificado (2√8 = 4√2).",
+          "Distrator C: Supôs erradamente que a distância na diagonal era igual às coordenadas.",
+          "Certa"
+        ]
+      }
+    },
+    {
+      id: 14, level: "Difícil",
+      text: "O ponto P(x, 0) é equidistante dos pontos A(0, 2) e B(4, 0). Qual é o valor de x?",
+      options: ["1", "1.5", "2", "2.5"],
+      correct: 1,
+      explanation: {
+        correct: "d(A,P)² = d(B,P)². Logo: (x-0)² + (0-2)² = (x-4)² + (0-0)². Resolvendo: x² + 4 = x² - 8x + 16. Assim 8x = 12 => x = 1.5.",
+        options: [
+          "Distrator A: Chute intuitivo comum.",
+          "Certa",
+          "Distrator C: Assumiu 2 porque é metade de 4, ignorando o impacto do y do ponto A.",
+          "Distrator D: Erro algébrico na resolução da equação linear."
+        ]
+      }
+    },
+    {
+      id: 15, level: "Difícil",
+      text: "Num jogo, a personagem salta do ponto A(1, 1) para o ponto B(4, 5) e depois para C(4, 10). Qual é a distância total percorrida?",
+      illustration: `<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs><pattern id="grid_q15" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="none" stroke="#E2E8F0" stroke-width="1"/></pattern></defs>
+        <rect width="200" height="200" fill="url(#grid_q15)" />
+        <line x1="20" y1="20" x2="20" y2="180" stroke="#94A3B8" stroke-width="2"/>
+        <line x1="10" y1="170" x2="180" y2="170" stroke="#94A3B8" stroke-width="2"/>
+        <polyline points="40,150 100,90 100,20" fill="none" stroke="#F59E0B" stroke-width="4" stroke-linejoin="round"/>
+        <circle cx="40" cy="150" r="5" fill="#1E40AF"/>
+        <text x="45" y="165" font-size="12" font-weight="bold" fill="#1E293B">A(1,1)</text>
+        <circle cx="100" cy="90" r="5" fill="#1E40AF"/>
+        <text x="110" y="95" font-size="12" font-weight="bold" fill="#1E293B">B(4,5)</text>
+        <circle cx="100" cy="20" r="5" fill="#1E40AF"/>
+        <text x="110" y="25" font-size="12" font-weight="bold" fill="#1E293B">C(4,10)</text>
+      </svg>`,
+      options: ["9", "10", "12", "15"],
+      correct: 1,
+      explanation: {
+        correct: "Caminho AB: √(3²+4²) = 5. Caminho BC (mesmo X): 10-5 = 5. Total = 5 + 5 = 10.",
+        options: [
+          "Distrator A: Calculou mal a primeira hipotenusa.",
+          "Certa",
+          "Distrator C: Somou os catetos iniciais e não os trajetos totais.",
+          "Distrator D: Somou todas as coordenadas num cálculo que não faz sentido."
+        ]
+      }
+    }
+  ];
+
+  // --- MOTOR JS (MANTIDO INTACTO) ---
+  const storageKey = 'promover_quiz_' + document.title.replace(/\s+/g, '_');
+  let currentQuestion = 0;
+  let savedAnswers = localStorage.getItem(storageKey);
+  let userAnswers = savedAnswers ? JSON.parse(savedAnswers) : new Array(questions.length).fill(null);
+
+  function setMode(mode) {
+    const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+    views.forEach(v => document.getElementById(v).style.display = 'none');
+    document.getElementById('quizFooter').style.display = 'none';
+
+    if(mode === 'explanation') {
+      document.getElementById('viewExplanation').style.display = 'flex';
+      document.getElementById('btnExp').classList.add('active');
+      document.getElementById('btnPrac').classList.remove('active');
+    } else if (mode === 'practice') {
+      document.getElementById('viewPractice').style.display = 'block';
+      document.getElementById('quizFooter').style.display = 'flex';
+      document.getElementById('btnExp').classList.remove('active');
+      document.getElementById('btnPrac').classList.add('active');
+      renderQuestion();
+      renderMap();
+    } else if (mode === 'result') {
+      document.getElementById('viewResult').style.display = 'block';
+      document.getElementById('quizFooter').style.display = 'none';
+      window.scrollTo(0, 0);
+    }
+  }
+
+  function renderQuestion() {
+    if(questions.length === 0) return;
+    const q = questions[currentQuestion];
+    const container = document.getElementById('quizContainer');
+    const letters = ['A', 'B', 'C', 'D'];
+    const ans = userAnswers[currentQuestion];
+    
+    let badgeClass = '';
+    if(q.level === 'Fácil') badgeClass = 'dif-facil';
+    else if(q.level === 'Médio') badgeClass = 'dif-medio';
+    else badgeClass = 'dif-dificil';
+
+    container.innerHTML = `
+      <div class="card-content" style="border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); padding: 25px; border-radius: 16px; background: white;">
+        <span class="difficulty-badge ${badgeClass}">${q.level}</span>
+        <div style="margin-bottom: 25px;">
+          <span style="font-size: 0.85rem; font-weight: 800; color: var(--theme-dark); letter-spacing:0.5px;">QUESTÃO ${currentQuestion + 1} DE ${questions.length}</span>
+          <h2 style="font-size: 1.25rem; margin-top: 8px; color: var(--text-color); font-weight: 900; line-height: 1.4;">${q.text}</h2>
+          ${q.illustration ? `<div style="margin: 15px 0; display: flex; justify-content: center; background: #F8FAFC; border: 2px dashed #94A3B8; border-radius: 12px; padding: 15px;">${q.illustration}</div>` : ''}
+        </div>
+        <div class="options-list">
+          ${q.options.map((opt, i) => {
+            let cls = '';
+            if (ans !== null) {
+              if (i === q.correct) cls = 'correct';
+              else if (i === ans) cls = 'wrong';
+              else cls = 'disabled';
+            }
+            return `
+              <button class="option-btn ${cls}" onclick="handleAnswer(${i})" ${ans !== null ? 'disabled' : ''}>
+                <div class="opt-circle">${letters[i]}</div>
+                <div>${opt}</div>
+              </button>
+            `;
+          }).join('')}
+        </div>
+        
+        ${ans !== null ? `
+          <div class="feedback-box">
+            <div class="feedback-title" style="color:${ans === q.correct ? 'var(--correct-border)' : 'var(--wrong-border)'}">
+              ${ans === q.correct ? '☑ Raciocínio Aprovado!' : '☒ Ops! Falha Detectada!'}
+            </div>
+            <div class="feedback-item correct-opt"><strong>A Verdade Direta:</strong> ${q.options[q.correct]}</div>
+            <div style="margin-top:12px; font-size:1rem; color:var(--text-color); margin-bottom:15px; font-weight:600;">
+              ${q.explanation.correct}
+            </div>
+            <div style="margin-top:20px; border-top:2px dashed var(--theme-light); padding-top:15px;">
+              <small style="color:var(--theme-dark); font-size:0.85rem;"><strong>DIAGNÓSTICO DOS DISTRATORES:</strong></small>
+              ${q.explanation.options.map((exp, i) => i !== q.correct ? `
+                <div class="feedback-item wrong-opt" style="margin-top:8px;"><strong>${letters[i]})</strong> ${exp}</div>
+              ` : '').join('')}
+            </div>
+          </div>
+        ` : ''}
+      </div>
+    `;
+    updateNav();
+  }
+
+  function handleAnswer(idx) {
+    if (userAnswers[currentQuestion] !== null) return;
+    
+    userAnswers[currentQuestion] = idx;
+    localStorage.setItem(storageKey, JSON.stringify(userAnswers));
+    
+    if (idx === questions[currentQuestion].correct) {
+      const duration = 1500;
+      const end = Date.now() + duration;
+
+      (function frame() {
+        confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0, y: 0.6 }, colors: ['#38BDF8', '#2563EB', '#F59E0B'] });
+        confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1, y: 0.6 }, colors: ['#38BDF8', '#2563EB', '#F59E0B'] });
+        if (Date.now() < end) { requestAnimationFrame(frame); }
+      }());
+    } else {
+      const quizContainer = document.getElementById('quizContainer');
+      quizContainer.classList.remove('shake-effect');
+      void quizContainer.offsetWidth; // trigger reflow
+      quizContainer.classList.add('shake-effect');
+      setTimeout(() => quizContainer.classList.remove('shake-effect'), 500);
+    }
+    
+    renderQuestion();
+    renderMap();
+  }
+
+  function renderMap() {
+    if(questions.length === 0) return;
+    const map = document.getElementById('qMap');
+    
+    map.innerHTML = questions.map((q, i) => {
+      let cls = 'map-dot';
+      if (i === currentQuestion) cls += ' active';
+      if (userAnswers[i] !== null) {
+        cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+      }
+      return `<div class="${cls}" onclick="goTo(${i})">${i + 1}</div>`;
+    }).join('');
+
+    setTimeout(() => {
+      const activeDot = map.querySelector('.map-dot.active');
+      if (activeDot) {
+        activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }, 50);
+  }
+
+  function goTo(i) {
+    if (window.confetti) confetti.reset();
+    currentQuestion = i;
+    renderQuestion();
+    renderMap();
+  }
+
+  function changeQuestion(d) {
+    let n = currentQuestion + d;
+    if (n >= 0 && n < questions.length) goTo(n);
+  }
+
+  function updateNav() {
+    document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+    const next = document.getElementById('btnNext');
+    if (currentQuestion === questions.length - 1) {
+      next.textContent = "Finalizar Diagnóstico";
+      next.onclick = finish;
+    } else {
+      next.textContent = "Avançar";
+      next.onclick = () => changeQuestion(1);
+    }
+  }
+
+  function finish() {
+    let correct = userAnswers.filter((a, i) => a === questions[i].correct).length;
+    let percent = Math.round((correct / questions.length) * 100);
+
+    if (window.confetti) confetti.reset();
+
+    document.getElementById('finalPercent').textContent = percent + "%";
+    document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${questions.length} questões.`;
+    
+    document.getElementById('finalStars').textContent = percent >= 80 ? "⭐⭐⭐" : (percent >= 60 ? "⭐⭐" : "⭐");
+
+    let summary = '<div style="text-align:left; margin-top:25px;">';
+    
+    if (percent < 80) {
+      summary += `
+        <div style="background:var(--wrong-bg); padding:20px; border-radius:12px; margin-bottom:20px; border:3px solid var(--wrong-border); color:var(--wrong-border); font-size:1.05rem;">
+          <strong>⚠️ Domínio Insuficiente!</strong> O teu desempenho não atingiu a nota de corte (80%). Atingir a pontuação mínima é obrigatório nesta prova. Revisa a teoria com rigor antes de tentares novamente.
+        </div>`;
+      document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()">Limpar Histórico e Refazer Prova</button>';
+    } else {
+      summary += `
+        <div style="background:var(--correct-bg); padding:20px; border-radius:12px; margin-bottom:20px; border:3px solid var(--correct-border); color:var(--correct-border); font-size:1.05rem;">
+          <strong>✅ Excelente Desempenho!</strong> Demonstraste uma base sólida, clínica e exata sobre os conceitos avaliados. A tua aprovação técnica está garantida neste módulo.
+        </div>`;
+      document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()">Refazer Prova (Zerar Histórico)</button>';
+    }
+
+    if (correct < questions.length) {
+      summary += '<h4 style="margin-bottom:15px; color:var(--theme-dark); font-size:1.2rem; font-weight:800;">Relatório de Falhas e Correções:</h4>';
+      questions.forEach((q, i) => {
+        if(userAnswers[i] !== q.correct && userAnswers[i] !== null) {
+          summary += `
+            <div style="margin-bottom:15px; padding:20px; background:var(--bg-color); border-radius:12px; border:2px dashed var(--theme-dark);">
+              <strong style="color:var(--theme-dark); font-size:1.1rem;">Q${i + 1}:</strong> <span style="font-weight:600;">${q.text}</span><br>
+              <span style="color:var(--wrong-border); font-size:0.95rem; font-weight:700; display:block; margin-top:8px;">❌ O que marcaste: ${q.options[userAnswers[i]]}</span>
+              <span style="color:var(--correct-border); font-size:0.95rem; font-weight:700; display:block; margin-top:4px;">✅ A Resposta Certa: ${q.options[q.correct]}</span>
+            </div>`;
+        }
+      });
+    }
+
+    summary += '</div>';
+    document.getElementById('review-container').innerHTML = summary;
+    setMode('result');
+  }
+
+  function reset() {
+    localStorage.removeItem(storageKey);
+    userAnswers = new Array(questions.length).fill(null);
+    currentQuestion = 0;
+    setMode('practice');
+  }
+
+  setMode(userAnswers.some(ans => ans !== null) ? 'practice' : 'explanation');
+</script>
+
+</body>
+</html>
