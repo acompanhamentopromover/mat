@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base Estrutural: Funções 1º e 2º Grau</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            /* Tema Estudo Focado: Azul Acadêmico (Concentração e Rigor) */
+            --bg-color: #F8FAFC;
+            --text-color: #0F172A;
+            --border-color: #1E293B;
+            --white: #FFFFFF;
+            --theme-light: #E2E8F0;
+            --theme-medium: #64748B;
+            --theme-dark: #334155;
+            --theme-contrast: #0F172A;
+            --theme-accent: #2563EB;
+            --theme-text-active: #FFFFFF;
+
+            /* Cores de Feedback */
+            --correct-bg: #F0FDF4;
+            --correct-border: #15803D;
+            --wrong-bg: #FEF2F2;
+            --wrong-border: #B91C1C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-color);
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; padding-bottom: 100px;
+            background-image: linear-gradient(var(--theme-light) 1px, transparent 1px),
+            linear-gradient(90deg, var(--theme-light) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+
+        @keyframes fadeIn { from {opacity: 0; } to { opacity: 1; } }
+
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .logo-header { width: 100%; max-width: 600px; display: flex; justify-content: center; flex-direction: column; align-items: center; padding: 20px 0 10px 0; }
+
+        .css-logo { font-size: 1.6rem; font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 20px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-accent); text-align: center; margin-bottom: 15px; }
+
+        h1 { font-size: 1.8rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); text-align: center; }
+
+        .subtitle { font-size: 0.95rem; color: var(--white); font-weight: 700; text-align: center; background: var(--theme-accent); padding: 4px 12px; border-radius: 20px; border: 2px solid var(--border-color); margin-top: 5px; box-shadow: 2px 2px 0px var(--border-color);}
+
+        .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+
+        .toggle-container { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 50px; padding: 4px; display: flex; margin-bottom: 10px; box-shadow: 3px 3px 0px var(--border-color); }
+
+        .toggle-btn {flex: 1; border: none; background: none; padding: 12px 0; border-radius: 40px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; color: var(--theme-dark); cursor: pointer; transition: all 0.3s ease; }
+
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); box-shadow: 0px 2px 5px rgba(0,0,0,0.2); }
+
+        .view-section { display: none; animation: fadeIn 0.4s ease; flex-direction: column; gap: 20px; }
+
+        .content-group {display: flex; flex-direction: column; gap: 12px; }
+
+        .section-badge { display: inline-block; padding: 8px 16px; background-color: var(--theme-dark); color: var(--white); font-size: 0.9rem; font-weight: 700; border-radius: 8px; border: 2px solid var(--border-color); box-shadow: 3px 3px 0px rgba(0,0,0,0.2); text-transform: uppercase; align-self: flex-start; margin-bottom: 5px; }
+
+        .theory-box { display: flex; flex-direction: column; padding: 20px; border-radius: 16px; background-color: var(--white); border: 2px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); font-weight: 500; font-size: 0.95rem; line-height: 1.6; position: relative; overflow: hidden; gap: 15px; }
+
+        .theory-box::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background-color: var(--theme-accent); border-right: 2px solid var(--border-color); }
+
+        .theory-box h3 {font-size: 1.2rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; display: flex; align-items: center; gap: 8px;}
+
+        /* FORMATAÇÃO MATEMÁTICA E GRÁFICA */
+        .math-block { font-family: 'Times New Roman', Times, serif; font-size: 1.2rem; font-weight: bold; background: #F8FAFC; border: 2px dashed #CBD5E1; padding: 15px; border-radius: 8px; text-align: center; color: var(--theme-dark); overflow-x: auto; }
+        
+        .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 4px; font-size: 0.95em; }
+        .frac .num { border-bottom: 2px solid currentColor; padding: 0 6px; width: 100%; text-align: center; }
+        .frac .den { padding: 0 6px; width: 100%; text-align: center; }
+
+        .highlight-box { background-color: #EFF6FF; border-left: 4px solid var(--theme-accent); padding: 15px; border-radius: 6px; font-size: 0.9rem; color: #1E3A8A; }
+        .highlight-box.warning { background-color: #FEF2F2; border-left-color: #DC2626; color: #991B1B; }
+
+        .question-svg { width: 100%; max-width: 320px; height: auto; background: white; border: 2px solid var(--border-color); border-radius: 8px; margin: 15px auto; display: block; box-shadow: 2px 2px 0px rgba(0,0,0,0.1); }
+
+        .difficulty-badge {display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+
+        .dif-facil {background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar {height: 6px;}
+        .question-map::-webkit-scrollbar-thumb {background: var(--theme-dark); border-radius: 10px;}
+
+        .map-dot { min-width: 38px; height: 38px; border: 2px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; flex-shrink: 0;}
+        .map-dot.active { background-color: var(--theme-accent); color: white; box-shadow: 2px 2px 0px var(--border-color); transform: scale(1.1); border-color: var(--border-color); }
+        .map-dot.answered-correct {background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 16px; background-color: var(--white); border: 2px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--theme-accent); border-color: var(--theme-accent); }
+
+        .opt-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+
+        .option-btn.correct {background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 2px 2px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle {background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong {background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle {background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled {pointer-events: none; opacity: 0.7; }
+
+        .feedback-box { display: block; margin-top: 20px; background-color: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 12px; padding: 20px; animation: slideUp 0.3s ease-out; }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 0.95rem; margin-bottom: 10px; display:flex; align-items:center; gap:8px; color: var(--theme-dark); }
+        .feedback-item { margin-bottom: 8px; font-size: 0.85rem; padding-left: 10px; border-left: 3px solid #CBD5E1; line-height: 1.5; color: #0F172A; }
+        .feedback-item.correct-opt {border-left-color: var(--correct-border); font-weight: 700; color: var(--correct-border); background: var(--correct-bg); padding: 10px; border-radius: 0 6px 6px 0; }
+        .feedback-item.wrong-opt {border-left-color: var(--wrong-border); color: #9F1239; }
+
+        .result-card {background: white; border: 3px solid var(--border-color); border-radius: 20px; padding: 30px; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 3.5rem; margin: 10px 0; letter-spacing: 5px; }
+        .percentage-big {font-size: 4.5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 10px 0; text-shadow: 3px 3px 0px var(--theme-accent); }
+
+        .btn-action { width: 100%; padding: 18px; background-color: var(--theme-accent); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; box-shadow: 4px 4px 0px var(--theme-dark); transition: all 0.1s; text-transform: uppercase; margin-top: 20px; }
+        .btn-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-dark); }
+
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-color); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100; }
+        .nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 800; border: 2px solid var(--border-color); cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase;}
+        .btn-next { background-color: var(--theme-accent); color: white; }
+        .btn-prev { background-color: white; color: var(--text-color); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="logo-header">
+        <div class="css-logo">PROMOVER</div>
+        <h1>MATEMÁTICA - 1º ANO</h1>
+        <p class="subtitle">ESTRUTURA COMPLETA DE FUNÇÕES</p>
+    </header>
+
+    <div class="toggle-container">
+        <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">Teoria Base</button>
+        <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">Flashcards (20)</button>
+    </div>
+
+    <!-- SEÇÃO DE TEORIA -->
+    <div id="viewExplanation" class="view-section" style="display: flex;">
+        
+        <!-- MÓDULO 1: 1º GRAU -->
+        <div class="content-group">
+            <span class="section-badge">Módulo 1: Função Afim (A Reta)</span>
+            <div class="theory-box">
+                <p>A função do 1º grau é uma reta descrita pela fórmula <strong>f(x) = ax + b</strong>. Lemos um gráfico sempre da esquerda para a direita. Se a reta sobe, ela cresce; se desce, decresce.</p>
+                
+                <div class="math-block">
+                    f(x) = ax + b
+                </div>
+
+                <div class="highlight-box">
+                    <strong>• Coeficiente Linear (b):</strong> É a "âncora" no eixo Y (vertical). É exatamente o valor onde a reta cruza esse eixo (quando x=0).<br>
+                    <strong>• Coeficiente Angular (a):</strong> Dita a inclinação. Se for positivo (a > 0), a reta é crescente. Se negativo (a < 0), decrescente.
+                </div>
+
+                <div class="highlight-box warning">
+                    <strong>A Raiz (A Fronteira no Eixo X):</strong><br>
+                    A raiz é o ponto exato onde a reta fura o eixo X (o "chão"). É onde a função muda de sinal. Para achá-la, basta igualar a equação a zero e isolar o x.
+                </div>
+
+                <svg viewBox="0 0 300 150" class="question-svg">
+                    <!-- Eixo X -->
+                    <line x1="10" y1="120" x2="280" y2="120" stroke="#94A3B8" stroke-width="2"/>
+                    <polygon points="280,116 288,120 280,124" fill="#94A3B8"/>
+                    <text x="280" y="110" font-size="12" font-weight="bold" fill="#64748B" font-family="sans-serif">x</text>
+                    
+                    <!-- Eixo Y -->
+                    <line x1="150" y1="140" x2="150" y2="15" stroke="#94A3B8" stroke-width="2"/>
+                    <polygon points="146,15 150,7 154,15" fill="#94A3B8"/>
+                    <text x="160" y="20" font-size="12" font-weight="bold" fill="#64748B" font-family="sans-serif">y</text>
+                    
+                    <!-- Reta Crescente -->
+                    <line x1="60" y1="140" x2="240" y2="30" stroke="#2563EB" stroke-width="3"/>
+                    
+                    <!-- Pontos -->
+                    <circle cx="150" cy="85" r="5" fill="#DC2626"/>
+                    <text x="162" y="89" font-size="12" font-weight="bold">Corta Y (b)</text>
+                    
+                    <circle cx="93" cy="120" r="5" fill="#DC2626"/>
+                    <text x="93" y="138" font-size="12" font-weight="bold" text-anchor="middle">Raiz (X)</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- MÓDULO 2: 2º GRAU - GRÁFICOS E COMPORTAMENTO -->
+        <div class="content-group">
+            <span class="section-badge">Módulo 2: A Parábola e os Extremos (Máx/Mín)</span>
+            <div class="theory-box">
+                <p>A parábola (<strong>f(x) = ax² + bx + c</strong>) não é uma curva desenhada ao acaso; ela modela limites. O sinal do coeficiente <strong>'a'</strong> define se a função tem um "fundo do poço" ou um "topo de morro".</p>
+                
+                <div class="highlight-box">
+                    <strong>Cenário 1: Concavidade para Cima (a > 0)</strong><br>
+                    A parábola "sorri". Ela desce, atinge um limite, e volta a subir. Esse ponto mais baixo absoluto é o <strong>Ponto de Mínimo</strong>. Em provas, isso modela "custo mínimo" ou "desperdício mínimo".
+                </div>
+
+                <svg viewBox="0 0 300 150" class="question-svg">
+                    <!-- Eixo X -->
+                    <line x1="10" y1="120" x2="280" y2="120" stroke="#94A3B8" stroke-width="2"/>
+                    <polygon points="280,116 288,120 280,124" fill="#94A3B8"/>
+                    <text x="280" y="110" font-size="12" font-weight="bold" fill="#64748B" font-family="sans-serif">x</text>
+                    
+                    <!-- Eixo Y -->
+                    <line x1="150" y1="145" x2="150" y2="15" stroke="#94A3B8" stroke-width="2"/>
+                    <polygon points="146,15 150,7 154,15" fill="#94A3B8"/>
+                    <text x="160" y="20" font-size="12" font-weight="bold" fill="#64748B" font-family="sans-serif">y</text>
+                    
+                    <!-- Curva Mínimo cruzando o eixo -->
+                    <path d="M 60 20 Q 150 240 240 20" fill="none" stroke="#2563EB" stroke-width="3"/>
+                    <text x="162" y="105" font-size="12" font-weight="bold">a > 0</text>
+                    
+                    <!-- Vértice -->
+                    <circle cx="150" cy="130" r="5" fill="#DC2626"/>
+                    <text x="162" y="135" font-size="11" font-weight="bold" fill="#DC2626">Ponto de Mínimo</text>
+                </svg>
+
+                <div class="highlight-box warning" style="background-color: #FEF2F2; border-left-color: #DC2626; color: #991B1B;">
+                    <strong>Cenário 2: Concavidade para Baixo (a < 0)</strong><br>
+                    A parábola fica "triste". Ela sobe, atinge o ápice, e cai. Esse topo absoluto é o <strong>Ponto de Máximo</strong>. É o raciocínio padrão para questões de "lucro máximo" ou "altura máxima de um projétil".
+                </div>
+
+                <svg viewBox="0 0 300 150" class="question-svg">
+                    <!-- Eixo X -->
+                    <line x1="10" y1="120" x2="280" y2="120" stroke="#94A3B8" stroke-width="2"/>
+                    <polygon points="280,116 288,120 280,124" fill="#94A3B8"/>
+                    <text x="280" y="110" font-size="12" font-weight="bold" fill="#64748B" font-family="sans-serif">x</text>
+                    
+                    <!-- Eixo Y -->
+                    <line x1="150" y1="145" x2="150" y2="15" stroke="#94A3B8" stroke-width="2"/>
+                    <polygon points="146,15 150,7 154,15" fill="#94A3B8"/>
+                    <text x="160" y="20" font-size="12" font-weight="bold" fill="#64748B" font-family="sans-serif">y</text>
+                    
+                    <!-- Curva Máximo cruzando o eixo -->
+                    <path d="M 60 140 Q 150 -60 240 140" fill="none" stroke="#DC2626" stroke-width="3"/>
+                    <text x="162" y="65" font-size="12" font-weight="bold">a < 0</text>
+                    
+                    <!-- Vértice -->
+                    <circle cx="150" cy="40" r="5" fill="#2563EB"/>
+                    <text x="162" y="45" font-size="11" font-weight="bold" fill="#2563EB">Ponto de Máximo</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- MÓDULO 3: AS RAÍZES (COMPLETAS E INCOMPLETAS) -->
+        <div class="content-group">
+            <span class="section-badge">Módulo 3: Encontrando as Raízes (Eixo X)</span>
+            <div class="theory-box">
+                <p>As raízes são os pontos onde a parábola "fura" o chão (eixo X). Para achá-las, igualamos <strong>ax² + bx + c = 0</strong>.</p>
+                
+                <div class="highlight-box warning">
+                    <strong>Opção 1: Equação Completa (Bhaskara)</strong><br>
+                    Usamos Bhaskara quando temos a, b e c diferentes de zero.<br><br>
+                    1º Passo (O Delta):<br>
+                    <div class="math-block" style="padding: 10px; margin-top:5px;">Δ = b² - 4ac</div>
+                    <br>
+                    2º Passo (A Raiz):<br>
+                    <div class="math-block" style="padding: 10px; margin-top:5px;">
+                        x = 
+                        <div class="frac">
+                            <span class="num">-b ± &radic;Δ</span>
+                            <span class="den">2a</span>
+                        </div>
+                    </div>
+                    <em>Atenção: Se Δ < 0, a parábola "flutua" e não corta o eixo X. Não tem raízes reais!</em>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>Opção 2: Incompletas (O atalho inteligente)</strong><br>
+                    Se o <strong>c = 0</strong> (Ex: x² - 5x = 0): Coloque x em evidência.<br>
+                    x(x - 5) = 0 &rarr; Raízes: <strong>x = 0</strong> ou <strong>x = 5</strong><br><br>
+
+                    Se o <strong>b = 0</strong> (Ex: 2x² - 18 = 0): Isole o x².<br>
+                    2x² = 18 &rarr; x² = 9 &rarr; Raízes: <strong>x = 3</strong> e <strong>x = -3</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- MÓDULO 4: O VÉRTICE -->
+        <div class="content-group">
+            <span class="section-badge">Módulo 4: Calculando o Vértice (O Topo/Fundo)</span>
+            <div class="theory-box">
+                <p>O vértice é exatamente aquele Ponto de Máximo ou Mínimo que vimos no Módulo 2. A diferença entre acertar e errar na prova está em saber o que a questão pediu:</p>
+                
+                <div class="math-block">
+                    X<sub>v</sub> = 
+                    <div class="frac">
+                        <span class="num">-b</span>
+                        <span class="den">2a</span>
+                    </div>
+                    <span style="margin: 0 15px;">|</span>
+                    Y<sub>v</sub> = 
+                    <div class="frac">
+                        <span class="num">-Δ</span>
+                        <span class="den">4a</span>
+                    </div>
+                </div>
+
+                <div class="highlight-box warning">
+                    <strong>X do Vértice (QUANDO ocorre):</strong><br>
+                    Responde a perguntas sobre o TEMPO ou a QUANTIDADE necessária para chegar ao limite. Ex: <em>"Quantas peças devo produzir para lucrar o máximo?"</em> ou <em>"Em qual instante a bola chega ao topo?"</em><br><br>
+
+                    <strong>Y do Vértice (QUAL É o limite):</strong><br>
+                    Responde a perguntas sobre o VALOR FINAL absoluto. Ex: <em>"Qual foi o lucro máximo em reais?"</em> ou <em>"Qual foi a altura máxima atingida?"</em>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-action" onclick="setMode('practice')">Ir para os Flashcards (20) →</button>
+    </div>
+
+    <!-- SEÇÃO DE SIMULADO -->
+    <div id="viewPractice" class="view-section">
+        <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+            <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">Flashcards de Ônibus</h2>
+            <p style="color: #0F172A; font-size: 0.95rem; font-weight:600;">
+                20 perguntas relâmpago. Zero papel. Apenas memória muscular matemática. Responda em menos de 10 segundos cada.
+            </p>
+        </div>
+        <div class="question-map" id="qMap"></div>
+        <div id="quizContainer" style="margin-bottom: 100px;"></div>
+    </div>
+
+    <!-- SEÇÃO DE RESULTADO -->
+    <div id="viewResult" class="view-section">
+        <div class="result-card">
+            <h2 style="font-weight:900; text-transform:uppercase;">Nota Final</h2>
+            <div class="stars-container" id="finalStars">★☆☆</div>
+            <div class="percentage-big" id="finalPercent">0%</div>
+            <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 20</p>
+            <div id="review-container"></div>
+        </div>
+        <div id="action-buttons"></div>
+    </div>
+</div>
+
+<footer class="quiz-footer" id="quizFooter">
+    <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+    <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+</footer>
+
+<script>
+    // BANCO DE 20 QUESTÕES FLASHCARD (MEMÓRIA MUSCULAR)
+    const questions = [
+        {
+            id: 1, level: "Fácil",
+            text: "Na função f(x) = 15 - x², quais são os valores de 'a', 'b' e 'c'?",
+            options: ["a = 15, b = 0, c = -1", "a = -1, b = 15, c = 0", "a = -1, b = 0, c = 15", "a = 1, b = 15, c = -1"],
+            correct: 2,
+            explanation: {
+                correct: "O 'a' é quem acompanha o x² (-1). O 'b' acompanha o x (não tem, logo é 0). O 'c' é o número sozinho (15).",
+                options: ["Você achou que a ordem da escrita ditava quem era o 'a'. O 'a' é sempre atrelado ao x².", "O 15 não acompanha a variável 'x', ele está sozinho.", "", "Errou o sinal do x² e a posição do termo independente."]
+            }
+        },
+        {
+            id: 2, level: "Fácil",
+            text: "Na função de 1º grau f(x) = 4x, qual é o valor do coeficiente linear ('b')?",
+            options: ["4", "0", "1", "Não existe"],
+            correct: 1,
+            explanation: {
+                correct: "A forma é ax + b. Como não tem número sozinho somando, b = 0 (a reta passa na origem 0,0).",
+                options: ["4 é o coeficiente angular ('a').", "Se não aparece nada multiplicando, seria 1. Mas somando/subtraindo é 0.", "", "Em matemática de funções polinomiais, o termo oculto é zero, não 'inexistente'."]
+            }
+        },
+        {
+            id: 3, level: "Médio",
+            text: "Cuidado! Na função f(x) = (x - 3)(x + 3), qual é o valor do coeficiente 'b'?",
+            options: ["0", "-9", "-3", "3"],
+            correct: 0,
+            explanation: {
+                correct: "Isso é um produto notável (soma pela diferença). Fica x² - 9. O 'a' é 1, o 'b' é 0 e o 'c' é -9.",
+                options: ["", "-9 é o coeficiente 'c'.", "Isso é apenas um dos números do parênteses.", "Idem ao anterior."]
+            }
+        },
+        {
+            id: 4, level: "Médio",
+            text: "Nesse tipo de questão (Exemplo: <em>'Um projétil foi lançado. Em qual <strong>instante de tempo</strong> ele atingiu a altura máxima?'</em>), se usa qual fórmula para descobrir esse MOMENTO?",
+            options: ["O Y do vértice (-Δ/4a)", "O X do vértice (-b/2a)", "Apenas o Delta (b² - 4ac)", "As raízes por Bhaskara"],
+            correct: 1,
+            explanation: {
+                correct: "Gatilho de prova: Se pede 'tempo', 'instante' ou 'quantidade', ele quer saber QUANDO o limite ocorreu no eixo horizontal. É sempre o X do vértice.",
+                options: ["O Y do vértice te daria QUAL FOI a altura máxima (os metros), não o tempo.", "", "O Delta sozinho não te dá uma coordenada física.", "As raízes te dariam o instante em que ele saiu do chão e o instante em que caiu de volta."]
+            }
+        },
+        {
+            id: 5, level: "Médio",
+            text: "Nesse tipo de questão (Exemplo: <em>'Qual foi o <strong>lucro máximo</strong> obtido pela empresa em reais?'</em>), se usa qual fórmula para achar esse VALOR EXTREMO?",
+            options: ["O Y do vértice (-Δ/4a)", "O X do vértice (-b/2a)", "As raízes (Bhaskara)", "Substituir o 'c' na equação"],
+            correct: 0,
+            explanation: {
+                correct: "Gatilho de prova: Se a questão pede o 'valor final', 'lucro máximo', 'altura máxima' ou 'custo mínimo', ela quer o resultado vertical do limite. É sempre o Y do vértice.",
+                options: ["", "O X do vértice te daria QUANTAS PEÇAS tiveram que ser vendidas para dar esse lucro.", "As raízes diriam em que momento o lucro foi ZERO.", "Isso daria apenas o lucro/prejuízo inicial (quando x=0)."]
+            }
+        },
+        {
+            id: 6, level: "Fácil",
+            text: `Nesse tipo de problema gráfico (Exemplo: <em>'Como descobrir os pontos exatos onde a trajetória furou o chão?'</em>), o que você faz com a equação?
+            <br>
+            <svg viewBox="0 0 200 120" class="question-svg">
+                <line x1="10" y1="70" x2="180" y2="70" stroke="#94A3B8" stroke-width="2"/>
+                <polygon points="180,67 186,70 180,73" fill="#94A3B8"/>
+                <text x="180" y="60" font-size="12" font-weight="bold" fill="#64748B" font-family="sans-serif">x</text>
+                
+                <line x1="100" y1="110" x2="100" y2="10" stroke="#94A3B8" stroke-width="2"/>
+                <polygon points="97,10 100,4 103,10" fill="#94A3B8"/>
+                <text x="110" y="15" font-size="12" font-weight="bold" fill="#64748B" font-family="sans-serif">y</text>
+
+                <path d="M 40 20 Q 100 160 160 20" fill="none" stroke="#2563EB" stroke-width="3"/>
+                
+                <circle cx="68" cy="70" r="5" fill="#DC2626"/>
+                <text x="68" y="90" font-size="11" font-weight="bold" fill="#DC2626" text-anchor="middle">Aqui!</text>
+                
+                <circle cx="132" cy="70" r="5" fill="#DC2626"/>
+                <text x="132" y="90" font-size="11" font-weight="bold" fill="#DC2626" text-anchor="middle">Aqui!</text>
+            </svg>`,
+            options: ["Substituo x = 0 (Acho o coeficiente 'c').", "Uso o X do Vértice.", "Igualo a função a ZERO e acho as raízes.", "Uso o Y do Vértice."],
+            correct: 2,
+            explanation: {
+                correct: "Furar o chão (eixo X) significa que a altura (Y) zerou. Sempre que a questão pedir os 'Zeros da Função' ou as intersecções no X, você iguala a equação a zero e resolve (por Bhaskara ou incompletas).",
+                options: ["Substituir x por zero te daria onde a linha corta o eixo vertical (Y).", "Isso te daria o ponto mais baixo da curva (no meio das raízes).", "", "Isso te daria a profundidade máxima alcançada abaixo do eixo."]
+            }
+        },
+        {
+            id: 7, level: "Fácil",
+            text: "Na hora do desespero! Você precisa usar a fórmula do Y do Vértice (-Δ / ???) para achar um Lucro Máximo. Qual é o denominador da fração?",
+            options: ["2a", "4a", "-4a", "4ac"],
+            correct: 1,
+            explanation: {
+                correct: "Fórmula do Yv = -Δ / 4a. Decore visualmente: O X do vértice tem o 2 embaixo (-b/2a), o Y do vértice tem o 4 embaixo.",
+                options: ["Esse é o denominador do X do Vértice.", "", "O sinal negativo já fica na parte de cima, junto do Delta.", "Esse é um pedaço interno da fórmula do Delta."]
+            }
+        },
+        {
+            id: 8, level: "Fácil",
+            text: "Na fórmula de Bhaskara (x = (-b ± √Δ) / 2a), o que acontece se o coeficiente 'b' que a questão te deu já for um número negativo (Ex: -5x)?",
+            options: ["Ele continua negativo na fórmula.", "A raiz quadrada inverte o sinal.", "Ele entra na fórmula como positivo (Menos com Menos dá Mais).", "O Delta zera por causa da colisão de sinais."],
+            correct: 2,
+            explanation: {
+                correct: "Regra básica que muita gente erra na pressa: se b = -5, na fórmula fica -(-5), ou seja, +5. O sinal inverte ao entrar na fórmula.",
+                options: ["O sinal de menos da fórmula de Bhaskara OBRIGA você a inverter o sinal original do coeficiente.", "A raiz quadrada nada tem a ver com o 'b' que está lá fora.", "", "O Delta tem sua própria equação isolada (b² - 4ac)."]
+            }
+        },
+        {
+            id: 9, level: "Fácil",
+            text: "Nesse tipo de conta rápida (Exemplo: <em>'Descubra a raiz da função afim f(x) = 2x - 10'</em>), como resolver de cabeça em 5 segundos?",
+            options: ["A raiz é -5.", "A raiz é 5.", "A raiz é 10.", "A raiz é 2."],
+            correct: 1,
+            explanation: {
+                correct: "Mentalmente: iguale a zero (2x - 10 = 0). Jogue o -10 para o outro lado invertendo o sinal (+10). Fica 2x = 10. Divida 10 por 2. x = 5.",
+                options: ["Você passou o -10 para o outro lado esquecendo de mudar o sinal dele para positivo.", "", "Você apenas olhou para o número puro (coeficiente 'b').", "Você apenas olhou para a taxa (coeficiente 'a')."]
+            }
+        },
+        {
+            id: 10, level: "Médio",
+            text: "Nesse tipo de questão com equação faltando o 'c' (Exemplo: <em>'Quais as raízes da função f(x) = x² - 8x ?'</em>), qual é o atalho para não perder tempo com Bhaskara?",
+            options: ["Colocar o 'x' em evidência: x(x - 8) = 0.", "Passar o -8x pro outro lado e tirar a raiz quadrada.", "Dividir a equação inteira por 8.", "O Delta sempre será zero."],
+            correct: 0,
+            explanation: {
+                correct: "Se falta o 'c', sempre coloque o 'x' em evidência. x(x - 8) = 0. Uma raiz obrigatoriamente será ZERO, e a outra será o oposto do que está no parênteses (+8).",
+                options: ["", "Tirar raiz quadrada de um lado que tem incógnitas vai te fazer perder uma das respostas (a raiz zero).", "Dividir por 8 não resolve a equação quadrática.", "O Delta neste caso seria 64, não zero."]
+            }
+        },
+        {
+            id: 11, level: "Médio",
+            text: "Nesse tipo de questão com equação faltando o 'b' (Exemplo: <em>'Resolva 2x² - 18 = 0'</em>), qual é o atalho para não fazer Bhaskara?",
+            options: ["Isolar o x² e extrair a raiz quadrada, sem esquecer do ±.", "Colocar o 'x' em evidência.", "A raiz será sempre zero.", "Multiplicar tudo por -1 e somar."],
+            correct: 0,
+            explanation: {
+                correct: "Passe o número para lá: 2x² = 18. Divida: x² = 9. Extraia a raiz: x = ±√9. As raízes são 3 e -3. Simples e rápido.",
+                options: ["", "Você não pode colocar 'x' em evidência no número 18, pois ele não tem 'x'.", "Isso só ocorreria se fosse 2x² = 0.", "Isso não eliminaria o expoente 2."]
+            }
+        },
+        {
+            id: 12, level: "Fácil",
+            text: `Neste tipo de questão visual: <em>'O gráfico da parábola não fura o eixo X'</em>, o que você sabe IMEDIATAMENTE sobre a matemática da função?
+            <br>
+            <svg viewBox="0 0 200 130" class="question-svg">
+                <line x1="10" y1="110" x2="180" y2="110" stroke="#94A3B8" stroke-width="2"/>
+                <polygon points="180,107 186,110 180,113" fill="#94A3B8"/>
+                <text x="180" y="100" font-size="12" font-weight="bold" fill="#64748B" font-family="sans-serif">x</text>
+                
+                <line x1="100" y1="120" x2="100" y2="10" stroke="#94A3B8" stroke-width="2"/>
+                <polygon points="97,10 100,4 103,10" fill="#94A3B8"/>
+                <text x="110" y="15" font-size="12" font-weight="bold" fill="#64748B" font-family="sans-serif">y</text>
+                
+                <path d="M 50 30 Q 100 110 150 30" fill="none" stroke="#2563EB" stroke-width="3"/>
+            </svg>`,
+            options: ["O Delta (Δ) é maior que zero (Δ > 0).", "O Delta (Δ) é menor que zero (Δ < 0).", "O Delta (Δ) é exatamente zero (Δ = 0).", "O coeficiente 'a' é negativo."],
+            correct: 1,
+            explanation: {
+                correct: "Se a parábola flutua sem tocar o eixo horizontal (X), significa que a equação não possui raízes reais. Isso ocorre exclusivamente quando o Δ é negativo.",
+                options: ["Se o Delta fosse positivo, ela seria mais profunda e cortaria o eixo X duas vezes.", "", "Se o Delta fosse zero, ela tocaria o eixo X perfeitamente com a 'ponta' do vértice.", "A parábola 'sorri', logo o 'a' é positivo."]
+            }
+        },
+        {
+            id: 13, level: "Fácil",
+            text: `Neste tipo de questão gráfica: O que o comportamento da reta te diz sobre os coeficientes 'a' e 'b'?
+            <br>
+            <svg viewBox="0 0 200 150" class="question-svg">
+                <line x1="10" y1="50" x2="180" y2="50" stroke="#94A3B8" stroke-width="2"/>
+                <polygon points="180,47 186,50 180,53" fill="#94A3B8"/>
+                <text x="180" y="40" font-size="12" font-weight="bold" fill="#64748B" font-family="sans-serif">x</text>
+                
+                <line x1="100" y1="140" x2="100" y2="10" stroke="#94A3B8" stroke-width="2"/>
+                <polygon points="97,10 100,4 103,10" fill="#94A3B8"/>
+                <text x="110" y="15" font-size="12" font-weight="bold" fill="#64748B" font-family="sans-serif">y</text>
+                
+                <line x1="40" y1="10" x2="140" y2="140" stroke="#DC2626" stroke-width="3"/>
+                
+                <circle cx="100" cy="88" r="5" fill="#0F172A"/>
+                <text x="110" y="92" font-size="12" font-weight="bold" fill="#0F172A">-4</text>
+            </svg>`,
+            options: ["a > 0 e b = -4", "a < 0 e b = 4", "a < 0 e b = -4", "a > 0 e b = 4"],
+            correct: 2,
+            explanation: {
+                correct: "Da esquerda para a direita a reta CAI, então ela é decrescente (a < 0). O ponto onde cruza a linha em pé (eixo Y) é o valor de 'b', que o gráfico mostra ser -4.",
+                options: ["Se a > 0, a reta estaria subindo (crescente).", "A reta cruza o eixo na parte de baixo, logo 'b' não pode ser o +4.", "", "Duplo erro de interpretação. Ela desce e cruza o lado negativo."]
+            }
+        },
+        {
+            id: 14, level: "Fácil",
+            text: "Nesse tipo de questão (Exemplo: <em>'O gráfico da função f(x) = -5x² + 3x - 12 corta o eixo vertical (Y) em qual ponto?'</em>), como descobrir de bater o olho?",
+            options: ["É preciso calcular Bhaskara.", "Basta olhar para o coeficiente 'a' (-5).", "Basta olhar para o coeficiente 'c' (neste caso, -12).", "Basta somar a + b + c."],
+            correct: 2,
+            explanation: {
+                correct: "Em qualquer função (1º ou 2º grau), o gráfico SEMPRE corta o eixo Y (vertical) exatamente no valor numérico do termo que não tem o 'x' (o termo independente 'c'). Logo, corta em y = -12.",
+                options: ["Bhaskara acha onde corta o eixo X (o chão), não o eixo Y (a parede).", "O 'a' diz apenas a concavidade (triste ou sorrindo).", "", "Isso daria -14, o que não significa o ponto de intersecção."]
+            }
+        },
+        {
+            id: 15, level: "Difícil",
+            text: `A pegadinha do 1º ano! Se a prova te der a função <strong>f(x) = -2x + 10</strong> e perguntar qual gráfico ela gera, o que você responde?
+            <br>
+            <svg viewBox="0 0 200 150" class="question-svg">
+                <line x1="10" y1="120" x2="180" y2="120" stroke="#94A3B8" stroke-width="2"/>
+                <polygon points="180,117 186,120 180,123" fill="#94A3B8"/>
+                <text x="180" y="110" font-size="12" font-weight="bold" fill="#64748B" font-family="sans-serif">x</text>
+                
+                <line x1="100" y1="140" x2="100" y2="10" stroke="#94A3B8" stroke-width="2"/>
+                <polygon points="97,10 100,4 103,10" fill="#94A3B8"/>
+                <text x="110" y="15" font-size="12" font-weight="bold" fill="#64748B" font-family="sans-serif">y</text>
+                
+                <line x1="40" y1="40" x2="160" y2="140" stroke="#DC2626" stroke-width="3"/>
+                <text x="150" y="35" font-size="12" font-weight="bold" fill="#DC2626" text-anchor="end">f(x) = -2x + 10</text>
+            </svg>`,
+            options: ["Uma parábola voltada para baixo (triste).", "Uma reta crescente (sobe).", "Uma reta decrescente (cai).", "Uma parábola voltada para cima (feliz)."],
+            correct: 2,
+            explanation: {
+                correct: "Cuidado! Não tem x² na fórmula, então é uma função afim do 1º grau (RETA), e não uma parábola. Como o 'a' (número com o x) é negativo (-2), a reta cai.",
+                options: ["Caiu na pegadinha visual do sinal de menos! Não tem x², logo não existe parábola.", "O 'a' é negativo, logo ela não cresce.", "", "Não é parábola."]
+            }
+        },
+        {
+            id: 16, level: "Médio",
+            text: "Em questões teóricas: É possível que o vértice de uma parábola seja, ao mesmo tempo, a única raiz da função matemática?",
+            options: ["Sim, sempre que Δ = 0.", "Não, as raízes nunca coincidem com o vértice.", "Sim, mas apenas se a = 0.", "Sim, sempre que Δ > 0."],
+            correct: 0,
+            explanation: {
+                correct: "Quando Δ = 0, a parábola encosta o 'bico' (vértice) perfeitamente em cima do eixo X, sem afundar. Nesse caso, a raiz única e o vértice são o mesmo ponto.",
+                options: ["", "Em Δ = 0 eles são exatamente o mesmo lugar no espaço.", "Se a=0, o x² some e ela deixa de ser uma parábola.", "Se Δ > 0, o gráfico afunda e as raízes abrem pros lados, se separando do vértice central."]
+            }
+        },
+        {
+            id: 17, level: "Médio",
+            text: "Nesse tipo de questão (Exemplo: <em>'Onde fica o ponto de lucro máximo global da função f(x) = 5x - 2 ?'</em>), o que você responde?",
+            options: ["Ocorre na raiz da função.", "É o ponto 'b' (-2).", "Uma reta infinita (1º grau) não tem ponto máximo global.", "Aplica-se a fórmula do Xv."],
+            correct: 2,
+            explanation: {
+                correct: "A função é de 1º grau, formando uma reta. Retas crescentes (como 5x) sobem infinitamente para o alto, nunca tendo um 'topo' (ponto máximo). Só parábolas têm máximos/mínimos.",
+                options: ["A raiz é onde o lucro é zero.", "O -2 é só a intersecção inicial no Y. A reta continua subindo depois disso.", "", "A fórmula do Vértice exige o coeficiente 'a' do x², que não existe aqui."]
+            }
+        },
+        {
+            id: 18, level: "Difícil",
+            text: "Nesse tipo de questão (Exemplo: <em>'A área de um terreno é A = -x² + 50x. Qual a área MÁXIMA?'</em>), por que você usa a fórmula do Vértice (-Δ/4a) e NÃO a de Bhaskara?",
+            options: ["Porque Bhaskara dá a área zero, e nós queremos a área no ponto máximo.", "Porque a parábola está virada pra cima.", "Porque a fórmula de Bhaskara só acha números inteiros.", "Porque a questão está errada, usa-se Bhaskara sim."],
+            correct: 0,
+            explanation: {
+                correct: "Bhaskara encontra as raízes, que são os momentos em que a Área = 0 (ninguém quer um terreno de área zero). Para achar o maior valor possível da área (o TOPO do morro da curva), usa-se o Y do Vértice.",
+                options: ["", "A parábola está virada para baixo (a = -1), o que permite a existência de um teto (máximo).", "Bhaskara pode achar frações e números irracionais também.", "Se você usar Bhaskara, você achará x=0 e x=50 (dimensões que dão área nula)."]
+            }
+        },
+        {
+            id: 19, level: "Fácil",
+            text: "Nesse tipo de problema gráfico: Se a parábola de uma função f(x) = ax² + bx + c passa perfeitamente pela Origem (o cruzamento central 0,0), o que sabemos com certeza?",
+            options: ["Que a = 0", "Que b = 0", "Que c = 0", "Que Δ = 0"],
+            correct: 2,
+            explanation: {
+                correct: "O coeficiente 'c' marca onde a curva corta o eixo vertical (Y). Se ela passa pela origem (0,0), o corte no Y é exatamente no zero. Logo, c = 0.",
+                options: ["Se a = 0, a curva vira uma reta (1º grau).", "Se b = 0, o vértice fica alinhado com o eixo Y, mas não garante que passe pelo (0,0).", "", "Isso apenas diria que ela toca o eixo X em um só lugar, podendo ser no ponto (4, 0), por exemplo."]
+            }
+        },
+        {
+            id: 20, level: "Fácil",
+            text: `E se a prova colocar a função bizarra <strong>f(x) = 10</strong> e pedir o gráfico? O que você faz?
+            <br>
+            <svg viewBox="0 0 200 130" class="question-svg">
+                <line x1="10" y1="100" x2="180" y2="100" stroke="#94A3B8" stroke-width="2"/>
+                <polygon points="180,97 186,100 180,103" fill="#94A3B8"/>
+                <text x="180" y="90" font-size="12" font-weight="bold" fill="#64748B" font-family="sans-serif">x</text>
+                
+                <line x1="100" y1="120" x2="100" y2="10" stroke="#94A3B8" stroke-width="2"/>
+                <polygon points="97,10 100,4 103,10" fill="#94A3B8"/>
+                <text x="110" y="15" font-size="12" font-weight="bold" fill="#64748B" font-family="sans-serif">y</text>
+                
+                <line x1="20" y1="40" x2="180" y2="40" stroke="#2563EB" stroke-width="3"/>
+                
+                <circle cx="100" cy="40" r="5" fill="#DC2626"/>
+                <text x="112" y="35" font-size="12" font-weight="bold" fill="#DC2626">10</text>
+            </svg>`,
+            options: ["Desenho uma reta inclinada.", "Desenho uma parábola na origem.", "Desenho uma reta deitada (horizontal).", "Digo que não existe gráfico."],
+            correct: 2,
+            explanation: {
+                correct: "É uma função constante. Como não tem 'x' multiplicando (o 'a' é zero), ela não sobe nem desce. O gráfico é uma reta 'deitada' que cruza o eixo Y no 10 e segue para sempre na mesma altura.",
+                options: ["Para ser inclinada, ela precisaria de uma taxa de variação (o 'a' junto do x).", "Para ser parábola precisaria do x².", "", "Toda função real possui um gráfico correspondente no plano cartesiano."]
+            }
+        }
+    ];
+
+    // --- LÓGICA DO QUIZ ---
+    let currentQuestion = 0;
+    let userAnswers = new Array(questions.length).fill(null);
+
+    function setMode(mode) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        views.forEach(v => document.getElementById(v).style.display = 'none');
+        document.getElementById('quizFooter').style.display = 'none';
+
+        if(mode === 'explanation') {
+            document.getElementById('viewExplanation').style.display = 'flex';
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (mode === 'practice') {
+            document.getElementById('viewPractice').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            renderQuestion();
+            renderMap();
+        } else if (mode === 'result') {
+            document.getElementById('viewResult').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'none';
+        }
+        window.scrollTo(0,0);
+    }
+
+    function renderQuestion() {
+        if(questions.length === 0) return;
+
+        const q = questions[currentQuestion];
+        const container = document.getElementById('quizContainer');
+        const letters = ['A', 'B', 'C', 'D'];
+        const ans = userAnswers[currentQuestion];
+        let badgeClass = '';
+
+        if(q.level === 'Fácil') badgeClass = 'dif-facil';
+        else if(q.level === 'Médio') badgeClass = 'dif-medio';
+        else badgeClass = 'dif-dificil';
+
+        container.innerHTML = `
+            <div style="border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); padding: 20px; border-radius: 12px; background: white;">
+                <span class="difficulty-badge ${badgeClass}">${q.level}</span>
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; font-weight: 800; color: var(--theme-dark);">EXERCÍCIO ${currentQuestion + 1} DE ${questions.length}</span>
+                    <div style="font-size: 1.15rem; margin-top: 5px; color: var(--text-color); font-weight: 900;">${q.text}</div>
+                </div>
+                
+                <div>
+                    ${q.options.map((opt, i) => {
+                        let cls = '';
+                        if (ans !== null) {
+                            if (i === q.correct) cls = 'correct';
+                            else if (i === ans) cls = 'wrong';
+                            else cls = 'disabled';
+                        }
+                        return `
+                        <button class="option-btn ${cls}" onclick="handleAnswer(${i})" ${ans !== null ? 'disabled' : ''}>
+                            <div class="opt-circle">${letters[i]}</div>
+                            <div>${opt}</div>
+                        </button>`
+                    }).join('')}
+                </div>
+
+                ${ans !== null ? `
+                <div class="feedback-box">
+                    <div class="feedback-title" style="color:${ans === q.correct ? 'var(--correct-border)' : 'var(--wrong-border)'}">
+                        ${ans === q.correct ? '☑ Resolução Correta!' : '☒ Erro de Procedimento:'}
+                    </div>
+                    <div class="feedback-item correct-opt"><strong>Gabarito:</strong> ${q.options[q.correct]}</div>
+                    <div style="margin-top:10px; font-size:0.95rem; color:var(--text-color); margin-bottom:15px; font-weight:600;">
+                        ${q.explanation.correct}
+                    </div>
+                    <div style="margin-top:15px; border-top:1px dashed var(--theme-light); padding-top:10px;">
+                        <small style="color:var(--theme-dark);"><strong>Análise da Falha:</strong></small>
+                        ${q.explanation.options.map((exp, i) => i !== q.correct && exp !== "" ? `<div class="feedback-item wrong-opt" style="margin-top:8px;"><strong>${letters[i]})</strong> ${exp}</div>` : '').join('')}
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+        `;
+        updateNav();
+    }
+
+    function handleAnswer(idx) {
+        if (userAnswers[currentQuestion] !== null) return;
+        userAnswers[currentQuestion] = idx;
+
+        if (idx === questions[currentQuestion].correct) {
+            const duration = 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: {x: 0, y: 0.6 }, colors: ['#15803D', '#22C55E', '#4ADE80'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: {x: 1, y: 0.6}, colors: ['#15803D', '#22C55E', '#4ADE80'] });
+                if (Date.now() < end) { requestAnimationFrame(frame); }
+            }());
+        } else {
+            const quizContainer = document.getElementById('quizContainer');
+            quizContainer.classList.remove('shake-effect');
+            void quizContainer.offsetWidth;
+            quizContainer.classList.add('shake-effect');
+            setTimeout(() => quizContainer.classList.remove('shake-effect'), 500);
+        }
+        
+        renderQuestion();
+        renderMap();
+    }
+
+    function renderMap() {
+        if(questions.length === 0) return;
+
+        const map = document.getElementById('qMap');
+        map.innerHTML = questions.map((q, i) => {
+            let cls = 'map-dot';
+            if (i === currentQuestion) cls += ' active';
+            if (userAnswers[i] !== null) {
+                cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+            }
+            return `<div class="${cls}" onclick="goTo(${i})">${i+1}</div>`;
+        }).join('');
+
+        setTimeout(() => {
+            const activeDot = map.querySelector('.map-dot.active');
+            if (activeDot) {
+                activeDot.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }, 50);
+    }
+
+    function goTo(i) {
+        if (window.confetti) confetti.reset();
+        currentQuestion = i;
+        renderQuestion();
+        renderMap();
+    }
+
+    function changeQuestion(d) {
+        let n = currentQuestion + d;
+        if (n >= 0 && n < questions.length) goTo(n);
+    }
+
+    function updateNav() {
+        document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+        const next = document.getElementById('btnNext');
+        if (currentQuestion === questions.length - 1) {
+            next.textContent = "Finalizar e Ver Nota";
+            next.onclick = finish;
+        } else {
+            next.textContent = "Próxima";
+            next.onclick = () => changeQuestion(1);
+        }
+    }
+
+    function finish() {
+        let correct = userAnswers.filter((a, i) => a === questions[i].correct).length;
+        let percent = Math.round((correct / questions.length) * 100);
+
+        if (window.confetti) confetti.reset();
+
+        document.getElementById('finalPercent').textContent = percent + "%";
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${questions.length} exercícios.`;
+
+        document.getElementById('finalStars').textContent = percent >= 80 ? "★★★" : percent >= 60 ? "★★☆" : "★☆☆";
+
+        let summary = '<div style="text-align:left; margin-top:20px;">';
+        if (percent < 80) {
+            summary += `<div style="background:var(--wrong-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--wrong-border); color:var(--wrong-border);">
+                <strong>⚠ Base Incompleta.</strong> Você não obteve os 80% mínimos. A memória muscular ainda não fixou. Refaça esse simulado no trajeto de volta para casa.
+            </div>`;
+            document.getElementById('action-buttons').innerHTML = `<button class="btn-action" onclick="resetApp()">Apagar Tudo e Refazer Lista</button>`;
+        } else {
+            summary += `<div style="background:var(--correct-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--correct-border); color:var(--correct-border);">
+                <strong>✅ Estrutura Sólida.</strong> A sua memória visual para as regras matemáticas está impecável.
+            </div>`;
+            document.getElementById('action-buttons').innerHTML = `<button class="btn-action" onclick="resetApp()">Refazer Lista</button>`;
+        }
+
+        if (correct < questions.length) {
+            summary += '<h4 style="margin-bottom:10px; color:var(--text-color);">Revisão dos Erros:</h4>';
+            questions.forEach((q, i) => {
+                if(userAnswers[i] !== q.correct && userAnswers[i] !== null) {
+                    
+                    const cleanText = q.text.replace(/<svg\b[^>]*>[\s\S]*?<\/svg>/gi, '').replace(/<br\s*\/?>/gi, ' ');
+                    
+                    summary += `<div style="margin-bottom:10px; padding:15px; background:var(--white); border-radius:8px; border:2px dashed var(--theme-dark);">
+                        <strong style="color:var(--theme-accent);">Exercício ${i+1}:</strong> <div style="font-size: 0.9em; margin: 4px 0;">${cleanText}</div>
+                        <span style="color:var(--wrong-border); font-size:0.9rem; font-weight:600; display:block; margin-top:5px;">Sua Resposta: ${q.options[userAnswers[i]]}</span>
+                        <span style="color:var(--correct-border); font-size:0.9rem; font-weight:600; display:block; margin-top:2px;">Gabarito Correto: ${q.options[q.correct]}</span>
+                    </div>`;
+                }
+            });
+        }
+        
+        summary += '</div>';
+        document.getElementById('review-container').innerHTML = summary;
+        setMode('result');
+    }
+
+    function resetApp() {
+        userAnswers = new Array(questions.length).fill(null);
+        currentQuestion = 0;
+        setMode('practice');
+    }
+
+    // Inicialização
+    setMode(userAnswers.some(ans => ans !== null) ? 'practice' : 'explanation');
+</script>
+</body>
+</html>
