@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Álgebra e Geometria 8º Ano</title>
+    <title>Álgebra e Geometria 8º Ano - Gabarito da Sophia</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
@@ -243,7 +243,7 @@
 <body>
     <div class="container">
         <header class="logo-header">
-            <div class="css-logo"><span class="pulse-effect">♦</span> Polinômios, Operações, Ângulos e Diagonais</div>
+            <div class="css-logo"><span class="pulse-effect">♦</span> GABARITO DA SOPHIA</div>
             <h1>MATEMÁTICA - 8º ANO</h1>
             <p class="subtitle">Polinômios, Operações, Ângulos e Diagonais</p>
         </header>
@@ -338,6 +338,23 @@
                     <h3>4. Número de Diagonais (d)</h3>
                     <p>Fórmula obrigatória: <strong style="font-size:1.2rem;">d = n(n - 3) / 2</strong></p>
                     
+                    <div style="display:flex; flex-direction:column; align-items:center; margin-bottom:15px; margin-top:15px; padding: 15px; background: #F8FAFC; border-radius: 8px; border: 2px dashed #94A3B8;">
+                        <svg viewBox="0 0 200 200" class="svg-illustration" style="max-width: 160px; margin-bottom: 10px;">
+                            <!-- Hexagono -->
+                            <polygon points="100,10 180,55 180,145 100,190 20,145 20,55" fill="#E0F2FE" stroke="#0F172A" stroke-width="4"/>
+                            <!-- Diagonais de apenas 1 vértice -->
+                            <line x1="100" y1="10" x2="180" y2="145" stroke="#F59E0B" stroke-width="3" stroke-dasharray="5,5"/>
+                            <line x1="100" y1="10" x2="100" y2="190" stroke="#F59E0B" stroke-width="3" stroke-dasharray="5,5"/>
+                            <line x1="100" y1="10" x2="20" y2="145" stroke="#F59E0B" stroke-width="3" stroke-dasharray="5,5"/>
+                            <!-- Vértice em Destaque -->
+                            <circle cx="100" cy="10" r="7" fill="#BE123C"/>
+                            <text x="100" y="35" font-family="Poppins" font-size="12" font-weight="800" fill="#BE123C" text-anchor="middle">Vértice</text>
+                        </svg>
+                        <p style="text-align:center; font-size: 0.85rem; color: #475569; font-weight: 600; margin: 0;">
+                            A ilustração mostra que de cada vértice partem <strong>(n - 3)</strong> diagonais. <br>Exemplo no hexágono (6 lados): saem exatamente 3 diagonais.
+                        </p>
+                    </div>
+
                     <div class="example-box">
                         <h4>Exemplo de Prova:</h4>
                         <p>Quantas diagonais tem um octógono (8 lados)?</p>
@@ -365,6 +382,28 @@
                 <div class="theory-box">
                     <h3>5. Ângulos Internos e Externos</h3>
                     <p>A fórmula da soma dos internos (Si) é <strong>(n - 2) · 180°</strong>. Mas o atalho mestre para provas difíceis é o <strong>Ângulo Externo (Ae)</strong>.</p>
+                    
+                    <div style="display:flex; flex-direction:column; align-items:center; margin-bottom:15px; margin-top:15px; padding: 15px; background: #F8FAFC; border-radius: 8px; border: 2px dashed #94A3B8;">
+                        <svg viewBox="0 0 280 130" class="svg-illustration" style="max-width: 280px; margin-bottom: 10px;">
+                            <!-- Interior do Polígono -->
+                            <polygon points="50,100 150,100 100,20" fill="#E2E8F0" opacity="0.6"/>
+                            <!-- Linhas Reais do Polígono -->
+                            <line x1="50" y1="100" x2="150" y2="100" stroke="#0F172A" stroke-width="4" stroke-linecap="round"/>
+                            <line x1="150" y1="100" x2="100" y2="20" stroke="#0F172A" stroke-width="4" stroke-linecap="round"/>
+                            <!-- Prolongamento do Lado (Externo) -->
+                            <line x1="150" y1="100" x2="240" y2="100" stroke="#0F172A" stroke-width="3" stroke-dasharray="6,4"/>
+                            <!-- Arco Ângulo Interno -->
+                            <path d="M 120 100 A 30 30 0 0 1 134 74" fill="none" stroke="#059669" stroke-width="4"/>
+                            <text x="75" y="90" font-family="Poppins" font-size="14" font-weight="900" fill="#059669">Interno</text>
+                            <!-- Arco Ângulo Externo -->
+                            <path d="M 134 74 A 30 30 0 0 1 180 100" fill="none" stroke="#BE123C" stroke-width="4"/>
+                            <text x="175" y="75" font-family="Poppins" font-size="14" font-weight="900" fill="#BE123C">Externo</text>
+                        </svg>
+                        <p style="text-align:center; font-size: 0.85rem; color: #475569; font-weight: 600; margin: 0;">
+                            <strong>Regra de Ouro:</strong> O ângulo interno e o externo, juntos, formam sempre uma meia-volta perfeitamente reta (180°).
+                        </p>
+                    </div>
+
                     <div class="highlight-box">
                         <strong>Atalho FB:</strong> A soma de todos os externos (Se) é <strong>SEMPRE 360°</strong>.<br>Logo, um ângulo externo sozinho é: <strong>Ae = 360 ÷ n</strong>
                     </div>

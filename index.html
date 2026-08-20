@@ -48,17 +48,15 @@
             overflow-x: hidden;
         }
 
-        /* --- HEADER (LOGO AUMENTADA) --- */
+        /* --- HEADER --- */
         .logo-header {
             width: 100%;
             max-width: 600px;
             display: flex;
             justify-content: center;
-            /* Aumentei um pouco o padding para dar espaço à logo maior */
             padding: 30px 0 20px 0; 
         }
         .logo-img {
-            /* AUMENTADO: De 80px para 130px para ficar bem visível */
             max-height: 130px; 
             width: auto;
             display: block;
@@ -138,43 +136,37 @@
         .badge-num { background-color: var(--color-num); }
         .badge-alg { background-color: var(--color-alg); }
         .badge-geo { background-color: var(--color-geo); }
-        .badge-med { background-color: var(--color-med); }
+        .badge-med { background-color: var(--color-med); color: #000; }
         .badge-prob { background-color: var(--color-prob); }
         .badge-menus { background-color: #2D3748; }
 
-        /* --- BOTÕES DOS TÓPICOS (CARACTERIZADOS) --- */
-        .topic-btn {
+        /* --- ITENS DOS TÓPICOS (COM CHECKBOX E LINK) --- */
+        .topic-item {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            text-decoration: none;
-            color: var(--text-color);
-            padding: 16px 20px;
+            align-items: stretch;
             background-color: var(--white);
             border: 2px solid var(--border-color);
             border-radius: 12px;
             margin-bottom: 12px;
-            font-weight: 600;
-            font-size: 0.95rem;
             box-shadow: 4px 4px 0px var(--border-color);
-            transition: all 0.1s ease;
             position: relative;
             overflow: hidden;
+            transition: all 0.1s ease;
         }
 
-        .topic-btn:hover {
+        .topic-item:hover {
             transform: translate(-2px, -2px);
             box-shadow: 6px 6px 0px var(--border-color);
             background-color: #FAFAFA;
         }
 
-        .topic-btn:active {
+        .topic-item:active {
             transform: translate(2px, 2px);
             box-shadow: 2px 2px 0px var(--border-color);
         }
 
-        /* A Borda Lateral Colorida (Característica) */
-        .topic-btn::before {
+        /* Borda Lateral Colorida */
+        .topic-item::before {
             content: '';
             position: absolute;
             left: 0;
@@ -182,24 +174,62 @@
             bottom: 0;
             width: 10px;
             border-right: 2px solid var(--border-color);
+            z-index: 1;
         }
 
-        /* Cores das laterais por categoria */
-        .btn-num::before { background-color: var(--bg-num); }
-        .btn-alg::before { background-color: var(--bg-alg); }
-        .btn-geo::before { background-color: var(--bg-geo); }
-        .btn-med::before { background-color: var(--bg-med); }
-        .btn-prob::before { background-color: var(--bg-prob); }
-        
-        /* Botões de Menu Principal (Estilo especial) */
-        .btn-menu-main {
-            background-color: #EDF2F7;
-            padding: 20px;
+        /* Checkbox Area */
+        .topic-cb-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 0 0 0 24px;
+            z-index: 2;
         }
-        .btn-menu-main::before { background-color: #CBD5E0; width: 15px; }
+        .topic-cb {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        /* Área do Link Clicável */
+        .topic-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: var(--text-color);
+            padding: 16px 20px 16px 12px;
+            flex-grow: 1;
+            font-weight: 600;
+            font-size: 0.95rem;
+            z-index: 2;
+        }
+
+        /* Cores das laterais e dos checkboxes por categoria */
+        .item-num::before { background-color: var(--bg-num); }
+        .item-num .topic-cb { accent-color: var(--color-num); }
+
+        .item-alg::before { background-color: var(--bg-alg); }
+        .item-alg .topic-cb { accent-color: var(--color-alg); }
+
+        .item-geo::before { background-color: var(--bg-geo); }
+        .item-geo .topic-cb { accent-color: var(--color-geo); }
+
+        .item-med::before { background-color: var(--bg-med); }
+        .item-med .topic-cb { accent-color: var(--color-med); }
+
+        .item-prob::before { background-color: var(--bg-prob); }
+        .item-prob .topic-cb { accent-color: var(--color-prob); }
+
+        /* Estilo especial Menus Principais */
+        .item-menus { background-color: #EDF2F7; }
+        .item-menus .topic-link { padding: 20px 20px 20px 12px; }
+        .item-menus::before { background-color: #CBD5E0; width: 15px; }
+        .item-menus .topic-cb { accent-color: #2D3748; }
 
         .arrow { font-weight: 900; color: #CBD5E0; }
-        .topic-btn:hover .arrow { color: var(--text-color); }
+        .topic-item:hover .arrow { color: var(--text-color); }
 
         /* Mensagem de Não Encontrado */
         #no-results {
@@ -236,149 +266,227 @@
 
         <div class="content-group">
             <div class="category-header"><span class="badge badge-menus">📂 Menus por Ano</span></div>
-            <a href="6ano-matematica.html" class="topic-btn btn-menu-main">Matemática 6º Ano <span class="arrow">➜</span></a>
-            <a href="7ano-matematica.html" class="topic-btn btn-menu-main">Matemática 7º Ano <span class="arrow">➜</span></a>
-            <a href="8ano-matematica.html" class="topic-btn btn-menu-main">Matemática 8º Ano <span class="arrow">➜</span></a>
-            <a href="9ano-matematica.html" class="topic-btn btn-menu-main">Matemática 9º Ano <span class="arrow">➜</span></a>
+            
+            <div class="topic-item item-menus" data-id="menu-6ano">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div>
+                <a href="6ano-matematica.html" class="topic-link"><span class="topic-title">Matemática 6º Ano</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-menus" data-id="menu-7ano">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div>
+                <a href="7ano-matematica.html" class="topic-link"><span class="topic-title">Matemática 7º Ano</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-menus" data-id="menu-8ano">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div>
+                <a href="8ano-matematica.html" class="topic-link"><span class="topic-title">Matemática 8º Ano</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-menus" data-id="menu-9ano">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div>
+                <a href="9ano-matematica.html" class="topic-link"><span class="topic-title">Matemática 9º Ano</span><span class="arrow">➜</span></a>
+            </div>
         </div>
 
         <!-- ========== CATEGORIA: CONCEITOS BÁSICOS ========== -->
         <div class="content-group">
             <div class="category-header"><span class="badge badge-num">📚 Conceitos Básicos</span></div>
-            <a href="basico.html" class="topic-btn btn-num">Conceitos Fundamentais <span class="arrow">➜</span></a>
+            
+            <div class="topic-item item-num" data-id="num-basico">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div>
+                <a href="basico.html" class="topic-link"><span class="topic-title">Conceitos Fundamentais</span><span class="arrow">➜</span></a>
+            </div>
         </div>
 
         <!-- ========== CATEGORIA: NÚMEROS & OPERAÇÕES ========== -->
         <div class="content-group">
             <div class="category-header"><span class="badge badge-num">🔢 Números & Operações</span></div>
-            <a href="numeros-inteiros.html" class="topic-btn btn-num">Números Inteiros <span class="arrow">➜</span></a>
-            <a href="numeros-racionais.html" class="topic-btn btn-num">Números Racionais <span class="arrow">➜</span></a>
-            <a href="numeros-irracionais.html" class="topic-btn btn-num">Números Irracionais <span class="arrow">➜</span></a>
-            <a href="numeros-decimais.html" class="topic-btn btn-num">Números Decimais <span class="arrow">➜</span></a>
-            <a href="numeros-sistema.html" class="topic-btn btn-num">Sistema de Numeração <span class="arrow">➜</span></a>
-            <a href="conjuntos-numericos.html" class="topic-btn btn-num">Conjuntos Numéricos <span class="arrow">➜</span></a>
-            <a href="operacoes-naturais.html" class="topic-btn btn-num">Operações com Naturais <span class="arrow">➜</span></a>
-            <a href="operacoes-inteiros.html" class="topic-btn btn-num">Operações com Inteiros <span class="arrow">➜</span></a>
-            <a href="operacoes-reais.html" class="topic-btn btn-num">Operações com Reais <span class="arrow">➜</span></a>
-            <a href="potenciacao.html" class="topic-btn btn-num">Potenciação <span class="arrow">➜</span></a>
-            <a href="potenciacao-raiz.html" class="topic-btn btn-num">Potenciação e Raiz <span class="arrow">➜</span></a>
-            <a href="potenciacao-raiz-inteiros.html" class="topic-btn btn-num">Potenciação e Raiz (Inteiros) <span class="arrow">➜</span></a>
-            <a href="potenciacao-expoentes-inteiros.html" class="topic-btn btn-num">Potenciação (Expoentes Inteiros) <span class="arrow">➜</span></a>
-            <a href="radiciacao.html" class="topic-btn btn-num">Radiciação <span class="arrow">➜</span></a>
-            <a href="radiciacao-propriedades.html" class="topic-btn btn-num">Propriedades da Radiciação <span class="arrow">➜</span></a>
-            <a href="notacao-cientifica.html" class="topic-btn btn-num">Notação Científica <span class="arrow">➜</span></a>
-            <a href="fracoes.html" class="topic-btn btn-num">Frações <span class="arrow">➜</span></a>
-            <a href="fracao-geratriz.html" class="topic-btn btn-num">Fração Geratriz <span class="arrow">➜</span></a>
-            <a href="dizimas-periodicas.html" class="topic-btn btn-num">Dízimas Periódicas <span class="arrow">➜</span></a>
-            <a href="mmc-mdc.html" class="topic-btn btn-num">MMC e MDC <span class="arrow">➜</span></a>
-            <a href="primos-compostos.html" class="topic-btn btn-num">Primos e Compostos <span class="arrow">➜</span></a>
-            <a href="fatores-primos.html" class="topic-btn btn-num">Fatores Primos <span class="arrow">➜</span></a>
-            <a href="criterios-divisibilidade.html" class="topic-btn btn-num">Critérios de Divisibilidade <span class="arrow">➜</span></a>
-            <a href="porcentagem.html" class="topic-btn btn-num">Porcentagem <span class="arrow">➜</span></a>
-            <a href="porcentagem-juros.html" class="topic-btn btn-num">Porcentagem e Juros <span class="arrow">➜</span></a>
-            <a href="porcentagem-aplicacoes.html" class="topic-btn btn-num">Porcentagem: Aplicações <span class="arrow">➜</span></a>
-            <a href="juros-simples-compostos.html" class="topic-btn btn-num">Juros Simples e Compostos <span class="arrow">➜</span></a>
-            <a href="principio-multiplicativo.html" class="topic-btn btn-num">Princípio Multiplicativo <span class="arrow">➜</span></a>
+            
+            <div class="topic-item item-num" data-id="num-inteiros">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="numeros-inteiros.html" class="topic-link"><span class="topic-title">Números Inteiros</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-racionais">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="numeros-racionais.html" class="topic-link"><span class="topic-title">Números Racionais</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-irracionais">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="numeros-irracionais.html" class="topic-link"><span class="topic-title">Números Irracionais</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-decimais">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="numeros-decimais.html" class="topic-link"><span class="topic-title">Números Decimais</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-sistema">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="numeros-sistema.html" class="topic-link"><span class="topic-title">Sistema de Numeração</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-conjuntos">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="conjuntos-numericos.html" class="topic-link"><span class="topic-title">Conjuntos Numéricos</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-op-nat">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="operacoes-naturais.html" class="topic-link"><span class="topic-title">Operações com Naturais</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-op-int">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="operacoes-inteiros.html" class="topic-link"><span class="topic-title">Operações com Inteiros</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-op-reais">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="operacoes-reais.html" class="topic-link"><span class="topic-title">Operações com Reais</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-pot">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="potenciacao.html" class="topic-link"><span class="topic-title">Potenciação</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-pot-raiz">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="potenciacao-raiz.html" class="topic-link"><span class="topic-title">Potenciação e Raiz</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-pot-raiz-int">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="potenciacao-raiz-inteiros.html" class="topic-link"><span class="topic-title">Potenciação e Raiz (Inteiros)</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-pot-exp-int">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="potenciacao-expoentes-inteiros.html" class="topic-link"><span class="topic-title">Potenciação (Expoentes Inteiros)</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-rad">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="radiciacao.html" class="topic-link"><span class="topic-title">Radiciação</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-rad-prop">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="radiciacao-propriedades.html" class="topic-link"><span class="topic-title">Propriedades da Radiciação</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-not-cien">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="notacao-cientifica.html" class="topic-link"><span class="topic-title">Notação Científica</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-fracoes">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="fracoes.html" class="topic-link"><span class="topic-title">Frações</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-frac-geratriz">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="fracao-geratriz.html" class="topic-link"><span class="topic-title">Fração Geratriz</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-dizimas">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="dizimas-periodicas.html" class="topic-link"><span class="topic-title">Dízimas Periódicas</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-mmc-mdc">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="mmc-mdc.html" class="topic-link"><span class="topic-title">MMC e MDC</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-primos-comp">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="primos-compostos.html" class="topic-link"><span class="topic-title">Primos e Compostos</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-fat-primos">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="fatores-primos.html" class="topic-link"><span class="topic-title">Fatores Primos</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-crit-div">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="criterios-divisibilidade.html" class="topic-link"><span class="topic-title">Critérios de Divisibilidade</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-porcent">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="porcentagem.html" class="topic-link"><span class="topic-title">Porcentagem</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-porcent-juros">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="porcentagem-juros.html" class="topic-link"><span class="topic-title">Porcentagem e Juros</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-porcent-aplic">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="porcentagem-aplicacoes.html" class="topic-link"><span class="topic-title">Porcentagem: Aplicações</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-juros-simples-comp">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="juros-simples-compostos.html" class="topic-link"><span class="topic-title">Juros Simples e Compostos</span><span class="arrow">➜</span></a>
+            </div>
+            <div class="topic-item item-num" data-id="num-princ-mult">
+                <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="principio-multiplicativo.html" class="topic-link"><span class="topic-title">Princípio Multiplicativo</span><span class="arrow">➜</span></a>
+            </div>
         </div>
 
         <div class="content-group">
             <div class="category-header"><span class="badge badge-alg">🧩 Álgebra</span></div>
-            <a href="equacao-1-grau.html" class="topic-btn btn-alg">Equação do 1º Grau <span class="arrow">➜</span></a>
-            <a href="equacoes-1grau.html" class="topic-btn btn-alg">Equações do 1º Grau (Aprofundamento) <span class="arrow">➜</span></a>
-            <a href="equacao1grau.html" class="topic-btn btn-alg">Equação 1º Grau <span class="arrow">➜</span></a>
-            <a href="equacoes-2grau.html" class="topic-btn btn-alg">Equações do 2º Grau <span class="arrow">➜</span></a>
-            <a href="bhaskara.html" class="topic-btn btn-alg">Equação do 2º Grau - Bhaskara <span class="arrow">➜</span></a>
-            <a href="somaeproduto.html" class="topic-btn btn-alg">Equação do 2º Grau - Soma e Produto <span class="arrow">➜</span></a>
-            <a href="segundograuincompleto.html" class="topic-btn btn-alg">Equação do 2º Grau Incompleta <span class="arrow">➜</span></a>
-            <a href="equacao-ax2-b.html" class="topic-btn btn-alg">Equações ax² = b <span class="arrow">➜</span></a>
-            <a href="resolucao-equacoes.html" class="topic-btn btn-alg">Resolução de Equações <span class="arrow">➜</span></a>
-            <a href="sistemas-equacoes.html" class="topic-btn btn-alg">Sistemas de Equações <span class="arrow">➜</span></a>
-            <a href="equacaoirracional.html" class="topic-btn btn-alg">Equação Irracional <span class="arrow">➜</span></a>
-            <a href="expressao-algebrica.html" class="topic-btn btn-alg">Expressão Algébrica <span class="arrow">➜</span></a>
-            <a href="expressoes-algebricas.html" class="topic-btn btn-alg">Expressões Algébricas (Operações) <span class="arrow">➜</span></a>
-            <a href="expressoes-numericas.html" class="topic-btn btn-alg">Expressões Numéricas <span class="arrow">➜</span></a>
-            <a href="linguagem-algebrica.html" class="topic-btn btn-alg">Linguagem Algébrica <span class="arrow">➜</span></a>
-            <a href="linguagem-algebrica-7.html" class="topic-btn btn-alg">Linguagem Algébrica (7º Ano) <span class="arrow">➜</span></a>
-            <a href="polinomio.html" class="topic-btn btn-alg">Polinômio <span class="arrow">➜</span></a>
-            <a href="fatoepro.html" class="topic-btn btn-alg">Produtos Notáveis e Fatoração <span class="arrow">➜</span></a>
-            <a href="fatoracao-expressoes.html" class="topic-btn btn-alg">Fatoração de Expressões <span class="arrow">➜</span></a>
-            <a href="funcao-afim.html" class="topic-btn btn-alg">Função Afim <span class="arrow">➜</span></a>
-            <a href="1ano-funcao1e2.html" class="topic-btn btn-alg">Função 1º Ano e 2º Ano <span class="arrow">➜</span></a>
-                <a href="medio-funcaoafim.html" class="topic-btn btn-alg">Função Afim (Ensino Médio) <span class="arrow">➜</span></a>
-            <a href="funcao-quadratica.html" class="topic-btn btn-alg">Função Quadrática <span class="arrow">➜</span></a>
-            <a href="grafico-funcao-afim.html" class="topic-btn btn-alg">Gráfico da Função Afim <span class="arrow">➜</span></a>
-            <a href="grafico-funcao-quadratica.html" class="topic-btn btn-alg">Gráfico da Função Quadrática <span class="arrow">➜</span></a>
-            <a href="sequencias-numericas.html" class="topic-btn btn-alg">Sequências Numéricas <span class="arrow">➜</span></a>
-            <a href="razao-proporcao.html" class="topic-btn btn-alg">Razão e Proporção <span class="arrow">➜</span></a>
-            <a href="razoes-proporcoes.html" class="topic-btn btn-alg">Razões e Proporções <span class="arrow">➜</span></a>
-            <a href="grandezas-proporcionais.html" class="topic-btn btn-alg">Grandezas Proporcionais <span class="arrow">➜</span></a>
-            <a href="gdpegip.html" class="topic-btn btn-alg">Grandezas Diretamente e Inversamente Proporcionais <span class="arrow">➜</span></a>
-            <a href="variacao-grandezas.html" class="topic-btn btn-alg">Variação de Grandezas <span class="arrow">➜</span></a>
-            <a href="intervalosreais.html" class="topic-btn btn-alg">Intervalos Reais <span class="arrow">➜</span></a>
-            <a href="propriedades-igualdade.html" class="topic-btn btn-alg">Propriedades da Igualdade <span class="arrow">➜</span></a>
+            
+            <div class="topic-item item-alg" data-id="alg-eq1"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="equacao-1-grau.html" class="topic-link"><span class="topic-title">Equação do 1º Grau</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-eq1-aprof"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="equacoes-1grau.html" class="topic-link"><span class="topic-title">Equações do 1º Grau (Aprofundamento)</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-eq1-bas"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="equacao1grau.html" class="topic-link"><span class="topic-title">Equação 1º Grau</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-eq2"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="equacoes-2grau.html" class="topic-link"><span class="topic-title">Equações do 2º Grau</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-bhaskara"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="bhaskara.html" class="topic-link"><span class="topic-title">Equação do 2º Grau - Bhaskara</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-soma-prod"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="somaeproduto.html" class="topic-link"><span class="topic-title">Equação do 2º Grau - Soma e Produto</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-eq2-inc"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="segundograuincompleto.html" class="topic-link"><span class="topic-title">Equação do 2º Grau Incompleta</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-eq-ax2b"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="equacao-ax2-b.html" class="topic-link"><span class="topic-title">Equações ax² = b</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-res-eq"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="resolucao-equacoes.html" class="topic-link"><span class="topic-title">Resolução de Equações</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-sistemas"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="sistemas-equacoes.html" class="topic-link"><span class="topic-title">Sistemas de Equações</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-eq-irr"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="equacaoirracional.html" class="topic-link"><span class="topic-title">Equação Irracional</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-exp-alg"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="expressao-algebrica.html" class="topic-link"><span class="topic-title">Expressão Algébrica</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-exp-alg-op"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="expressoes-algebricas.html" class="topic-link"><span class="topic-title">Expressões Algébricas (Operações)</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-exp-num"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="expressoes-numericas.html" class="topic-link"><span class="topic-title">Expressões Numéricas</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-ling-alg"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="linguagem-algebrica.html" class="topic-link"><span class="topic-title">Linguagem Algébrica</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-ling-alg-7"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="linguagem-algebrica-7.html" class="topic-link"><span class="topic-title">Linguagem Algébrica (7º Ano)</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-polinomio"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="polinomio.html" class="topic-link"><span class="topic-title">Polinômio</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-prod-not"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="fatoepro.html" class="topic-link"><span class="topic-title">Produtos Notáveis e Fatoração</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-fat-exp"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="fatoracao-expressoes.html" class="topic-link"><span class="topic-title">Fatoração de Expressões</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-fun-afim"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="funcao-afim.html" class="topic-link"><span class="topic-title">Função Afim</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-fun-1-2ano"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="1ano-funcao1e2.html" class="topic-link"><span class="topic-title">Função 1º Ano e 2º Ano</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-fun-afim-em"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="medio-funcaoafim.html" class="topic-link"><span class="topic-title">Função Afim (Ensino Médio)</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-fun-quad"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="funcao-quadratica.html" class="topic-link"><span class="topic-title">Função Quadrática</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-graf-afim"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="grafico-funcao-afim.html" class="topic-link"><span class="topic-title">Gráfico da Função Afim</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-graf-quad"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="grafico-funcao-quadratica.html" class="topic-link"><span class="topic-title">Gráfico da Função Quadrática</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-seq-num"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="sequencias-numericas.html" class="topic-link"><span class="topic-title">Sequências Numéricas</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-razao-prop"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="razao-proporcao.html" class="topic-link"><span class="topic-title">Razão e Proporção</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-razoes-prop"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="razoes-proporcoes.html" class="topic-link"><span class="topic-title">Razões e Proporções</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-gran-prop"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="grandezas-proporcionais.html" class="topic-link"><span class="topic-title">Grandezas Proporcionais</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-gd-gip"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="gdpegip.html" class="topic-link"><span class="topic-title">Grandezas Diretamente e Inversamente Proporcionais</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-var-gran"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="variacao-grandezas.html" class="topic-link"><span class="topic-title">Variação de Grandezas</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-int-reais"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="intervalosreais.html" class="topic-link"><span class="topic-title">Intervalos Reais</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-alg" data-id="alg-prop-ig"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="propriedades-igualdade.html" class="topic-link"><span class="topic-title">Propriedades da Igualdade</span><span class="arrow">➜</span></a></div>
         </div>
 
         <div class="content-group">
             <div class="category-header"><span class="badge badge-geo">📐 Geometria</span></div>
-            <a href="geometria-basica-6.html" class="topic-btn btn-geo">Geometria Básica (Pontos, Retas e Ângulos) <span class="arrow">➜</span></a>
-            <a href="angulos.html" class="topic-btn btn-geo">Ângulos <span class="arrow">➜</span></a>
-            <a href="angulos-relacoes.html" class="topic-btn btn-geo">Ângulos e Relações <span class="arrow">➜</span></a>
-            <a href="triangulos-7.html" class="topic-btn btn-geo">Triângulos (7º Ano) <span class="arrow">➜</span></a>
-            <a href="triangulos-quadrilateros.html" class="topic-btn btn-geo">Triângulos e Quadriláteros <span class="arrow">➜</span></a>
-            <a href="semelhanca-triangulos.html" class="topic-btn btn-geo">Semelhança de Triângulos <span class="arrow">➜</span></a>
-            <a href="congruencia-triangulos.html" class="topic-btn btn-geo">Congruência de Triângulos <span class="arrow">➜</span></a>
-            <a href="teorema-pitagoras.html" class="topic-btn btn-geo">Teorema de Pitágoras <span class="arrow">➜</span></a>
-            <a href="teorema-tales.html" class="topic-btn btn-geo">Teorema de Tales <span class="arrow">➜</span></a>
-            <a href="tales2.html" class="topic-btn btn-geo">Teorema de Tales 2 <span class="arrow">➜</span></a>
-            <a href="relacoes-metricas.html" class="topic-btn btn-geo">Relações Métricas <span class="arrow">➜</span></a>
-            <a href="razoes-trigonometricas.html" class="topic-btn btn-geo">Razões Trigonométricas <span class="arrow">➜</span></a>
-            <a href="quadrilateros.html" class="topic-btn btn-geo">Quadriláteros <span class="arrow">➜</span></a>
-            <a href="poligonos.html" class="topic-btn btn-geo">Polígonos <span class="arrow">➜</span></a>
-            <a href="poligonos-regulares.html" class="topic-btn btn-geo">Polígonos Regulares <span class="arrow">➜</span></a>
-            <a href="circunferencia.html" class="topic-btn btn-geo">Circunferência <span class="arrow">➜</span></a>
-            <a href="circunferencia-circulo.html" class="topic-btn btn-geo">Circunferência e Círculo <span class="arrow">➜</span></a>
-            <a href="solidos-geometricos.html" class="topic-btn btn-geo">Sólidos Geométricos <span class="arrow">➜</span></a>
-            <a href="prismas-piramides.html" class="topic-btn btn-geo">Prismas e Pirâmides <span class="arrow">➜</span></a>
-            <a href="construcoes-geometricas.html" class="topic-btn btn-geo">Construções Geométricas <span class="arrow">➜</span></a>
-            <a href="transformacoes-geometricas.html" class="topic-btn btn-geo">Transformações Geométricas <span class="arrow">➜</span></a>
-            <a href="plano-cartesiano.html" class="topic-btn btn-geo">Plano Cartesiano <span class="arrow">➜</span></a>
-            <a href="retas.html" class="topic-btn btn-geo">Retas <span class="arrow">➜</span></a>
-            <a href="mediatriz-bissetriz.html" class="topic-btn btn-geo">Mediatriz e Bissetriz <span class="arrow">➜</span></a>
-            <a href="planificacao-vistas.html" class="topic-btn btn-geo">Planificação e Vistas <span class="arrow">➜</span></a>
-            <a href="geometria-analitica.html" class="topic-btn btn-geo">Geometria Analítica <span class="arrow">➜</span></a>
+            
+            <div class="topic-item item-geo" data-id="geo-basica-6"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="geometria-basica-6.html" class="topic-link"><span class="topic-title">Geometria Básica (Pontos, Retas e Ângulos)</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-angulos"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="angulos.html" class="topic-link"><span class="topic-title">Ângulos</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-angulos-rel"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="angulos-relacoes.html" class="topic-link"><span class="topic-title">Ângulos e Relações</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-triangulos-7"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="triangulos-7.html" class="topic-link"><span class="topic-title">Triângulos (7º Ano)</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-tri-quad"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="triangulos-quadrilateros.html" class="topic-link"><span class="topic-title">Triângulos e Quadriláteros</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-sem-tri"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="semelhanca-triangulos.html" class="topic-link"><span class="topic-title">Semelhança de Triângulos</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-cong-tri"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="congruencia-triangulos.html" class="topic-link"><span class="topic-title">Congruência de Triângulos</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-pitagoras"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="teorema-pitagoras.html" class="topic-link"><span class="topic-title">Teorema de Pitágoras</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-tales"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="teorema-tales.html" class="topic-link"><span class="topic-title">Teorema de Tales</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-tales2"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="tales2.html" class="topic-link"><span class="topic-title">Teorema de Tales 2</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-rel-met"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="relacoes-metricas.html" class="topic-link"><span class="topic-title">Relações Métricas</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-raz-trig"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="razoes-trigonometricas.html" class="topic-link"><span class="topic-title">Razões Trigonométricas</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-quadrilateros"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="quadrilateros.html" class="topic-link"><span class="topic-title">Quadriláteros</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-poligonos"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="poligonos.html" class="topic-link"><span class="topic-title">Polígonos</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-pol-reg"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="poligonos-regulares.html" class="topic-link"><span class="topic-title">Polígonos Regulares</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-circunferencia"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="circunferencia.html" class="topic-link"><span class="topic-title">Circunferência</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-circ-circulo"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="circunferencia-circulo.html" class="topic-link"><span class="topic-title">Circunferência e Círculo</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-solidos"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="solidos-geometricos.html" class="topic-link"><span class="topic-title">Sólidos Geométricos</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-prismas-pir"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="prismas-piramides.html" class="topic-link"><span class="topic-title">Prismas e Pirâmides</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-const-geo"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="construcoes-geometricas.html" class="topic-link"><span class="topic-title">Construções Geométricas</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-trans-geo"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="transformacoes-geometricas.html" class="topic-link"><span class="topic-title">Transformações Geométricas</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-plano-cart"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="plano-cartesiano.html" class="topic-link"><span class="topic-title">Plano Cartesiano</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-retas"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="retas.html" class="topic-link"><span class="topic-title">Retas</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-med-bis"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="mediatriz-bissetriz.html" class="topic-link"><span class="topic-title">Mediatriz e Bissetriz</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-plan-vistas"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="planificacao-vistas.html" class="topic-link"><span class="topic-title">Planificação e Vistas</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-geo" data-id="geo-geo-analitica"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="geometria-analitica.html" class="topic-link"><span class="topic-title">Geometria Analítica</span><span class="arrow">➜</span></a></div>
         </div>
 
         <div class="content-group">
             <div class="category-header"><span class="badge badge-med">⚖️ Grandezas e Medidas</span></div>
-            <a href="area-figuras-planas.html" class="topic-btn btn-med">Área de Figuras Planas <span class="arrow">➜</span></a>
-            <a href="area-quadrados.html" class="topic-btn btn-med">Área de Quadrados <span class="arrow">➜</span></a>
-            <a href="perimetro.html" class="topic-btn btn-med">Perímetro <span class="arrow">➜</span></a>
-            <a href="volume-blocos.html" class="topic-btn btn-med">Volume de Blocos <span class="arrow">➜</span></a>
-            <a href="volume-prismas.html" class="topic-btn btn-med">Volume de Prismas <span class="arrow">➜</span></a>
-            <a href="nocao-volume.html" class="topic-btn btn-med">Noção de Volume <span class="arrow">➜</span></a>
-            <a href="medidas-comprimento.html" class="topic-btn btn-med">Medidas de Comprimento <span class="arrow">➜</span></a>
-            <a href="medidas-tempo.html" class="topic-btn btn-med">Medidas de Tempo <span class="arrow">➜</span></a>
-            <a href="litro-dm3.html" class="topic-btn btn-med">Relação Litro e dm³ <span class="arrow">➜</span></a>
-            <a href="razoes-especiais.html" class="topic-btn btn-med">Razões Especiais (Velocidade/Densidade) <span class="arrow">➜</span></a>
+            
+            <div class="topic-item item-med" data-id="med-area-planas"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="area-figuras-planas.html" class="topic-link"><span class="topic-title">Área de Figuras Planas</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-med" data-id="med-area-quad"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="area-quadrados.html" class="topic-link"><span class="topic-title">Área de Quadrados</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-med" data-id="med-perimetro"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="perimetro.html" class="topic-link"><span class="topic-title">Perímetro</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-med" data-id="med-vol-blocos"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="volume-blocos.html" class="topic-link"><span class="topic-title">Volume de Blocos</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-med" data-id="med-vol-prismas"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="volume-prismas.html" class="topic-link"><span class="topic-title">Volume de Prismas</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-med" data-id="med-nocao-vol"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="nocao-volume.html" class="topic-link"><span class="topic-title">Noção de Volume</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-med" data-id="med-med-comp"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="medidas-comprimento.html" class="topic-link"><span class="topic-title">Medidas de Comprimento</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-med" data-id="med-med-tempo"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="medidas-tempo.html" class="topic-link"><span class="topic-title">Medidas de Tempo</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-med" data-id="med-litro-dm3"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="litro-dm3.html" class="topic-link"><span class="topic-title">Relação Litro e dm³</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-med" data-id="med-raz-esp"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="razoes-especiais.html" class="topic-link"><span class="topic-title">Razões Especiais (Velocidade/Densidade)</span><span class="arrow">➜</span></a></div>
         </div>
 
         <div class="content-group">
             <div class="category-header"><span class="badge badge-prob">🎲 Probabilidade e Estatística</span></div>
-            <a href="probabilidade.html" class="topic-btn btn-prob">Probabilidade <span class="arrow">➜</span></a>
-            <a href="probabilidade-simples.html" class="topic-btn btn-prob">Probabilidade Simples <span class="arrow">➜</span></a>
-            <a href="probabilidade-frequencial.html" class="topic-btn btn-prob">Probabilidade Frequencial <span class="arrow">➜</span></a>
-            <a href="graficos-estatisticos.html" class="topic-btn btn-prob">Gráficos Estatísticos <span class="arrow">➜</span></a>
-            <a href="graficos-setores.html" class="topic-btn btn-prob">Gráficos de Setores <span class="arrow">➜</span></a>
-            <a href="leitura-graficos.html" class="topic-btn btn-prob">Leitura de Gráficos <span class="arrow">➜</span></a>
-            <a href="tabelas-dados.html" class="topic-btn btn-prob">Tabelas de Dados <span class="arrow">➜</span></a>
-            <a href="tabelas-classes.html" class="topic-btn btn-prob">Tabelas com Classes <span class="arrow">➜</span></a>
-            <a href="media-moda-mediana.html" class="topic-btn btn-prob">Média, Moda e Mediana <span class="arrow">➜</span></a>
-            <a href="medidas-dispersao.html" class="topic-btn btn-prob">Medidas de Dispersão <span class="arrow">➜</span></a>
-            <a href="amplitude.html" class="topic-btn btn-prob">Amplitude <span class="arrow">➜</span></a>
-            <a href="amostragem.html" class="topic-btn btn-prob">Amostragem <span class="arrow">➜</span></a>
-            <a href="estatisticaifce.html" class="topic-btn btn-prob">Estatística IFCE <span class="arrow">➜</span></a>
-            <a href="probsimecom.html" class="topic-btn btn-prob">Probabilidade Casos Simples e Compostos <span class="arrow">➜</span></a>
-            <a href="fluxogramas.html" class="topic-btn btn-prob">Fluxogramas <span class="arrow">➜</span></a>
+            
+            <div class="topic-item item-prob" data-id="prob-prob"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="probabilidade.html" class="topic-link"><span class="topic-title">Probabilidade</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-prob" data-id="prob-prob-simp"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="probabilidade-simples.html" class="topic-link"><span class="topic-title">Probabilidade Simples</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-prob" data-id="prob-prob-freq"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="probabilidade-frequencial.html" class="topic-link"><span class="topic-title">Probabilidade Frequencial</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-prob" data-id="prob-graf-est"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="graficos-estatisticos.html" class="topic-link"><span class="topic-title">Gráficos Estatísticos</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-prob" data-id="prob-graf-set"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="graficos-setores.html" class="topic-link"><span class="topic-title">Gráficos de Setores</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-prob" data-id="prob-leit-graf"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="leitura-graficos.html" class="topic-link"><span class="topic-title">Leitura de Gráficos</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-prob" data-id="prob-tab-dados"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="tabelas-dados.html" class="topic-link"><span class="topic-title">Tabelas de Dados</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-prob" data-id="prob-tab-classes"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="tabelas-classes.html" class="topic-link"><span class="topic-title">Tabelas com Classes</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-prob" data-id="prob-med-moda-med"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="media-moda-mediana.html" class="topic-link"><span class="topic-title">Média, Moda e Mediana</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-prob" data-id="prob-med-disp"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="medidas-dispersao.html" class="topic-link"><span class="topic-title">Medidas de Dispersão</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-prob" data-id="prob-amplitude"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="amplitude.html" class="topic-link"><span class="topic-title">Amplitude</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-prob" data-id="prob-amostragem"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="amostragem.html" class="topic-link"><span class="topic-title">Amostragem</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-prob" data-id="prob-est-ifce"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="estatisticaifce.html" class="topic-link"><span class="topic-title">Estatística IFCE</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-prob" data-id="prob-prob-sim-comp"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="probsimecom.html" class="topic-link"><span class="topic-title">Probabilidade Casos Simples e Compostos</span><span class="arrow">➜</span></a></div>
+            <div class="topic-item item-prob" data-id="prob-fluxogramas"><div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div><a href="fluxogramas.html" class="topic-link"><span class="topic-title">Fluxogramas</span><span class="arrow">➜</span></a></div>
         </div>
 
         <div id="no-results">
@@ -392,30 +500,97 @@
     </footer>
 
     <script>
-        // Lógica de Pesquisa (Filtra Tópicos E Esconde Grupos Vazios)
+        // ----------------------------------------------------
+        // SISTEMA DE PROGRESSO (SALVO NO DISPOSITIVO - LOCALSTORAGE)
+        // ----------------------------------------------------
+        // Chave exclusiva para Matemática
+        const STORAGE_KEY = 'matematica_promover_progresso_2026';
+
+        function getProgress() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+        }
+
+        function saveProgress(progressArray) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(progressArray));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const progress = getProgress();
+            
+            progress.forEach(id => {
+                const item = document.querySelector(`.topic-item[data-id="${id}"]`);
+                if (item) {
+                    const cb = item.querySelector('.topic-cb');
+                    if (cb) cb.checked = true;
+                }
+            });
+        });
+
+        // Evento 1: Clicar no Checkbox
+        document.querySelectorAll('.topic-cb').forEach(cb => {
+            cb.addEventListener('change', function(e) {
+                const item = this.closest('.topic-item');
+                const id = item.getAttribute('data-id');
+                let progress = getProgress();
+
+                if (this.checked) {
+                    if (!progress.includes(id)) progress.push(id);
+                } else {
+                    progress = progress.filter(item => item !== id);
+                }
+                saveProgress(progress);
+            });
+        });
+
+        // Evento 2: Clicar no link (Marca automático)
+        document.querySelectorAll('.topic-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const item = this.closest('.topic-item');
+                const id = item.getAttribute('data-id');
+                const cb = item.querySelector('.topic-cb');
+                
+                if (!cb.checked) {
+                    cb.checked = true;
+                    let progress = getProgress();
+                    if (!progress.includes(id)) {
+                        progress.push(id);
+                        saveProgress(progress);
+                    }
+                }
+            });
+        });
+
+        // ----------------------------------------------------
+        // LÓGICA DE PESQUISA (Otimizada com remoção de acentos)
+        // ----------------------------------------------------
         const searchInput = document.getElementById('searchInput');
         const contentGroups = document.querySelectorAll('.content-group');
         const noResultsMsg = document.getElementById('no-results');
 
         searchInput.addEventListener('keyup', function(e) {
             const term = e.target.value.toLowerCase();
+            const termNormalized = term.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             let totalVisibleGroups = 0;
 
             contentGroups.forEach(group => {
-                const links = group.querySelectorAll('.topic-btn');
-                let hasVisibleLink = false;
+                const items = group.querySelectorAll('.topic-item');
+                let hasVisibleItem = false;
 
-                links.forEach(link => {
-                    const text = link.textContent.toLowerCase();
-                    if (text.includes(term)) {
-                        link.style.display = 'flex';
-                        hasVisibleLink = true;
+                items.forEach(item => {
+                    const titleElement = item.querySelector('.topic-title');
+                    const text = titleElement.textContent.toLowerCase();
+                    const textNormalized = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    
+                    if (textNormalized.includes(termNormalized)) {
+                        item.style.display = 'flex'; 
+                        hasVisibleItem = true;
                     } else {
-                        link.style.display = 'none';
+                        item.style.display = 'none';
                     }
                 });
 
-                if (hasVisibleLink) {
+                if (hasVisibleItem) {
                     group.style.display = 'block';
                     totalVisibleGroups++;
                 } else {
