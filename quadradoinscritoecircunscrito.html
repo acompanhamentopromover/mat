@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quadrados Inscritos e Circunscritos - 9 Ano - Promover</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+:root {
+  --bg-color: #F0FDF4; 
+  --text-color: #064E3B; 
+  --border-color: #059669; 
+  --white: #FFFFFF;
+  --theme-light: #D1FAE5; 
+  --theme-medium: #34D399;
+  --theme-dark: #047857; 
+  --theme-contrast: #10B981;
+  --theme-accent: #022C22;
+  --theme-text-active: #FFFFFF;
+
+  --correct-bg: #D1FAE5;
+  --correct-border: #059669;
+  --wrong-bg: #FFE4E6;
+  --wrong-border: #BE123C;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Poppins', sans-serif; 
+  background-color: var(--bg-color); 
+  color: var(--text-color);
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  min-height: 100vh; 
+  padding: 20px; 
+  padding-bottom: 100px;
+  background-image: linear-gradient(var(--theme-light) 1px, transparent 1px), linear-gradient(90deg, var(--theme-light) 1px, transparent 1px);
+  background-size: 20px 20px; 
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-6px); }
+  100% { transform: translateX(0); }
+}
+.shake-effect { animation: shake 0.4s ease-in-out; }
+@keyframes fadeIn { from {opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from {transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; }}
+
+.pulse-effect { animation: pulse 1s infinite; display: inline-block; }
+@keyframes pulse {
+  0% { transform: scale(1); }
+  15% { transform: scale(1.15); color: var(--theme-contrast); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.15); color: var(--theme-contrast); }
+  100% { transform: scale(1); }
+}
+
+.logo-header { width: 100%; max-width: 600px; display: flex; justify-content: center; flex-direction: column; align-items: center; padding: 20px 0 10px 0; }
+.css-logo { font-size: 1.6rem; font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 20px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); text-align: center; margin-bottom: 15px; }
+h1 { font-size: 1.8rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); text-align: center; }
+.subtitle { font-size: 0.95rem; color: var(--theme-dark); font-weight: 600; text-align: center; }
+.container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+
+.toggle-container { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 50px; padding: 4px; display: flex; margin-bottom: 10px; box-shadow: 3px 3px 0px var(--border-color); }
+.toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 40px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; color: var(--theme-dark); cursor: pointer; transition: all 0.3s ease; }
+.toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); box-shadow: 0px 2px 5px rgba(0,0,0,0.2); }
+.view-section { display: none; animation: fadeIn 0.4s ease; flex-direction: column; gap: 20px; }
+
+.search-container {position: relative; width: 100%; }
+.search-input { width: 100%; padding: 15px 20px 15px 50px; border: 2px solid var(--border-color); border-radius: 50px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+.search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+.search-icon {position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; opacity: 0.7; }
+#no-results { text-align: center; color: var(--theme-dark); font-weight: 600; display: none; }
+
+.content-group { display: flex; flex-direction: column; gap: 12px; }
+.section-badge { display: inline-block; padding: 8px 16px; background-color: var(--theme-dark); color: var(--white); font-size: 0.9rem; font-weight: 700; border-radius: 8px; border: 2px solid var(--border-color); box-shadow: 3px 3px 0px rgba(0,0,0,0.2); text-transform: uppercase; align-self: flex-start; margin-bottom: 5px; }
+.theory-box { display: flex; flex-direction: column; padding: 20px; border-radius: 16px; background-color: var(--white); border: 2px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); font-weight: 500; font-size: 0.95rem; line-height: 1.6; position: relative; overflow: hidden; gap: 15px; }
+.theory-box::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background-color: var(--theme-contrast); border-right: 2px solid var(--border-color); }
+.theory-box h3 {font-size: 1.2rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; display: flex; align-items: center; gap: 8px;}
+.theory-box p { margin-bottom: 10px; color: #1E293B; }
+.theory-box ul { padding-left: 20px; margin-bottom: 10px; }
+.theory-box li { margin-bottom: 6px; }
+.illustration-container { display: flex; justify-content: center; align-items: center; padding: 20px; background: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 8px; margin: 15px 0; overflow: hidden; width: 100%;}
+.illustration-container svg {max-width: 100%; height: auto; display: block; margin: 0 auto; }
+.highlight-box { background-color: #ECFDF5; border-left: 4px solid var(--theme-contrast); padding: 15px; border-radius: 6px; font-size: 0.9rem; color: #065F46; font-weight: 600; }
+
+.difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+.dif-facil {background: #D1FAE5; color: #065F46; }
+.dif-medio { background: #FEF08A; color: #713F12; }
+.dif-dificil { background: #FECACA; color: #7F1D1D; }
+.question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+.question-map::-webkit-scrollbar { display: none; }
+.map-dot {min-width: 35px; height: 35px; border: 2px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+.map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 2px 2px 0px var(--theme-contrast); transform: scale(1.1); }
+.map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+.map-dot.answered-wrong {background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+.option-btn { display: flex; align-items: center; width: 100%; padding: 16px; background-color: var(--white); border: 2px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 600; text-align: left; color: var(--text-color); }
+.option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+.opt-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+.option-btn.correct {background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 2px 2px 0px var(--correct-border); }
+.option-btn.correct .opt-circle {background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+.option-btn.wrong {background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+.option-btn.wrong .opt-circle {background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+.option-btn.disabled {pointer-events: none; opacity: 0.6; }
+
+.feedback-box { display: block; margin-top: 20px; background-color: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 12px; padding: 20px; animation: slideUp 0.3s ease-out; }
+.feedback-title { font-weight: 900; text-transform: uppercase; font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items:center; gap:8px; color: var(--theme-dark); }
+.feedback-item { margin-bottom: 8px; font-size: 0.85rem; padding-left: 10px; border-left: 3px solid #CBD5E1; line-height: 1.5; color: #0F172A; }
+.feedback-item.correct-opt {border-left-color: var(--correct-border); font-weight: 700; color: var(--correct-border); background: var(--correct-bg); padding: 10px; border-radius: 0 6px 6px 0; }
+.feedback-item.wrong-opt { border-left-color: var(--wrong-border); color: #7F1D1D; }
+.result-card {background: white; border: 3px solid var(--border-color); border-radius: 20px; padding: 30px; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+.stars-container { font-size: 3.5rem; margin: 10px 0; letter-spacing: 5px; }
+.percentage-big {font-size: 4.5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 10px 0; text-shadow: 3px 3px 0px var(--theme-contrast); }
+
+.btn-action { width: 100%; padding: 18px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; box-shadow: 4px 4px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 20px; }
+.btn-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+.quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-color); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100; }
+.nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 800; border: 2px solid var(--border-color); cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase;}
+.btn-next { background-color: var(--theme-dark); color: white; }
+.btn-prev { background-color: white; color: var(--text-color); }
+.math-frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; line-height: 1.2; font-size: 0.9em; font-weight: 800; margin: 0 4px; }
+.numerator { border-bottom: 2px solid var(--text-color); padding: 0 4px; }
+.denominator { padding: 0 4px; }
+.svg-text { paint-order: stroke; stroke: #FFFFFF; stroke-width: 5px; stroke-linecap: round; stroke-linejoin: round; font-family: 'Poppins', sans-serif; font-weight: 800; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header class="logo-header">
+    <div class="css-logo"><span class="pulse-effect">♦</span> PROMOVER</div>
+    <h1>MATEMÁTICA / 9º ANO</h1>
+    <p class="subtitle">Geometria Analítica: Quadrados Inscritos e Circunscritos</p>
+  </header>
+
+  <div class="toggle-container">
+    <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">Teoria</button>
+    <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">Prática (<span id="qtd-btn">0</span>)</button>
+  </div>
+
+  <div id="viewExplanation" class="view-section" style="display: flex;">
+    <div class="search-container">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar conceito (ex: apótema, inscrito)...">
+    </div>
+    <div id="no-results"><p>Termo não encontrado.</p></div>
+
+    <div class="content-group">
+      <span class="section-badge">1. Quadrado Circunscrito (Externo)</span>
+      <div class="theory-box">
+        <h3>Propriedades do Quadrado Circunscrito</h3>
+        <p>Um quadrado é <strong>circunscrito</strong> a uma circunferência quando seus quatro lados tangenciam (tocam em um único ponto) a borda externa do círculo.</p>
+        
+        <div style="background: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid #E2E8F0; border-left: 5px solid var(--theme-dark); margin-bottom: 15px;">
+          <strong>Dedução Lógica:</strong><br>
+          A altura e a largura do quadrado externo são perfeitamente equivalentes ao diâmetro da circunferência. Sendo o diâmetro o dobro do raio (2R), concluímos que a medida do lado do quadrado será exatamente 2R.
+        </div>
+
+        <div class="highlight-box">
+          💡 <strong>Fórmulas (Circunscrito):</strong> <br>
+          <strong>Lado (L)</strong> = 2 · Raio <br>
+          <strong>Apótema (a)</strong> = Raio <em>(A distância do centro ao ponto médio do lado)</em>
+        </div>
+
+        <div class="illustration-container">
+          <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+            <rect x="40" y="40" width="160" height="160" fill="#ECFDF5" stroke="#047857" stroke-width="3"/>
+            <circle cx="120" cy="120" r="80" fill="#FFFFFF" stroke="#10B981" stroke-width="3"/>
+            <circle cx="120" cy="120" r="4" fill="#022C22"/>
+            <line x1="120" y1="120" x2="120" y2="40" stroke="#059669" stroke-width="3" stroke-dasharray="5"/>
+            <line x1="120" y1="120" x2="120" y2="200" stroke="#059669" stroke-width="3" stroke-dasharray="5"/>
+            <line x1="120" y1="120" x2="200" y2="120" stroke="#059669" stroke-width="3" stroke-dasharray="5"/>
+            <text x="126" y="85" font-size="18" fill="#022C22" class="svg-text">R</text>
+            <text x="126" y="165" font-size="18" fill="#022C22" class="svg-text">R</text>
+            <text x="140" y="115" font-size="16" fill="#022C22" class="svg-text">Apótema = R</text>
+            <line x1="30" y1="40" x2="30" y2="200" stroke="#022C22" stroke-width="2"/>
+            <line x1="25" y1="40" x2="35" y2="40" stroke="#022C22" stroke-width="2"/>
+            <line x1="25" y1="200" x2="35" y2="200" stroke="#022C22" stroke-width="2"/>
+            <text x="-5" y="125" font-size="18" fill="#022C22" transform="rotate(-90 15 125)" class="svg-text">Lado = 2R</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-group">
+      <span class="section-badge">2. Quadrado Inscrito (Interno)</span>
+      <div class="theory-box">
+        <h3>Propriedades do Quadrado Inscrito</h3>
+        <p>Um quadrado é <strong>inscrito</strong> quando ele está contido no círculo, de forma que seus quatro vértices pertencem (tocam) à circunferência.</p>
+        
+        <div style="background: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid #E2E8F0; border-left: 5px solid var(--theme-dark); margin-bottom: 15px;">
+          <strong>Dedução por Pitágoras:</strong><br>
+          A diagonal do quadrado inscrito é igual ao diâmetro do círculo (2R). Traçando a diagonal, dividimos o quadrado em um triângulo retângulo onde os catetos são os lados (L).<br><br>
+          Aplicando <strong>Hipotenusa² = Cateto² + Cateto²</strong>:<br>
+          (2R)² = L² + L²<br>
+          4R² = 2L² <em>(Simplificando por 2)</em><br>
+          2R² = L²<br>
+          <strong>L = √(2R²) ➔ L = R√2</strong>
+        </div>
+        
+        <div class="highlight-box">
+          💡 <strong>Fórmulas (Inscrito):</strong><br>
+          <strong>Lado (L)</strong> = R√2<br>
+          <strong>Apótema (a)</strong> = 
+          <span class="math-frac">
+            <span class="numerator">R√2</span>
+            <span class="denominator">2</span>
+          </span>
+        </div>
+
+        <div class="illustration-container">
+          <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="120" cy="120" r="80" fill="#FFFFFF" stroke="#10B981" stroke-width="3"/>
+            <polygon points="63.44,63.44 176.56,63.44 176.56,176.56 63.44,176.56" fill="#ECFDF5" stroke="#047857" stroke-width="3"/>
+            <circle cx="120" cy="120" r="4" fill="#022C22"/>
+            <line x1="63.44" y1="176.56" x2="176.56" y2="63.44" stroke="#BE123C" stroke-width="3" stroke-dasharray="5"/>
+            <line x1="63.44" y1="176.56" x2="176.56" y2="176.56" stroke="#EA580C" stroke-width="4"/>
+            <line x1="176.56" y1="176.56" x2="176.56" y2="63.44" stroke="#EA580C" stroke-width="4"/>
+            <path d="M 160.56,176.56 L 160.56,160.56 L 176.56,160.56" fill="none" stroke="#EA580C" stroke-width="2"/>
+            <circle cx="168" cy="168" r="1.5" fill="#EA580C"/>
+            <text x="100" y="115" font-size="18" fill="#9F1239" transform="rotate(-45 120 120)" class="svg-text">Diagonal = 2R</text>
+            <text x="110" y="195" font-size="22" fill="#C2410C" class="svg-text">L</text>
+            <text x="185" y="125" font-size="22" fill="#C2410C" class="svg-text">L</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-group">
+      <span class="section-badge">3. Relação de Áreas</span>
+      <div class="theory-box">
+        <h3>A Regra do Dobro</h3>
+        <p>Em uma mesma circunferência, a área do quadrado circunscrito (externo) será sempre <strong>o dobro</strong> da área do quadrado inscrito (interno).</p>
+        
+        <div style="background: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid #E2E8F0; border-left: 5px solid var(--theme-dark); margin-bottom: 15px;">
+          <strong>Demonstração Visual:</strong> Na imagem abaixo, o quadrado inscrito (verde escuro) é composto perfeitamente por 4 triângulos retângulos. O quadrado circunscrito (verde claro) abrange uma área composta por 8 triângulos idênticos. Desta forma, a área externa representa numericamente o dobro da área interna.
+        </div>
+
+        <div class="illustration-container">
+          <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+            <rect x="40" y="40" width="160" height="160" fill="#D1FAE5" fill-opacity="0.5" stroke="#047857" stroke-width="3"/>
+            <circle cx="120" cy="120" r="80" fill="none" stroke="#10B981" stroke-width="2"/>
+            <polygon points="120,40 200,120 120,200 40,120" fill="#10B981" fill-opacity="0.8" stroke="#059669" stroke-width="3"/>
+            <line x1="40" y1="120" x2="200" y2="120" stroke="#022C22" stroke-width="1.5" stroke-dasharray="4"/>
+            <line x1="120" y1="40" x2="120" y2="200" stroke="#022C22" stroke-width="1.5" stroke-dasharray="4"/>
+            <line x1="40" y1="40" x2="200" y2="200" stroke="#022C22" stroke-width="1.5" stroke-dasharray="4"/>
+            <line x1="40" y1="200" x2="200" y2="40" stroke="#022C22" stroke-width="1.5" stroke-dasharray="4"/>
+            <text x="45" y="55" font-size="14" fill="#022C22" class="svg-text">8 Triângulos (Exterior)</text>
+            <text x="75" y="150" font-size="14" fill="#022C22" class="svg-text">4 Triângulos (Interior)</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-action" onclick="setMode('practice')">
+      Iniciar Prática (<span id="qtd-btn-bottom">0</span> Q) →
+    </button>
+  </div>
+
+  <div id="viewPractice" class="view-section">
+    <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+      <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">Diagnóstico Prático</h2>
+      <p id="regras-prova" style="color: #0F172A; font-size: 0.95rem; font-weight:600;">Carregando regras...</p>
+    </div>
+    <div class="question-map" id="qMap"></div>
+    <div id="quizContainer" style="margin-bottom: 100px;"></div>
+  </div>
+
+  <div id="viewResult" class="view-section">
+    <div class="result-card">
+      <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+      <div class="stars-container" id="finalStars">★</div>
+      <div class="percentage-big" id="finalPercent">0%</div>
+      <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText"></p>
+      <div id="review-container"></div>
+    </div>
+    <div id="action-buttons"></div>
+  </div>
+
+</div>
+
+<footer class="quiz-footer" id="quizFooter">
+  <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+  <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+</footer>
+
+<script>
+const searchInput = document.getElementById('searchInput');
+const contentGroups = document.querySelectorAll('.content-group');
+const noResultsMsg = document.getElementById('no-results');
+
+searchInput.addEventListener('input', function(e) {
+  const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  let totalVisible = 0;
+
+  contentGroups.forEach(group => {
+    const textContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (textContent.includes(term)) {
+      group.style.display = 'flex';
+      totalVisible++;
+    } else {
+      group.style.display = 'none';
+    }
+  });
+  noResultsMsg.style.display = totalVisible === 0 ? 'block' : 'none';
+});
+
+const questions = [
+  {
+    id: 1, level: "Fácil",
+    text: "Observe a imagem de um quadrado circunscrito a uma circunferência. Se o raio mede 5 cm, qual é a medida do lado deste quadrado?",
+    illustration: `<svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" style="max-height:140px;">
+      <rect x="30" y="30" width="100" height="100" fill="#ECFDF5" stroke="#064E3B" stroke-width="3"/>
+      <circle cx="80" cy="80" r="50" fill="#FFFFFF" stroke="#10B981" stroke-width="3"/>
+      <circle cx="80" cy="80" r="3" fill="#064E3B"/>
+      <line x1="80" y1="80" x2="130" y2="80" stroke="#064E3B" stroke-width="3"/>
+      <text x="95" y="72" font-size="14" fill="#064E3B" class="svg-text">R=5</text>
+    </svg>`,
+    options: ["5 cm", "10 cm", "20 cm", "25 cm"],
+    correct: 1,
+    explanation: { correct: "Em um quadrado circunscrito, a medida do lado é equivalente ao diâmetro da circunferência (L = 2R). Assim, L = 2 · 5 = 10 cm.", options: ["Este é o valor do raio, que equivale apenas à metade da medida do lado.", "Alternativa correta.", "Este é o valor do perímetro do quadrado (4 · 10), não do lado.", "Esta seria a área de um quadrado de lado 5."] }
+  },
+  {
+    id: 2, level: "Fácil",
+    text: "Um quadrado está inscrito em uma circunferência de raio 8 metros. Qual é a medida da diagonal deste quadrado?",
+    illustration: `<svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" style="max-height:140px;">
+      <circle cx="80" cy="80" r="60" fill="#F8FAFC" stroke="#10B981" stroke-width="3"/>
+      <polygon points="37.57,37.57 122.43,37.57 122.43,122.43 37.57,122.43" fill="none" stroke="#064E3B" stroke-width="3"/>
+      <line x1="37.57" y1="37.57" x2="122.43" y2="122.43" stroke="#BE123C" stroke-width="3" stroke-dasharray="5"/>
+      <circle cx="80" cy="80" r="3" fill="#BE123C"/>
+      <text x="65" y="70" font-size="12" fill="#BE123C" transform="rotate(45 80 80)" class="svg-text">Diagonal</text>
+    </svg>`,
+    options: ["8 metros", "16 metros", "8√2 metros", "64 metros"],
+    correct: 1,
+    explanation: { correct: "A diagonal de um quadrado inscrito apresenta medida igual ao diâmetro da circunferência (2R). Sendo R = 8, a diagonal mede 16 metros.", options: ["Este é o valor do raio, correspondente à metade da diagonal.", "Alternativa correta.", "Este seria o valor do lado do quadrado inscrito.", "Esta seria a área de um quadrado de lado 8."] }
+  },
+  {
+    id: 3, level: "Fácil",
+    text: "Em um quadrado circunscrito a uma circunferência com raio de 12 cm, qual é a medida do apótema do quadrado?",
+    options: ["6 cm", "24 cm", "12 cm", "12√2 cm"],
+    correct: 2,
+    explanation: { correct: "No quadrado circunscrito, o apótema (distância do centro até o ponto médio do lado) tem a mesma medida do raio. Logo, o apótema mede 12 cm.", options: ["Incorreto. O apótema não equivale à metade do raio.", "Este é o valor do lado do quadrado (diâmetro), não do apótema.", "Alternativa correta.", "Esta fórmula seria aplicável para calcular o lado de um quadrado inscrito."] }
+  },
+  {
+    id: 4, level: "Fácil",
+    text: "Uma moldura quadrada é construída externamente (circunscrita) a um espelho circular de raio 3 cm. Qual é a área desta moldura?",
+    options: ["18 cm²", "9 cm²", "36 cm²", "12 cm²"],
+    correct: 2,
+    explanation: { correct: "O lado do quadrado circunscrito mede 2R. Logo, L = 2 · 3 = 6 cm. A área do quadrado é L². Portanto, 6² = 36 cm².", options: ["Cálculo incorreto resultante da multiplicação de 3 por 6.", "Este é o valor de R², utilizado no cálculo da área do círculo.", "Alternativa correta.", "Este é o valor do perímetro da moldura (4 · 3), não da área."] }
+  },
+  {
+    id: 5, level: "Fácil",
+    text: "Calcule o perímetro de um quadrado circunscrito a um círculo de raio 4 metros.",
+    illustration: `<svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" style="max-height:140px;">
+      <rect x="30" y="30" width="100" height="100" fill="none" stroke="#064E3B" stroke-width="3"/>
+      <circle cx="80" cy="80" r="50" fill="#ECFDF5" stroke="#10B981" stroke-width="2"/>
+      <circle cx="80" cy="80" r="3" fill="#064E3B"/>
+      <line x1="80" y1="80" x2="80" y2="30" stroke="#064E3B" stroke-width="3"/>
+      <text x="88" y="60" font-size="14" fill="#064E3B" class="svg-text">R=4</text>
+    </svg>`,
+    options: ["16 metros", "32 metros", "64 metros", "8 metros"],
+    correct: 1,
+    explanation: { correct: "O lado do quadrado mede 2R (L = 8 m). O perímetro corresponde à soma dos quatro lados iguais: 4 · 8 = 32 metros.", options: ["Este seria o perímetro se o lado do quadrado medisse 4 metros.", "Alternativa correta.", "Este é o valor da área do quadrado (8 · 8).", "Este é o valor correspondente a apenas um lado do quadrado."] }
+  },
+  
+  {
+    id: 6, level: "Médio",
+    text: "Qual é a medida do lado de um quadrado inscrito em uma circunferência com 5 cm de raio?",
+    options: ["10 cm", "25 cm", "5√2 cm", "10√2 cm"],
+    correct: 2,
+    explanation: { correct: "A fórmula algébrica para o lado do quadrado inscrito é L = R√2. Substituindo o raio pelo valor 5, obtemos L = 5√2 cm.", options: ["Este seria o lado se o quadrado fosse circunscrito (L = 2R).", "Este é o quadrado numérico do valor do raio.", "Alternativa correta.", "Incorreto. O fator matemático √2 multiplica o raio (5), não o diâmetro (10)."] }
+  },
+  {
+    id: 7, level: "Médio",
+    text: "O raio de uma base circular é 6 metros. Um quadrado é inscrito nesta base. Qual é a medida do apótema deste quadrado?",
+    illustration: `<svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" style="max-height:140px;">
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#10B981" stroke-width="3"/>
+      <polygon points="37.57,37.57 122.43,37.57 122.43,122.43 37.57,122.43" fill="#ECFDF5" stroke="#064E3B" stroke-width="3"/>
+      <circle cx="80" cy="80" r="3" fill="#BE123C"/>
+      <line x1="80" y1="80" x2="80" y2="122.43" stroke="#BE123C" stroke-width="3"/>
+      <path d="M 80,110.5 L 88,110.5 L 88,122.43" fill="none" stroke="#BE123C" stroke-width="2"/>
+      <text x="86" y="100" font-size="12" fill="#BE123C" class="svg-text">Apótema</text>
+    </svg>`,
+    options: ["3√2 metros", "6√2 metros", "3 metros", "12 metros"],
+    correct: 0,
+    explanation: { correct: "O apótema de um quadrado corresponde à metade da medida do seu lado. O lado inscrito é L = 6√2. A divisão deste valor por 2 resulta em 3√2 metros.", options: ["Alternativa correta.", "Este é o valor integral do lado do quadrado, não do apótema.", "A raiz de 2 é um componente fundamental da fórmula e não pode ser suprimida.", "Este é o valor correspondente ao diâmetro da circunferência."] }
+  },
+  {
+    id: 8, level: "Médio",
+    text: "Uma placa circular tem raio de 4 cm. Um quadrado inscrito é recortado do seu centro. Qual é a área do quadrado recortado?",
+    options: ["16 cm²", "32 cm²", "64 cm²", "16√2 cm²"],
+    correct: 1,
+    explanation: { correct: "O lado do quadrado inscrito é L = R√2 = 4√2. A área é o quadrado matemático do lado: (4√2)² = 16 · 2 = 32 cm².", options: ["Valor incorreto, resultante do quadrado do raio isoladamente.", "Alternativa correta.", "Esta seria a área de um quadrado circunscrito (L = 8).", "Este é o perímetro do quadrado inscrito (4 · 4√2)."] }
+  },
+  {
+    id: 9, level: "Médio",
+    text: "Um quadrado está circunscrito a uma circunferência de diâmetro 10 cm. Qual é a diferença entre a área deste quadrado e a área de um quadrado inscrito na mesma circunferência?",
+    illustration: `<svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" style="max-height:140px;">
+      <rect x="20" y="20" width="120" height="120" fill="none" stroke="#064E3B" stroke-width="3" stroke-dasharray="4"/>
+      <circle cx="80" cy="80" r="60" fill="none" stroke="#10B981" stroke-width="3"/>
+      <polygon points="37.57,37.57 122.43,37.57 122.43,122.43 37.57,122.43" fill="#ECFDF5" stroke="#064E3B" stroke-width="3"/>
+    </svg>`,
+    options: ["50 cm²", "100 cm²", "25 cm²", "75 cm²"],
+    correct: 0,
+    explanation: { correct: "A área do quadrado circunscrito é 10 · 10 = 100 cm². Pela regra proporcional, a área do inscrito é a metade (50 cm²). A diferença (100 - 50) resulta em 50 cm².", options: ["Alternativa correta.", "Esta é a área total do quadrado circunscrito.", "Cálculo impreciso das proporções de área.", "Resultado incorreto da subtração algébrica."] }
+  },
+  {
+    id: 10, level: "Médio",
+    text: "O lado de um quadrado inscrito em uma circunferência mede 10√2 cm. Qual é a medida do diâmetro desta circunferência?",
+    options: ["10 cm", "20 cm", "20√2 cm", "5 cm"],
+    correct: 1,
+    explanation: { correct: "Através da fórmula L = R√2, igualando 10√2 = R√2, isolamos o raio em 10 cm. O diâmetro, sendo o dobro do raio, medirá 20 cm.", options: ["Esta é a medida do raio. O enunciado exige o cálculo do diâmetro.", "Alternativa correta.", "O fator √2 não deve ser incluído na medida do diâmetro.", "O diâmetro corresponde ao dobro do raio, não à sua metade."] }
+  },
+  
+  {
+    id: 11, level: "Difícil",
+    text: "Determine a medida da área hachurada (bordas coloridas) formada entre um quadrado circunscrito e uma circunferência de raio 5 cm. (Utilize π = 3,14)",
+    illustration: `<svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" style="max-height:140px;">
+      <rect x="20" y="20" width="120" height="120" fill="#10B981" stroke="#064E3B" stroke-width="3"/>
+      <circle cx="80" cy="80" r="60" fill="#FFFFFF" stroke="#059669" stroke-width="2"/>
+      <line x1="80" y1="80" x2="140" y2="80" stroke="#064E3B" stroke-width="3"/>
+      <text x="100" y="75" font-size="14" fill="#064E3B" class="svg-text">R=5</text>
+    </svg>`,
+    options: ["21,50 cm²", "31,40 cm²", "78,50 cm²", "100,00 cm²"],
+    correct: 0,
+    explanation: { correct: "A área hachurada equivale à Área do Quadrado subtraída da Área do Círculo. Quadrado (L=10) = 100. Círculo (π·R²) = 3,14 · 25 = 78,5. O resultado é 100 - 78,5 = 21,50 cm².", options: ["Alternativa correta.", "Este é o comprimento da circunferência (2πR), não aplicável no cálculo de área.", "Esta é a área total do círculo.", "Esta é a área total do quadrado circunscrito."] }
+  },
+  {
+    id: 12, level: "Difícil",
+    text: "O comprimento de uma circunferência (expresso por C = 2πR) mede 12π metros. Qual é a área do quadrado inscrito nesta circunferência?",
+    options: ["72 m²", "144 m²", "36 m²", "36√2 m²"],
+    correct: 0,
+    explanation: { correct: "Isolando a variável raio: 2πR = 12π ➔ 2R = 12 ➔ R = 6. O lado inscrito é L = 6√2. O cálculo da área é L² = (6√2)² = 36 · 2 = 72 m².", options: ["Alternativa correta.", "Esta é a área do quadrado circunscrito (Regra do dobro).", "Erro algébrico: o fator 2 foi omitido ao elevar a raiz ao quadrado.", "A área final é expressa estritamente por números racionais; a raiz é solucionada."] }
+  },
+  {
+    id: 13, level: "Difícil",
+    text: "Um quadrado inscrito possui área X e um quadrado circunscrito possui área Y na mesma circunferência. Qual a relação algébrica correta entre as áreas?",
+    options: ["Y = 2X", "X = 2Y", "Y = X²", "Y = 4X"],
+    correct: 0,
+    explanation: { correct: "Conforme a relação geométrica proporcional, a área do quadrado circunscrito (Y) constitui sempre o dobro matemático da área do quadrado inscrito (X). Logo, Y = 2X.", options: ["Alternativa correta.", "A proporção apresentada encontra-se invertida.", "A correlação entre áreas nestes polígonos é linear (fator 2), não quadrática.", "Esta relação ocorreria apenas se a variação ocorresse no raio, não no polígono."] }
+  },
+  {
+    id: 14, level: "Difícil",
+    text: "O perímetro de um quadrado inscrito em uma circunferência mede 40√2 cm. Qual é a medida do raio dessa circunferência?",
+    options: ["10 cm", "20 cm", "5 cm", "40 cm"],
+    correct: 0,
+    explanation: { correct: "Dividindo o perímetro por 4, obtemos o lado: L = 10√2. Aplicando a fórmula L = R√2, igualamos R√2 = 10√2, determinando que o raio (R) é 10 cm.", options: ["Alternativa correta.", "Resultado originado da divisão equivocada do perímetro por 2.", "Erro de isolamento algébrico da variável R.", "O valor 40 atua como coeficiente total do perímetro, não expressa o raio."] }
+  },
+  {
+    id: 15, level: "Difícil",
+    text: "A área de um quadrado inscrito em um círculo é igual a 18 cm². Qual é a área exata deste círculo? (Expresse o resultado em função de π)",
+    options: ["9π cm²", "18π cm²", "36π cm²", "81π cm²"],
+    correct: 0,
+    explanation: { correct: "A área do inscrito é L² = 18. Como L² = (R√2)² = 2R², definimos que 2R² = 18 ➔ R² = 9. A área do círculo (π·R²) resulta rigorosamente em 9π cm².", options: ["Alternativa correta.", "Assunção incorreta de que as áreas do círculo e do quadrado seriam equivalentes.", "Resultado aplicável apenas se a área inicial do quadrado fosse de 36 cm².", "Erro matemático por elevar ao quadrado o valor que já representava R²."] }
+  }
+];
+
+const storageKey = 'promover_quiz_quadrados_' + document.title.replace(/[^a-zA-Z0-9]/g, '_');
+let currentQuestion = 0;
+let userAnswers = [];
+
+function initQuiz() {
+  const totalQ = questions.length;
+  if (totalQ === 0) return;
+  
+  try {
+    const savedAnswers = localStorage.getItem(storageKey);
+    userAnswers = savedAnswers ? JSON.parse(savedAnswers) : new Array(totalQ).fill(null);
+    if(userAnswers.length !== totalQ) throw new Error("Array length mismatch");
+  } catch(e) {
+    localStorage.removeItem(storageKey);
+    userAnswers = new Array(totalQ).fill(null);
+  }
+
+  document.getElementById('qtd-btn').textContent = totalQ;
+  const btnBottom = document.getElementById('qtd-btn-bottom');
+  if (btnBottom) btnBottom.textContent = totalQ;
+  const notaCorte = Math.ceil(totalQ * 0.8);
+  document.getElementById('regras-prova').innerHTML = `${totalQ} questões. Acerte <strong>80% (${notaCorte}/${totalQ})</strong> para aprovação. Progresso salvo automaticamente.`;
+}
+
+function setMode(mode) {
+  const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+  views.forEach(v => document.getElementById(v).style.display = 'none');
+  document.getElementById('quizFooter').style.display = 'none';
+
+  if(mode === 'explanation') {
+    document.getElementById('viewExplanation').style.display = 'flex';
+    document.getElementById('btnExp').classList.add('active');
+    document.getElementById('btnPrac').classList.remove('active');
+  } else if (mode === 'practice') {
+    document.getElementById('viewPractice').style.display = 'block';
+    document.getElementById('quizFooter').style.display = 'flex';
+    document.getElementById('btnExp').classList.remove('active');
+    document.getElementById('btnPrac').classList.add('active');
+    renderQuestion();
+    renderMap();
+  } else if (mode === 'result') {
+    document.getElementById('viewResult').style.display = 'block';
+    document.getElementById('quizFooter').style.display = 'none';
+    window.scrollTo(0,0);
+  }
+}
+
+function renderQuestion() {
+  if(questions.length === 0) return;
+  const q = questions[currentQuestion];
+  const container = document.getElementById('quizContainer');
+  const letters = ['A', 'B', 'C', 'D'];
+  const ans = userAnswers[currentQuestion];
+  let badgeClass = '';
+
+  if(q.level === 'Fácil') badgeClass = 'dif-facil';
+  else if(q.level === 'Médio') badgeClass = 'dif-medio';
+  else badgeClass = 'dif-dificil';
+
+  let htmlStr = `
+    <div class="card-content" style="border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); padding: 15px; border-radius: 12px; background: white;">
+      <span class="difficulty-badge ${badgeClass}">${q.level}</span>
+      
+      <div style="margin-bottom: 20px;">
+        <span style="font-size: 0.8rem; font-weight: 800; color: var(--theme-dark);">QUESTÃO ${currentQuestion + 1} DE ${questions.length}</span>
+        <h2 style="font-size: 1.15rem; margin-top: 5px; color: var(--text-color); font-weight: 900;">${q.text}</h2>
+        ${q.illustration ? `<div style="display:flex; justify-content:center; align-items:center; background:#F8FAFC; border: 2px dashed var(--theme-contrast); border-radius: 8px; padding: 10px; margin-top: 15px;">${q.illustration}</div>` : ''}
+      </div>
+      
+      <div class="options-list">
+  `;
+
+  q.options.forEach((opt, i) => {
+    let cls = '';
+    if (ans !== null) {
+      if (i === q.correct) cls = 'correct';
+      else if (i === ans) cls = 'wrong';
+      else cls = 'disabled';
+    }
+    let dis = ans !== null ? 'disabled' : '';
+    htmlStr += `<button class="option-btn ${cls}" onclick="handleAnswer(${i})" ${dis}>
+      <div class="opt-circle">${letters[i]}</div>
+      <div>${opt}</div>
+    </button>`;
+  });
+
+  htmlStr += `</div>`;
+  
+  if (ans !== null) {
+    let feedbackTitleColor = ans === q.correct ? 'var(--correct-border)' : 'var(--wrong-border)';
+    let feedbackTitleText = ans === q.correct ? '☑ Resposta Correta' : '✖ Resposta Incorreta';
+    
+    htmlStr += `
+      <div class="feedback-box">
+        <div class="feedback-title" style="color:${feedbackTitleColor}">
+           ${feedbackTitleText}
+        </div>
+        <div class="feedback-item correct-opt"><strong>Alternativa Correta:</strong> ${q.options[q.correct]}</div>
+        
+        <div style="margin-top: 10px; font-size:0.95rem; color:var(--text-color); margin-bottom:15px; font-weight:600;">
+          ${q.explanation.correct}
+        </div>
+        
+        <div style="margin-top:15px; border-top:1px dashed var(--theme-light); padding-top:10px;">
+          <small style="color:var(--theme-dark);"><strong>Análise das Alternativas Incorretas:</strong></small>
+    `;
+
+    q.explanation.options.forEach((exp, i) => {
+      if (i !== q.correct) {
+        htmlStr += `<div class="feedback-item wrong-opt" style="margin-top:8px;"><strong>${letters[i]})</strong> ${exp}</div>`;
+      }
+    });
+
+    htmlStr += `</div></div>`;
+  }
+
+  htmlStr += `</div>`;
+  container.innerHTML = htmlStr;
+  updateNav();
+}
+
+function handleAnswer(idx) {
+  if (userAnswers[currentQuestion] !== null) return;
+  userAnswers[currentQuestion] = idx;
+  localStorage.setItem(storageKey, JSON.stringify(userAnswers));
+  
+  if (idx === questions[currentQuestion].correct) {
+    if (typeof confetti !== 'undefined') {
+      const duration = 1500;
+      const end = Date.now() + duration;
+      (function frame() {
+        confetti({ particleCount: 5, angle: 60, spread: 55, origin: {x: 0, y: 0.6 }, colors: ['#10B981', '#059669', '#34D399', '#047857'] });
+        confetti({ particleCount: 5, angle: 120, spread: 55, origin: {x: 1, y: 0.6 }, colors: ['#10B981', '#059669', '#34D399', '#047857'] });
+        if (Date.now() < end) { requestAnimationFrame(frame); }
+      }());
+    }
+  } else {
+    const quizContainer = document.getElementById('quizContainer');
+    quizContainer.classList.remove('shake-effect');
+    void quizContainer.offsetWidth;
+    quizContainer.classList.add('shake-effect');
+    setTimeout(() => quizContainer.classList.remove('shake-effect'), 500);
+  }
+  
+  renderQuestion();
+  renderMap();
+  
+  setTimeout(() => {
+    const feedback = document.querySelector('.feedback-box');
+    if(feedback) {
+      feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, 150);
+}
+
+function renderMap() {
+  if(questions.length === 0) return;
+  const map = document.getElementById('qMap');
+  
+  let mapHtml = '';
+  questions.forEach((q, i) => {
+    let cls = 'map-dot';
+    if (i === currentQuestion) cls += ' active';
+    if (userAnswers[i] !== null) {
+      cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+    }
+    mapHtml += `<div class="${cls}" onclick="goTo(${i})">${i+1}</div>`;
+  });
+  
+  map.innerHTML = mapHtml;
+  
+  setTimeout(() => {
+    const activeDot = map.querySelector('.map-dot.active');
+    if (activeDot) {
+      activeDot.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }, 50);
+}
+
+function goTo(i) {
+  if (typeof confetti !== 'undefined') confetti.reset();
+  currentQuestion = i;
+  renderQuestion();
+  renderMap();
+}
+
+function changeQuestion(d) {
+  let n = currentQuestion + d;
+  if (n >= 0 && n < questions.length) goTo(n);
+}
+
+function updateNav() {
+  document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+  const next = document.getElementById('btnNext');
+  
+  if (currentQuestion === questions.length - 1) {
+    next.textContent = "Finalizar Diagnóstico";
+    next.onclick = finish;
+  } else {
+    next.textContent = "Avançar";
+    next.onclick = () => changeQuestion(1);
+  }
+}
+
+function finish() {
+  let correct = userAnswers.filter((a, i) => a !== null && a === questions[i].correct).length;
+  let percent = Math.round((correct/questions.length) * 100);
+  
+  if (typeof confetti !== 'undefined') confetti.reset();
+  
+  document.getElementById('finalPercent').textContent = percent + "%";
+  document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${questions.length} questões.`;
+  document.getElementById('finalStars').textContent = percent >= 80 ? "⭐⭐⭐" : percent >= 60 ? "⭐⭐" : "⭐";
+  
+  let summary = '<div style="text-align:left; margin-top:20px;">';
+  
+  if (percent < 80) {
+    summary += `<div style="background:var(--wrong-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--wrong-border); color:var(--wrong-border);">
+    <strong>⚠️ Revisão Necessária.</strong> O desempenho não atingiu o critério de proficiência de 80%. Recomenda-se a análise minuciosa da fundamentação teórica.
+    </div>`;
+    document.getElementById('action-buttons').innerHTML = `<button class="btn-action" onclick="resetQuiz()"> Refazer Prática</button>`;
+  } else {
+    summary += `<div style="background:var(--correct-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--correct-border); color:var(--correct-border);">
+    <strong>🏆 Aprovação.</strong> Demonstração adequada de proficiência técnica nos cálculos envolvendo polígonos inscritos e circunscritos.
+    </div>`;
+    document.getElementById('action-buttons').innerHTML = `<button class="btn-action" onclick="resetQuiz()"> Refazer Prática</button>`;
+  }
+  
+  if (correct < questions.length) {
+    summary += `<h4 style="margin-bottom:10px; color:var(--text-color);">Relatório Analítico de Ocorrências:</h4>`;
+    questions.forEach((q, i) => {
+      if(userAnswers[i] !== q.correct && userAnswers[i] !== null) {
+        let userChoiceText = q.options[userAnswers[i]];
+        summary += `<div style="margin-bottom:10px; padding:15px; background:var(--white); border-radius:8px; border:2px dashed var(--theme-dark);">
+        <strong style="color:var(--theme-dark);">Questão ${i+1}:</strong> ${q.text}<br>
+        <span style="color:var(--wrong-border); font-size:0.9rem; font-weight:600; display:block; margin-top:5px;">Alternativa Selecionada: ${userChoiceText}</span>
+        <span style="color:var(--correct-border); font-size:0.9rem; font-weight:600; display:block; margin-top:2px;">Alternativa Correta: ${q.options[q.correct]}</span>
+        </div>`;
+      }
+    });
+  }
+  
+  summary += '</div>';
+  document.getElementById('review-container').innerHTML = summary;
+  setMode('result');
+}
+
+function resetQuiz() {
+  localStorage.removeItem(storageKey);
+  userAnswers = new Array(questions.length).fill(null);
+  currentQuestion = 0;
+  setMode('practice');
+}
+
+// Inicialização Principal
+initQuiz();
+let answeredCount = userAnswers.filter(ans => ans !== null).length;
+
+if (answeredCount === questions.length && questions.length > 0) {
+  // Retorno Inteligente: O aluno concluiu toda a prova, pular para resultados finais.
+  finish();
+} else if (answeredCount > 0) {
+  // Retorno Inteligente: O aluno possui questões pendentes, carregar primeira em branco.
+  let firstUnanswered = userAnswers.indexOf(null);
+  currentQuestion = firstUnanswered !== -1 ? firstUnanswered : 0;
+  setMode('practice');
+} else {
+  // O aluno não iniciou a prova, renderizar material teórico inicial.
+  setMode('explanation');
+}
+</script>
+</body>
+</html>

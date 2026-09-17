@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geometria 9 Ano Circulos e Pitagoras - Promover</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+:root {
+  --bg-color: #EEF2FF; 
+  --text-color: #1E1B4B; 
+  --border-color: #4338CA; 
+  --white: #FFFFFF;
+  --theme-light: #E0E7FF; 
+  --theme-medium: #818CF8;
+  --theme-dark: #4F46E5; 
+  --theme-contrast: #6366F1;
+  --theme-accent: #312E81;
+  --theme-text-active: #FFFFFF;
+
+  --correct-bg: #D1FAE5;
+  --correct-border: #059669;
+  --wrong-bg: #FFE4E6;
+  --wrong-border: #BE123C;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Poppins', sans-serif; 
+  background-color: var(--bg-color); 
+  color: var(--text-color);
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  min-height: 100vh; 
+  padding: 20px; 
+  padding-bottom: 100px;
+  background-image: linear-gradient(var(--theme-light) 1px, transparent 1px), linear-gradient(90deg, var(--theme-light) 1px, transparent 1px);
+  background-size: 20px 20px; 
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-6px); }
+  100% { transform: translateX(0); }
+}
+.shake-effect { animation: shake 0.4s ease-in-out; }
+@keyframes fadeIn { from {opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from {transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; }}
+.pulse-effect { animation: pulse 1s infinite; display: inline-block; }
+@keyframes pulse {
+  0% { transform: scale(1); }
+  15% { transform: scale(1.15); color: var(--theme-contrast); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.15); color: var(--theme-contrast); }
+  100% { transform: scale(1); }
+}
+
+.logo-header { width: 100%; max-width: 600px; display: flex; justify-content: center; flex-direction: column; align-items: center; padding: 20px 0 10px 0; }
+.css-logo { font-size: 1.6rem; font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 20px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); text-align: center; margin-bottom: 15px; }
+h1 { font-size: 1.8rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); text-align: center; }
+.subtitle { font-size: 0.95rem; color: var(--theme-dark); font-weight: 600; text-align: center; }
+
+.container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+.toggle-container { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 50px; padding: 4px; display: flex; margin-bottom: 10px; box-shadow: 3px 3px 0px var(--border-color); }
+.toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 40px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; color: var(--theme-dark); cursor: pointer; transition: all 0.3s ease; }
+.toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); box-shadow: 0px 2px 5px rgba(0,0,0,0.2); }
+.view-section { display: none; animation: fadeIn 0.4s ease; flex-direction: column; gap: 20px; }
+
+.search-container {position: relative; width: 100%; }
+.search-input { width: 100%; padding: 15px 20px 15px 50px; border: 2px solid var(--border-color); border-radius: 50px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+.search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+.search-icon {position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; opacity: 0.7; }
+#no-results { text-align: center; color: var(--theme-dark); font-weight: 600; display: none; }
+
+.content-group { display: flex; flex-direction: column; gap: 12px; }
+.section-badge { display: inline-block; padding: 8px 16px; background-color: var(--theme-dark); color: var(--white); font-size: 0.9rem; font-weight: 700; border-radius: 8px; border: 2px solid var(--border-color); box-shadow: 3px 3px 0px rgba(0,0,0,0.2); text-transform: uppercase; align-self: flex-start; margin-bottom: 5px; }
+
+.theory-box { display: flex; flex-direction: column; padding: 20px; border-radius: 16px; background-color: var(--white); border: 2px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); font-weight: 500; font-size: 0.95rem; line-height: 1.6; position: relative; overflow: hidden; gap: 15px; }
+.theory-box::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background-color: var(--theme-contrast); border-right: 2px solid var(--border-color); }
+.theory-box h3 {font-size: 1.2rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; display: flex; align-items: center; gap: 8px;}
+.theory-box p { margin-bottom: 10px; color: #1E293B; }
+.theory-box ul { padding-left: 20px; margin-bottom: 10px; }
+.theory-box li { margin-bottom: 6px; }
+
+.illustration-container { display: flex; justify-content: center; align-items: center; padding: 20px; background: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 8px; margin: 15px 0; overflow: hidden; width: 100%;}
+.illustration-container svg {max-width: 100%; height: auto; display: block; margin: 0 auto; }
+.highlight-box { background-color: var(--theme-light); border-left: 4px solid var(--theme-contrast); padding: 15px; border-radius: 6px; font-size: 0.9rem; color: var(--theme-accent); font-weight: 600; }
+
+.difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+.dif-facil {background: #D1FAE5; color: #065F46; }
+.dif-medio { background: #FEF08A; color: #713F12; }
+.dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+.question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+.question-map::-webkit-scrollbar { display: none; }
+.map-dot {min-width: 35px; height: 35px; border: 2px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+.map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 2px 2px 0px var(--theme-contrast); transform: scale(1.1); }
+.map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+.map-dot.answered-wrong {background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+.option-btn { display: flex; align-items: center; width: 100%; padding: 16px; background-color: var(--white); border: 2px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 600; text-align: left; color: var(--text-color); }
+.option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+.opt-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+.option-btn.correct {background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 2px 2px 0px var(--correct-border); }
+.option-btn.correct .opt-circle {background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+.option-btn.wrong {background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+.option-btn.wrong .opt-circle {background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+.option-btn.disabled {pointer-events: none; opacity: 0.6; }
+
+.feedback-box { display: block; margin-top: 20px; background-color: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 12px; padding: 20px; animation: slideUp 0.3s ease-out; }
+.feedback-title { font-weight: 900; text-transform: uppercase; font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items:center; gap:8px; color: var(--theme-dark); }
+.feedback-item { margin-bottom: 8px; font-size: 0.85rem; padding-left: 10px; border-left: 3px solid #CBD5E1; line-height: 1.5; color: #0F172A; }
+.feedback-item.correct-opt {border-left-color: var(--correct-border); font-weight: 700; color: var(--correct-border); background: var(--correct-bg); padding: 10px; border-radius: 0 6px 6px 0; }
+.feedback-item.wrong-opt { border-left-color: var(--wrong-border); color: #7F1D1D; }
+
+.result-card {background: white; border: 3px solid var(--border-color); border-radius: 20px; padding: 30px; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+.stars-container { font-size: 3.5rem; margin: 10px 0; letter-spacing: 5px; }
+.percentage-big {font-size: 4.5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 10px 0; text-shadow: 3px 3px 0px var(--theme-contrast); }
+
+.btn-action { width: 100%; padding: 18px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; box-shadow: 4px 4px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 20px; }
+.btn-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+
+.quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-color); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100; }
+.nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 800; border: 2px solid var(--border-color); cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase;}
+.btn-next { background-color: var(--theme-dark); color: white; }
+.btn-prev { background-color: white; color: var(--text-color); }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header class="logo-header">
+    <div class="css-logo"><span class="pulse-effect">♦</span> PROMOVER</div>
+    <h1>MATEMÁTICA / 9º ANO</h1>
+    <p class="subtitle">Geometria Profunda: Círculos, Ângulos e Pitágoras</p>
+  </header>
+
+  <div class="toggle-container">
+    <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">Teoria</button>
+    <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">Prática (<span id="qtd-btn">0</span>)</button>
+  </div>
+
+  <div id="viewExplanation" class="view-section" style="display: flex;">
+    <div class="search-container">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar conceito (ex: arco, pitágoras)...">
+    </div>
+    <div id="no-results"><p>Termo não encontrado.</p></div>
+
+    <div class="content-group">
+      <span class="section-badge">1. Elementos e o Teorema de Pitágoras</span>
+      <div class="theory-box">
+        <h3>A Maior Corda e o Triângulo Retângulo</h3>
+        <p>A circunferência possui <strong>cordas</strong>, que são segmentos que ligam dois pontos na borda. O <strong>Diâmetro</strong> é simplesmente a maior corda possível, pois ele passa exatamente pelo centro do círculo.</p>
+        
+        <div class="highlight-box">
+          💡 <strong>O Teorema de Pitágoras no Círculo:</strong> Se traçarmos a menor distância do centro do círculo até qualquer corda, essa linha fará um ângulo de 90° e cortará a corda exatamente na metade.
+        </div>
+        
+        <p>Quando ligamos o centro do círculo à ponta dessa corda, criamos o <strong>Raio</strong>. Isso forma um <strong>Triângulo Retângulo perfeito</strong> para os cálculos! A Hipotenusa é o Raio, um cateto é a distância, e o outro cateto é a <em>metade</em> da corda.</p>
+        
+        <div class="illustration-container">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#4F46E5" stroke-width="3"/>
+            <circle cx="100" cy="100" r="4" fill="#312E81"/>
+            <line x1="40" y1="150" x2="160" y2="150" stroke="#1E1B4B" stroke-width="4"/>
+            <line x1="100" y1="100" x2="100" y2="150" stroke="#6366F1" stroke-width="2" stroke-dasharray="4"/>
+            <rect x="100" y="140" width="10" height="10" fill="none" stroke="#6366F1" stroke-width="1.5"/>
+            <line x1="100" y1="100" x2="160" y2="150" stroke="#E11D48" stroke-width="3"/>
+            <text x="85" y="95" font-family="Poppins" font-size="10" fill="#312E81" font-weight="bold">Centro</text>
+            <text x="50" y="165" font-family="Poppins" font-size="11" fill="#1E1B4B" font-weight="bold">Corda Inteira</text>
+            <text x="60" y="125" font-family="Poppins" font-size="10" fill="#6366F1" font-weight="bold">Distância</text>
+            <text x="135" y="120" font-family="Poppins" font-size="12" fill="#E11D48" font-weight="bold">Raio</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-group">
+      <span class="section-badge">2. A Dança dos Ângulos</span>
+      <div class="theory-box">
+        <h3>Ângulo Central vs. Inscrito</h3>
+        <p>Esta é a relação mais importante da geometria circular avançada. Ela dita a regra da "Metade Exata".</p>
+        <p>Se dois ângulos "olham" (subtendem) para o mesmo arco na borda do círculo, o <strong>ângulo inscrito</strong> (aquele que tem a ponta na borda) mede sempre a <strong>metade</strong> do ângulo central (aquele que tem a ponta no centro).</p>
+
+        <div class="illustration-container">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#4F46E5" stroke-width="3"/>
+            <circle cx="40" cy="150" r="4" fill="#312E81"/>
+            <circle cx="160" cy="150" r="4" fill="#312E81"/>
+            <path d="M 40 150 A 80 80 0 0 0 160 150" fill="none" stroke="#E11D48" stroke-width="5"/>
+            <line x1="100" y1="100" x2="40" y2="150" stroke="#6366F1" stroke-width="2"/>
+            <line x1="100" y1="100" x2="160" y2="150" stroke="#6366F1" stroke-width="2"/>
+            <line x1="100" y1="20" x2="40" y2="150" stroke="#059669" stroke-width="2"/>
+            <line x1="100" y1="20" x2="160" y2="150" stroke="#059669" stroke-width="2"/>
+            <text x="85" y="85" font-family="Poppins" font-size="14" fill="#6366F1" font-weight="bold">90°</text>
+            <text x="85" y="15" font-family="Poppins" font-size="14" fill="#059669" font-weight="bold">45°</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-group">
+      <span class="section-badge">3. Consequências Matemáticas</span>
+      <div class="theory-box">
+        <h3>Ângulos Inscritos Iguais e Álgebra</h3>
+        <p>Uma consequência direta da regra acima é que <strong>todos os ângulos inscritos que apontam para o mesmo arco terão a mesma medida</strong>.</p>
+        <p>Isso nos permite montar equações algébricas quando os exercícios apresentam incógnitas. Por exemplo, se dois ângulos apontam para o mesmo arco, você pode igualá-los: <code>8x - 2 = 6x + 10</code>.</p>
+        
+        <h3>O Triângulo na Semicircunferência</h3>
+        <p>Se a base de um triângulo inscrito for exatamente o Diâmetro, significa que ele está apontando para metade do círculo (um arco de 180°).</p>
+        
+        <div class="highlight-box">
+          O Veredito: O ângulo lá na ponta medirá a metade de 180°. Logo, <strong>todo triângulo inscrito cuja base é o diâmetro é obrigatoriamente um Triângulo Retângulo (90°)</strong>.
+        </div>
+
+        <div class="illustration-container">
+          <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#4F46E5" stroke-width="3"/>
+            <line x1="20" y1="100" x2="180" y2="100" stroke="#312E81" stroke-width="4"/>
+            <line x1="20" y1="100" x2="120" y2="22" stroke="#E11D48" stroke-width="3"/>
+            <line x1="180" y1="100" x2="120" y2="22" stroke="#E11D48" stroke-width="3"/>
+            <path d="M 112 30 L 119 38 L 128 31" fill="none" stroke="#E11D48" stroke-width="2"/>
+            <text x="90" y="115" font-family="Poppins" font-size="12" fill="#312E81" font-weight="bold">Diâmetro (180°)</text>
+            <text x="125" y="15" font-family="Poppins" font-size="14" fill="#E11D48" font-weight="bold">90°</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-group">
+      <span class="section-badge">4. Fórmulas e Cinemática</span>
+      <div class="theory-box">
+        <h3>A Casca, o Recheio e a Roda</h3>
+        <ul>
+          <li><strong>Área Total:</strong> O espaço preenchido dentro. Fórmula: <code>A = π · R²</code></li>
+          <li><strong>Comprimento (Perímetro):</strong> A linha de contorno (a casca). Fórmula: <code>C = 2 · π · R</code></li>
+          <li><strong>Setor Circular (Fatia):</strong> Se quiser a área de apenas um pedaço (como uma fatia de pizza de 80°), use a Regra de Três comparando com o total de 360°.</li>
+        </ul>
+
+        <h3>A Física das Roldanas (Engrenagens)</h3>
+        <p>Quando duas rodas estão ligadas por uma correia, elas percorrem a mesma distância linear na borda. No entanto:</p>
+        <p>Como a roda menor tem um comprimento menor, ela precisa dar <strong>mais voltas (gira mais rápido)</strong>. E lembre-se da regra de ouro da cinemática: se a correia for "cruzada" em formato de X, <strong>o sentido de rotação é invertido!</strong></p>
+
+        <div class="illustration-container">
+          <svg viewBox="0 0 240 120" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="60" cy="60" r="40" fill="#E0E7FF" stroke="#4F46E5" stroke-width="3"/>
+            <circle cx="60" cy="60" r="5" fill="#312E81"/>
+            <circle cx="180" cy="60" r="20" fill="#E0E7FF" stroke="#4F46E5" stroke-width="3"/>
+            <circle cx="180" cy="60" r="5" fill="#312E81"/>
+            <line x1="60" y1="20" x2="180" y2="80" stroke="#E11D48" stroke-width="2" stroke-dasharray="4"/>
+            <line x1="60" y1="100" x2="180" y2="40" stroke="#E11D48" stroke-width="2" stroke-dasharray="4"/>
+            <path d="M 35 25 A 45 45 0 0 1 85 25" fill="none" stroke="#059669" stroke-width="3"/>
+            <polygon points="85,25 78,20 80,28" fill="#059669" />
+            <path d="M 195 85 A 25 25 0 0 1 165 85" fill="none" stroke="#059669" stroke-width="3"/>
+            <polygon points="165,85 172,90 170,82" fill="#059669" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-action" onclick="setMode('practice')">
+      Iniciar Diagnóstico (<span id="qtd-btn-bottom">0</span> Q) →
+    </button>
+  </div>
+
+  <div id="viewPractice" class="view-section">
+    <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+      <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo</h2>
+      <p id="regras-prova" style="color: #0F172A; font-size: 0.95rem; font-weight:600;">
+        Carregando regras da prova...
+      </p>
+    </div>
+    <div class="question-map" id="qMap"></div>
+    <div id="quizContainer" style="margin-bottom: 100px;"></div>
+  </div>
+
+  <div id="viewResult" class="view-section">
+    <div class="result-card">
+      <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+      <div class="stars-container" id="finalStars">★</div>
+      <div class="percentage-big" id="finalPercent">0%</div>
+      <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText"></p>
+      <div id="review-container"></div>
+    </div>
+    <div id="action-buttons"></div>
+  </div>
+
+</div>
+
+<footer class="quiz-footer" id="quizFooter">
+  <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+  <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+</footer>
+
+<script>
+const searchInput = document.getElementById('searchInput');
+const contentGroups = document.querySelectorAll('.content-group');
+const noResultsMsg = document.getElementById('no-results');
+
+searchInput.addEventListener('input', function(e) {
+  const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  let totalVisible = 0;
+
+  contentGroups.forEach(group => {
+    const textContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (textContent.includes(term)) {
+      group.style.display = 'flex';
+      totalVisible++;
+    } else {
+      group.style.display = 'none';
+    }
+  });
+
+  noResultsMsg.style.display = totalVisible === 0 ? 'block' : 'none';
+});
+
+// BANCO DE 30 QUESTÕES BALANCEADAS E ILUSTRADAS (10 Fáceis, 10 Médias, 10 Difíceis)
+const questions = [
+  // --- 14 ORIGINAIS DO LIVRO ---
+  {
+    id: 1, level: "Fácil",
+    text: "A iraniana Maryam Mirzakhani foi a primeira mulher premiada com a Medalha Fields. A medalha tem formato circular com raio de 3,2 cm. Qual é a medida aproximada da área de uma face dessa medalha? (Considere π = 3,14)",
+    illustration: "<svg viewBox='0 0 200 120' xmlns='http://www.w3.org/2000/svg' style='max-height:120px;'><circle cx='100' cy='60' r='50' fill='#FCD34D' stroke='#B45309' stroke-width='4'/><circle cx='100' cy='60' r='40' fill='none' stroke='#D97706' stroke-width='1' stroke-dasharray='2'/><line x1='100' y1='60' x2='150' y2='60' stroke='#1E1B4B' stroke-width='2'/><circle cx='100' cy='60' r='3' fill='#1E1B4B'/><text x='110' y='50' font-family='Poppins' font-size='12' fill='#1E1B4B' font-weight='bold'>3,2 cm</text></svg>",
+    options: ["8,04 cm²", "20,10 cm²", "32,15 cm²", "40,20 cm²"],
+    correct: 2,
+    explanation: { correct: "A fórmula da área é A = π · R². Fazendo A = 3,14 · (3,2)², temos A = 3,14 · 10,24 = 32,1536 cm².", options: ["Não elevou o raio ao quadrado.", "Calculou o perímetro (2·π·R).", "Correta!", "Erro na multiplicação decimal."] }
+  },
+  {
+    id: 2, level: "Médio",
+    text: "Um temporal formou-se a 50 km de distância. Voos para uma região circular com raio 20% maior que essa distância foram cancelados. A medida da área cancelada é:",
+    illustration: "<svg viewBox='0 0 200 120' xmlns='http://www.w3.org/2000/svg' style='max-height:120px;'><circle cx='100' cy='60' r='50' fill='#E0E7FF' stroke='#4F46E5' stroke-width='2' stroke-dasharray='4'/><circle cx='100' cy='60' r='35' fill='#94A3B8' stroke='#475569' stroke-width='2'/><line x1='100' y1='60' x2='135' y2='60' stroke='#1E1B4B' stroke-width='2'/><text x='105' y='55' font-family='Poppins' font-size='10' fill='#1E1B4B' font-weight='bold'>50 km</text><path d='M 100 60 L 140 20' stroke='#E11D48' stroke-width='2' stroke-dasharray='2'/><text x='145' y='25' font-family='Poppins' font-size='10' fill='#E11D48' font-weight='bold'>+20%</text></svg>",
+    options: ["Maior que 10.000 km² e menor que 15.000 km²", "Maior que 5.000 km² e menor que 10.000 km²", "Maior que 1.000 km² e menor que 5.000 km²", "Menor que 1.000 km²"],
+    correct: 0,
+    explanation: { correct: "Raio é 50 km + 20% = 60 km. A Área é π · 60² = 3,14 · 3600 = 11.304 km². Está entre 10.000 e 15.000.", options: ["Correta!", "Usou raio de 50km sem os 20%.", "Erro no cálculo de 60².", "Calculou o comprimento, não a área."] }
+  },
+  {
+    id: 3, level: "Difícil",
+    text: "Esquema de um setor circular para horta. Ângulo de 60°, raio maior 2 m e menor 1 m. Qual é a área destinada à horta? (Considere π = 3,14)",
+    illustration: "<svg viewBox='0 0 200 120' xmlns='http://www.w3.org/2000/svg' style='max-height:120px;'><path d='M 100 100 L 150 13.39 A 100 100 0 0 0 50 13.39 Z' fill='none' stroke='#CBD5E1' stroke-width='1'/><path d='M 75 56.69 A 50 50 0 0 1 125 56.69 L 150 13.39 A 100 100 0 0 0 50 13.39 Z' fill='#10B981' stroke='#047857' stroke-width='2'/><text x='92' y='80' font-family='Poppins' font-size='10' fill='#1E1B4B' font-weight='bold'>60°</text><text x='135' y='45' font-family='Poppins' font-size='10' fill='#1E1B4B' font-weight='bold'>1 m</text><text x='70' y='25' font-family='Poppins' font-size='10' fill='#1E1B4B' font-weight='bold'>2 m</text></svg>",
+    options: ["3,14 m²", "1,57 m²", "6,28 m²", "12,56 m²"],
+    correct: 1,
+    explanation: { correct: "Área da coroa: π(2² - 1²) = 3π. Como o ângulo é 60° (1/6 do círculo), dividimos por 6. A = 3π/6 = π/2 = 1,57 m².", options: ["Esqueceu de dividir por 2 na simplificação.", "Correta!", "Não dividiu por 6 (regra de três do setor).", "Calculou o círculo inteiro."] }
+  },
+  {
+    id: 4, level: "Médio",
+    text: "O quadrado tem lado de 5 cm e a parte branca é um quarto de círculo com raio de 2 cm. Determine a área destacada em cinza. (Considere π = 3,14)",
+    illustration: "<svg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg' style='max-height:120px;'><rect x='10' y='10' width='100' height='100' fill='#94A3B8' stroke='#1E1B4B' stroke-width='2'/><path d='M 110 110 L 70 110 A 40 40 0 0 1 110 70 Z' fill='#FFFFFF' stroke='#1E1B4B' stroke-width='2'/><text x='50' y='25' font-family='Poppins' font-size='10' fill='#FFFFFF' font-weight='bold'>5 cm</text><text x='85' y='105' font-family='Poppins' font-size='10' fill='#1E1B4B' font-weight='bold'>2</text></svg>",
+    options: ["21,86 cm²", "18,72 cm²", "25,00 cm²", "20,00 cm²"],
+    correct: 0,
+    explanation: { correct: "Quadrado = 25 cm². Quarto de círculo = (π·2²)/4 = π = 3,14. Subtraindo a parte branca: 25 - 3,14 = 21,86 cm².", options: ["Correta!", "Usou raio incorreto.", "Área total do quadrado sem o recorte.", "Subtração direta de perímetro, incorreto."] }
+  },
+  {
+    id: 5, level: "Difícil",
+    text: "Rita recorta um setor (Raio 45 cm, 80°) e uma coroa (Diâmetro 50, largura 15). Qual a área total de papel-cartão em função de π?",
+    illustration: "<svg viewBox='0 0 240 120' xmlns='http://www.w3.org/2000/svg' style='max-height:120px;'><circle cx='60' cy='60' r='50' fill='#D97706'/><circle cx='60' cy='60' r='20' fill='#FFFFFF'/><text x='60' y='30' font-family='Poppins' font-size='10' fill='#FFFFFF' font-weight='bold'>15</text><path d='M 180 100 L 220 20 A 90 90 0 0 0 140 20 Z' fill='#D97706'/><text x='175' y='80' font-family='Poppins' font-size='10' fill='#FFFFFF' font-weight='bold'>80°</text></svg>",
+    options: ["450π cm²", "975π cm²", "525π cm²", "1200π cm²"],
+    correct: 1,
+    explanation: { correct: "Setor: (80/360)·π·45² = 450π. Coroa (R=25, r=10): π(25²-10²) = 525π. Total = 450π + 525π = 975π.", options: ["Calculou apenas o topo do chapéu.", "Correta!", "Calculou apenas a aba do chapéu.", "Erro de subtração na coroa."] }
+  },
+  {
+    id: 6, level: "Médio",
+    text: "Sabrina deu 5 voltas em um parque circular andando 47 km no total. Qual é o raio aproximado desse parque? (Considere π = 3,14)",
+    options: ["3,0 km", "7,5 km", "1,5 km", "9,4 km"],
+    correct: 2,
+    explanation: { correct: "5 voltas = 47km -> 1 volta = 9,4km (Comprimento). 9,4 = 2·3,14·R -> R = 9,4 / 6,28 ≈ 1,5 km.", options: ["Esse é o Diâmetro.", "Divisão incorreta.", "Correta!", "Esse é o comprimento de 1 volta."] }
+  },
+  {
+    id: 7, level: "Difícil",
+    text: "Comprimento da linha vermelha: arco de 270° de raio 5 cm mais os dois segmentos retos. (Considere π = 3,14)",
+    illustration: "<svg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg' style='max-height:120px;'><path d='M 60 60 L 60 10 A 50 50 0 1 0 110 60 Z' fill='#E2E8F0' stroke='#E11D48' stroke-width='3'/><text x='45' y='45' font-family='Poppins' font-size='10' fill='#1E1B4B' font-weight='bold'>270°</text><text x='75' y='75' font-family='Poppins' font-size='10' fill='#1E1B4B' font-weight='bold'>5 cm</text></svg>",
+    options: ["33,55 cm", "23,55 cm", "10,00 cm", "39,25 cm"],
+    correct: 0,
+    explanation: { correct: "Arco: (270/360) · 2·3,14·5 = 23,55. Perímetro total inclui os 2 raios (5+5=10). 23,55 + 10 = 33,55 cm.", options: ["Correta!", "Esqueceu de somar os raios retos.", "Somou apenas as partes retas.", "Calculou o círculo de 360° inteiro."] }
+  },
+  {
+    id: 8, level: "Médio",
+    text: "Calcule ĉ. A circunferência possui ângulos centrais: 140°, â, b̂ e ĉ. Sabendo que â = 2·ĉ e b̂ = ĉ + 20°.",
+    illustration: "<svg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg' style='max-height:120px;'><circle cx='60' cy='60' r='50' fill='none' stroke='#1E1B4B' stroke-width='2'/><path d='M 60 60 L 100 25 A 50 50 0 0 0 20 25 Z' fill='#FEF08A'/><path d='M 60 60 L 20 25 A 50 50 0 0 0 15 85 Z' fill='#A7F3D0'/><path d='M 60 60 L 15 85 A 50 50 0 0 0 100 85 Z' fill='#E2E8F0'/><path d='M 60 60 L 100 85 A 50 50 0 0 0 100 25 Z' fill='#BFDBFE'/><text x='50' y='95' font-family='Poppins' font-size='10' fill='#1E1B4B' font-weight='bold'>140°</text><text x='85' y='60' font-family='Poppins' font-size='12' fill='#1E1B4B' font-weight='bold'>â</text><text x='55' y='40' font-family='Poppins' font-size='12' fill='#1E1B4B' font-weight='bold'>b</text><text x='30' y='60' font-family='Poppins' font-size='12' fill='#1E1B4B' font-weight='bold'>ĉ</text></svg>",
+    options: ["70°", "50°", "100°", "30°"],
+    correct: 1,
+    explanation: { correct: "Soma = 360°. 140 + 2ĉ + (ĉ+20) + ĉ = 360 -> 4ĉ + 160 = 360 -> 4ĉ = 200 -> ĉ = 50°.", options: ["Este é o valor de b̂.", "Correta!", "Este é o valor de â.", "Erro na divisão."] }
+  },
+  {
+    id: 9, level: "Médio",
+    text: "Triângulo retângulo formado pelo centro e dois pontos na borda. Os dois catetos (raios) medem 4 cm. Qual o comprimento da corda AB?",
+    illustration: "<svg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg' style='max-height:120px;'><circle cx='60' cy='60' r='50' fill='none' stroke='#1E1B4B' stroke-width='2'/><line x1='60' y1='60' x2='60' y2='10' stroke='#4F46E5' stroke-width='2'/><line x1='60' y1='60' x2='110' y2='60' stroke='#4F46E5' stroke-width='2'/><line x1='60' y1='10' x2='110' y2='60' stroke='#E11D48' stroke-width='2'/><rect x='60' y='50' width='10' height='10' fill='none' stroke='#1E1B4B'/><text x='45' y='35' font-family='Poppins' font-size='10' fill='#1E1B4B' font-weight='bold'>4</text><text x='80' y='75' font-family='Poppins' font-size='10' fill='#1E1B4B' font-weight='bold'>4</text><text x='95' y='35' font-family='Poppins' font-size='12' fill='#E11D48' font-weight='bold'>AB</text></svg>",
+    options: ["8 cm", "16 cm", "4√2 cm", "2√2 cm"],
+    correct: 2,
+    explanation: { correct: "Usando Pitágoras: AB² = 4² + 4² = 32. AB = √32 = 4√2 cm.", options: ["Apenas somou 4+4.", "Elevou ao quadrado e não extraiu a raiz.", "Correta!", "Fatorou a raiz incorretamente."] }
+  },
+  {
+    id: 10, level: "Difícil",
+    text: "Centro O, raio medindo √29 cm. A distância do centro à corda AB é 2 cm. Determine o comprimento TOTAL da corda AB.",
+    options: ["10 cm", "5 cm", "25 cm", "29 cm"],
+    correct: 0,
+    explanation: { correct: "(√29)² = 2² + x² -> 29 = 4 + x² -> x = 5 (metade da corda). Corda total = 5 * 2 = 10 cm.", options: ["Correta!", "Calculou apenas metade da corda.", "Esqueceu da raiz na hora de achar o x.", "Isso é a hipotenusa ao quadrado."] }
+  },
+  {
+    id: 11, level: "Médio",
+    text: "Triângulo isósceles cravado no centro de um círculo. Os ângulos da base medem (2x + 8°) e (6x - 6°). Qual a medida real em graus desses ângulos?",
+    illustration: "<svg viewBox='0 0 150 100' xmlns='http://www.w3.org/2000/svg' style='max-height:100px;'><path d='M 75 100 A 70 70 0 0 1 145 70' fill='none' stroke='#E2E8F0' stroke-width='2'/><path d='M 75 100 A 70 70 0 0 0 5 70' fill='none' stroke='#E2E8F0' stroke-width='2'/><line x1='75' y1='90' x2='15' y2='60' stroke='#4F46E5' stroke-width='2'/><line x1='75' y1='90' x2='135' y2='60' stroke='#4F46E5' stroke-width='2'/><line x1='15' y1='60' x2='135' y2='60' stroke='#1E1B4B' stroke-width='2'/><text x='25' y='55' font-family='Poppins' font-size='9' fill='#1E1B4B' font-weight='bold'>2x+8°</text><text x='95' y='55' font-family='Poppins' font-size='9' fill='#1E1B4B' font-weight='bold'>6x-6°</text></svg>",
+    options: ["3,5°", "15°", "10°", "22°"],
+    correct: 1,
+    explanation: { correct: "2x + 8 = 6x - 6 -> 14 = 4x -> x = 3,5. Substituindo: 2(3,5) + 8 = 15°.", options: ["Este é apenas o valor de x.", "Correta!", "Erro na álgebra da equação.", "Multiplicou incorretamente."] }
+  },
+  {
+    id: 12, level: "Fácil",
+    text: "Qual é a medida do ângulo central formado por um hexágono regular inscrito na circunferência?",
+    options: ["72°", "120°", "60°", "45°"],
+    correct: 2,
+    explanation: { correct: "Divide-se o centro (360°) pelo número de lados (6). 360 / 6 = 60°.", options: ["Pentágono (5 lados).", "Triângulo (3 lados).", "Correta!", "Octógono (8 lados)."] }
+  },
+  {
+    id: 13, level: "Médio",
+    text: "O comprimento do arco é 7,85 cm e o raio é 5 cm. Qual a medida do ângulo central correspondente? (Considere π = 3,14)",
+    illustration: "<svg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg' style='max-height:120px;'><circle cx='60' cy='60' r='50' fill='none' stroke='#CBD5E1' stroke-width='2'/><line x1='60' y1='60' x2='60' y2='10' stroke='#1E1B4B' stroke-width='2'/><line x1='60' y1='60' x2='110' y2='60' stroke='#1E1B4B' stroke-width='2'/><path d='M 60 10 A 50 50 0 0 1 110 60' fill='none' stroke='#E11D48' stroke-width='4'/><text x='100' y='30' font-family='Poppins' font-size='10' fill='#E11D48' font-weight='bold'>7,85</text><text x='75' y='75' font-family='Poppins' font-size='10' fill='#1E1B4B' font-weight='bold'>5 cm</text></svg>",
+    options: ["145°", "45°", "90°", "60°"],
+    correct: 2,
+    explanation: { correct: "Comprimento = 2·3,14·5 = 31,4 cm (360°). Regra de três: (7,85/31,4)*360 = 90°.", options: ["Erro na multiplicação.", "Achou que era metade.", "Correta!", "Equivalente a 5,23 cm."] }
+  },
+  {
+    id: 14, level: "Médio",
+    text: "A pista circular mede 130 m de raio. Qual o comprimento total da pista (1 volta)? (Considere π = 3,14)",
+    options: ["816,4 m", "408,2 m", "130,0 m", "260,0 m"],
+    correct: 0,
+    explanation: { correct: "Fórmula C = 2·π·R. C = 2 · 3,14 · 130 = 816,4 metros.", options: ["Correta!", "Esqueceu de multiplicar por 2.", "Isso é apenas o raio.", "Isso é apenas o diâmetro."] }
+  },
+
+  // --- 16 NOVAS QUESTÕES (EQUILÍBRIO 10/10/10) ---
+  {
+    id: 15, level: "Fácil",
+    text: "Na imagem, o ângulo central mede 100°. Sabendo que o ângulo inscrito aponta para o mesmo arco, qual é a sua medida (x)?",
+    illustration: "<svg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg' style='max-height:120px;'><circle cx='60' cy='60' r='50' fill='none' stroke='#1E1B4B' stroke-width='2'/><path d='M 60 60 L 95 95 A 50 50 0 0 0 25 95 Z' fill='#FEF08A'/><line x1='60' y1='60' x2='95' y2='95' stroke='#E11D48' stroke-width='2'/><line x1='60' y1='60' x2='25' y2='95' stroke='#E11D48' stroke-width='2'/><line x1='60' y1='10' x2='95' y2='95' stroke='#059669' stroke-width='2'/><line x1='60' y1='10' x2='25' y2='95' stroke='#059669' stroke-width='2'/><text x='48' y='80' font-family='Poppins' font-size='10' fill='#E11D48' font-weight='bold'>100°</text><text x='56' y='25' font-family='Poppins' font-size='10' fill='#059669' font-weight='bold'>x</text></svg>",
+    options: ["100°", "200°", "50°", "25°"],
+    correct: 2,
+    explanation: { correct: "A regra de ouro: O ângulo inscrito mede sempre a metade do ângulo central. 100 / 2 = 50°.", options: ["O ângulo inscrito não é igual ao central.", "Você dobrou em vez de dividir.", "Correta!", "Dividiu por 4 em vez de 2."] }
+  },
+  {
+    id: 16, level: "Fácil",
+    text: "O triângulo ABC está cravado na semicircunferência, e sua base é exatamente o Diâmetro. Qual a medida obrigatória do ângulo x lá na borda?",
+    illustration: "<svg viewBox='0 0 120 80' xmlns='http://www.w3.org/2000/svg' style='max-height:120px;'><path d='M 10 70 A 50 50 0 0 1 110 70' fill='none' stroke='#1E1B4B' stroke-width='2'/><line x1='10' y1='70' x2='110' y2='70' stroke='#312E81' stroke-width='3'/><line x1='10' y1='70' x2='80' y2='20' stroke='#E11D48' stroke-width='2'/><line x1='110' y1='70' x2='80' y2='20' stroke='#E11D48' stroke-width='2'/><text x='75' y='35' font-family='Poppins' font-size='12' fill='#E11D48' font-weight='bold'>x</text></svg>",
+    options: ["45°", "60°", "180°", "90°"],
+    correct: 3,
+    explanation: { correct: "Um triângulo inscrito no diâmetro aponta para um arco de 180°. Como todo ângulo inscrito é a metade, 180/2 = 90°.", options: ["Não é a metade de 90°.", "Não é um triângulo equilátero.", "Esse é o tamanho do arco de base.", "Correta!"] }
+  },
+  {
+    id: 17, level: "Fácil",
+    text: "A Roda A está girando no sentido Horário e está conectada à Roda B por uma correia normal (não cruzada). Em qual sentido a Roda B vai girar?",
+    illustration: "<svg viewBox='0 0 150 80' xmlns='http://www.w3.org/2000/svg' style='max-height:100px;'><circle cx='40' cy='40' r='25' fill='#E0E7FF' stroke='#4F46E5' stroke-width='2'/><circle cx='110' cy='40' r='15' fill='#E0E7FF' stroke='#4F46E5' stroke-width='2'/><line x1='40' y1='15' x2='110' y2='25' stroke='#1E1B4B' stroke-width='2'/><line x1='40' y1='65' x2='110' y2='55' stroke='#1E1B4B' stroke-width='2'/><path d='M 25 25 A 20 20 0 0 1 55 25' fill='none' stroke='#059669' stroke-width='2'/><polygon points='55,25 50,20 52,28' fill='#059669'/></svg>",
+    options: ["Anti-horário", "Horário", "Ficará Parada", "Vai e Volta"],
+    correct: 1,
+    explanation: { correct: "Com a correia normal (sem cruzar em formato de X), a força é transmitida na mesma direção. Horário -> Horário.", options: ["Seria assim apenas se a correia fosse cruzada.", "Correta!", "A correia obriga a girar.", "A física não permite isso em roldanas simples."] }
+  },
+  {
+    id: 18, level: "Fácil",
+    text: "Agora, a Roda A gira no sentido Horário, mas a correia está cruzada (formando um X) até a Roda B. O que acontece com a rotação de B?",
+    illustration: "<svg viewBox='0 0 150 80' xmlns='http://www.w3.org/2000/svg' style='max-height:100px;'><circle cx='40' cy='40' r='25' fill='#E0E7FF' stroke='#4F46E5' stroke-width='2'/><circle cx='110' cy='40' r='15' fill='#E0E7FF' stroke='#4F46E5' stroke-width='2'/><line x1='40' y1='15' x2='110' y2='55' stroke='#E11D48' stroke-width='2'/><line x1='40' y1='65' x2='110' y2='25' stroke='#E11D48' stroke-width='2'/><path d='M 25 25 A 20 20 0 0 1 55 25' fill='none' stroke='#059669' stroke-width='2'/><polygon points='55,25 50,20 52,28' fill='#059669'/></svg>",
+    options: ["Gira no sentido Anti-Horário", "Gira no sentido Horário", "Não consegue girar (Trava)", "Alterna os sentidos"],
+    correct: 0,
+    explanation: { correct: "Sempre que a correia está em formato de 'X', a direção de puxada inverte fisicamente o movimento da próxima roda.", options: ["Correta!", "Esse é o caso da correia paralela.", "O sistema funciona perfeitamente, invertendo o giro.", "Não há alternância num sistema contínuo."] }
+  },
+  {
+    id: 19, level: "Fácil",
+    text: "Uma pizza gigante tem exatamente 20 cm de raio. Qual é a Área total que ela ocupa na mesa? (Considere π = 3,14)",
+    illustration: "<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' style='max-height:100px;'><circle cx='50' cy='50' r='45' fill='#FCD34D' stroke='#D97706' stroke-width='3'/><line x1='50' y1='50' x2='95' y2='50' stroke='#1E1B4B' stroke-width='2'/><text x='60' y='45' font-family='Poppins' font-size='10' fill='#1E1B4B' font-weight='bold'>20 cm</text></svg>",
+    options: ["125,6 cm²", "1256 cm²", "628 cm²", "2512 cm²"],
+    correct: 1,
+    explanation: { correct: "Área = π · R². Ou seja, 3,14 · (20)². A = 3,14 · 400 = 1256 cm².", options: ["Você calculou o comprimento (perímetro), não a área.", "Correta!", "Você esqueceu de elevar o 20 ao quadrado.", "Dobrou a área indevidamente."] }
+  },
+  {
+    id: 20, level: "Fácil",
+    text: "O volante de um carro clássico possui um diâmetro de 40 cm. Qual é o Comprimento total do contorno (a casca) desse volante? (Considere π = 3,14)",
+    options: ["1256 cm", "251,2 cm", "125,6 cm", "5024 cm"],
+    correct: 2,
+    explanation: { correct: "Se o diâmetro é 40, o Raio é 20. O Comprimento = 2·π·R = 2·3,14·20 = 125,6 cm.", options: ["Você usou a fórmula da Área ao quadrado.", "Você usou 40 como Raio, mas 40 é o Diâmetro.", "Correta!", "Múltiplos erros na fórmula."] }
+  },
+  {
+    id: 21, level: "Fácil",
+    text: "Um hexágono regular está inscrito em um círculo de raio 10 cm. Uma das propriedades únicas do hexágono é que o tamanho do seu lado é...",
+    illustration: "<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' style='max-height:100px;'><circle cx='50' cy='50' r='45' fill='none' stroke='#94A3B8' stroke-width='2'/><polygon points='50,5 89,27 89,72 50,95 11,72 11,27' fill='none' stroke='#4F46E5' stroke-width='2'/><line x1='50' y1='50' x2='89' y2='27' stroke='#1E1B4B' stroke-width='1' stroke-dasharray='3'/><text x='65' y='45' font-family='Poppins' font-size='10' fill='#1E1B4B' font-weight='bold'>10 cm</text></svg>",
+    options: ["10√3 cm", "20 cm", "5 cm", "10 cm"],
+    correct: 3,
+    explanation: { correct: "O hexágono regular é feito de 6 triângulos EQUILÁTEROS. Logo, o lado do hexágono é EXATAMENTE igual ao raio da circunferência.", options: ["Fórmula incorreta para lado.", "Isso é o Diâmetro.", "Isso é metade do raio.", "Correta!"] }
+  },
+  {
+    id: 22, level: "Fácil",
+    text: "Dois ângulos inscritos estão com os olhos (pontas) na borda apontando para o MESMO arco vermelho. Se o da esquerda mede 40°, o da direita (x) mede:",
+    illustration: "<svg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg' style='max-height:120px;'><circle cx='60' cy='60' r='50' fill='none' stroke='#1E1B4B' stroke-width='2'/><path d='M 20 85 A 50 50 0 0 0 100 85' fill='none' stroke='#E11D48' stroke-width='4'/><line x1='30' y1='20' x2='20' y2='85' stroke='#059669' stroke-width='2'/><line x1='30' y1='20' x2='100' y2='85' stroke='#059669' stroke-width='2'/><line x1='90' y1='20' x2='20' y2='85' stroke='#312E81' stroke-width='2'/><line x1='90' y1='20' x2='100' y2='85' stroke='#312E81' stroke-width='2'/><text x='25' y='35' font-family='Poppins' font-size='10' fill='#059669' font-weight='bold'>40°</text><text x='85' y='35' font-family='Poppins' font-size='10' fill='#312E81' font-weight='bold'>x</text></svg>",
+    options: ["80°", "40°", "20°", "60°"],
+    correct: 1,
+    explanation: { correct: "Ângulos inscritos que apontam para o mesmo arco possem medidas IDÊNTICAS. Então x = 40°.", options: ["Dobrou indevidamente, eles são idênticos.", "Correta!", "Achou que dividiria por 2 de novo.", "Sem relação matemática."] }
+  },
+  {
+    id: 23, level: "Médio",
+    text: "A Roda Maior (R=10 cm) dá exatas 20 voltas. Quantas voltas a Roda Menor (R=5 cm), conectada pela correia, dará no mesmo tempo?",
+    illustration: "<svg viewBox='0 0 150 80' xmlns='http://www.w3.org/2000/svg' style='max-height:100px;'><circle cx='40' cy='40' r='30' fill='#E0E7FF' stroke='#4F46E5' stroke-width='2'/><circle cx='120' cy='40' r='15' fill='#E0E7FF' stroke='#4F46E5' stroke-width='2'/><line x1='40' y1='10' x2='120' y2='25' stroke='#1E1B4B' stroke-width='2'/><line x1='40' y1='70' x2='120' y2='55' stroke='#1E1B4B' stroke-width='2'/><text x='30' y='43' font-family='Poppins' font-size='9' fill='#1E1B4B' font-weight='bold'>R=10</text><text x='110' y='43' font-family='Poppins' font-size='9' fill='#1E1B4B' font-weight='bold'>R=5</text></svg>",
+    options: ["10 voltas", "20 voltas", "40 voltas", "50 voltas"],
+    correct: 2,
+    explanation: { correct: "É uma proporção inversa! Raio * Voltas = constante. 10 * 20 = 5 * X -> 200 = 5X -> X = 40 voltas. Como ela é metade do tamanho, gira o dobro.", options: ["Calculou proporcional (errado na física).", "Igualou o número de voltas.", "Correta!", "Multiplicou tudo aleatoriamente."] }
+  },
+  {
+    id: 24, level: "Médio",
+    text: "Em um círculo de Raio 13 cm, existe uma corda reta de 24 cm. Usando Pitágoras, qual é a distância (linha verde) do centro até a corda?",
+    illustration: "<svg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg' style='max-height:120px;'><circle cx='60' cy='60' r='50' fill='none' stroke='#1E1B4B' stroke-width='2'/><line x1='20' y1='90' x2='100' y2='90' stroke='#E11D48' stroke-width='3'/><line x1='60' y1='60' x2='100' y2='90' stroke='#312E81' stroke-width='2' stroke-dasharray='3'/><line x1='60' y1='60' x2='60' y2='90' stroke='#059669' stroke-width='3'/><text x='75' y='70' font-family='Poppins' font-size='10' fill='#312E81' font-weight='bold'>13</text><text x='25' y='105' font-family='Poppins' font-size='10' fill='#E11D48' font-weight='bold'>Corda inteira = 24</text></svg>",
+    options: ["12 cm", "5 cm", "10 cm", "25 cm"],
+    correct: 1,
+    explanation: { correct: "Hipotenusa é 13. O cateto da base é METADE da corda (12). Pitágoras: 13² = x² + 12² -> 169 = x² + 144 -> x² = 25 -> Distância x = 5 cm.", options: ["Este é apenas o valor de metade da corda.", "Correta!", "Você somou em vez de subtrair em Pitágoras.", "Esqueceu de extrair a raiz quadrada de 25."] }
+  },
+  {
+    id: 25, level: "Difícil",
+    text: "Calcule a medida exata (sem remover o π) do comprimento de um ARCO de 120° em uma pista circular de raio 6 metros.",
+    options: ["4π metros", "12π metros", "6π metros", "8π metros"],
+    correct: 0,
+    explanation: { correct: "C Total = 2*π*6 = 12π. O arco de 120° é 1/3 do círculo (120/360). Portanto, dividimos por 3: 12π / 3 = 4π metros.", options: ["Correta!", "Esse é o perímetro do círculo de 360° inteiro.", "Essa é a área do arco (se fosse R²).", "Divisão incorreta da regra de três."] }
+  },
+  {
+    id: 26, level: "Difícil",
+    text: "Um quadrado está perfeitamente cravado (inscrito) dentro de um círculo de Raio 10 cm. Sabendo que π = 3, qual é a área das 4 'bordinhas' que sobram fora do quadrado?",
+    illustration: "<svg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg' style='max-height:120px;'><circle cx='60' cy='60' r='50' fill='#E0E7FF' stroke='#4F46E5' stroke-width='2'/><rect x='24.6' y='24.6' width='70.7' height='70.7' fill='#FFFFFF' stroke='#1E1B4B' stroke-width='2'/><line x1='60' y1='60' x2='95' y2='95' stroke='#E11D48' stroke-width='2' stroke-dasharray='3'/><text x='75' y='75' font-family='Poppins' font-size='10' fill='#E11D48' font-weight='bold'>10 cm</text></svg>",
+    options: ["200 cm²", "300 cm²", "100 cm²", "50 cm²"],
+    correct: 2,
+    explanation: { correct: "A Círculo = π·10² = 3·100 = 300. A diagonal do quadrado é o diâmetro (20). Lado² + Lado² = 20² -> 2L² = 400 -> L²(Área Quad) = 200. Bordinhas = 300 - 200 = 100 cm².", options: ["Essa é a Área apenas do Quadrado.", "Essa é a Área de todo o Círculo.", "Correta!", "Erro na conta da diagonal de Pitágoras."] }
+  },
+  {
+    id: 27, level: "Difícil",
+    text: "Qual é a Área da Coroa Circular sombreada de cinza se o Raio maior é 8 cm e o Raio menor (buraco) é 5 cm? (Considere π = 3,14)",
+    options: ["122,46 cm²", "201,06 cm²", "78,50 cm²", "39,00 cm²"],
+    correct: 0,
+    explanation: { correct: "Área Coroa = π·(R² - r²) -> 3,14·(8² - 5²) -> 3,14·(64 - 25) -> 3,14·39 = 122,46 cm².", options: ["Correta!", "Você somou R² e r² em vez de subtrair o buraco.", "Você esqueceu de multiplicar por Pi (3,14).", "Você apenas subtraiu 64-25, faltando o Pi."] }
+  },
+  {
+    id: 28, level: "Difícil",
+    text: "O ângulo central de uma circunferência mede algebricamente 4x. O ângulo inscrito que aponta para o mesmo arco mede (x + 30°). Descubra o valor de x.",
+    options: ["45°", "60°", "30°", "15°"],
+    correct: 2,
+    explanation: { correct: "O central é o dobro do inscrito. Logo: 4x = 2·(x + 30). Resolvemos: 4x = 2x + 60 -> 2x = 60 -> x = 30°.", options: ["Esqueceu de aplicar a distributiva (multiplicar o 30 por 2).", "Calculou o valor de 2x direto.", "Correta!", "Dividiu incorretamente no final da equação."] }
+  },
+  {
+    id: 29, level: "Difícil",
+    text: "Sistema Composto: A (20cm) liga-se a B (10cm). B e C (30cm) estão grudadas no mesmo eixo. C liga-se a D (15cm). Se A der 10 voltas, quantas voltas dará D?",
+    illustration: "<svg viewBox='0 0 200 100' xmlns='http://www.w3.org/2000/svg' style='max-height:120px;'><circle cx='40' cy='50' r='20' fill='#E0E7FF' stroke='#1E1B4B'/><circle cx='110' cy='50' r='30' fill='#FEF08A' stroke='#1E1B4B'/><circle cx='110' cy='50' r='10' fill='#A7F3D0' stroke='#1E1B4B'/><circle cx='170' cy='50' r='15' fill='#FCA5A5' stroke='#1E1B4B'/><text x='35' y='55' font-family='Poppins' font-size='10' fill='#1E1B4B'>A</text><text x='107' y='35' font-family='Poppins' font-size='10' fill='#1E1B4B'>C</text><text x='165' y='55' font-family='Poppins' font-size='10' fill='#1E1B4B'>D</text><line x1='40' y1='30' x2='110' y2='40' stroke='#000' stroke-width='1'/><line x1='110' y1='20' x2='170' y2='35' stroke='#000' stroke-width='1'/></svg>",
+    options: ["40 voltas", "20 voltas", "80 voltas", "10 voltas"],
+    correct: 0,
+    explanation: { correct: "A -> B: 20*10 = 10*x -> B dá 20 voltas. Eixo duplo: Se B dá 20, C também dá 20. C -> D: 30*20 = 15*y -> 600 = 15y -> y = 40 voltas.", options: ["Correta!", "Essas são as voltas do eixo do meio (B/C).", "Você duplicou a passagem do eixo do meio.", "A física condena as engrenagens menores girarem o mesmo tanto."] }
+  },
+  {
+    id: 30, level: "Difícil",
+    text: "Perímetro da Pista de Atletismo: Ela é formada por um retângulo central (100m de largura por 50m de altura) com dois semicírculos nas laterais. Qual o contorno total da pista? (Considere π = 3,14)",
+    options: ["357 m", "257 m", "514 m", "457 m"],
+    correct: 0,
+    explanation: { correct: "As linhas retas (cima e baixo) somam 100+100=200m. Os dois semicírculos formam 1 círculo completo de Diâmetro 50m (Raio 25m). Comprimento = 2*3,14*25 = 157. Total = 200 + 157 = 357m.", options: ["Correta!", "Você somou apenas uma parte reta de 100m.", "Somou as linhas verticais internas do retângulo (errado).", "Calculou a área das pontas ao invés do contorno."] }
+  }
+];
+
+// Blindando a chave do LocalStorage
+const storageKey = 'promover_quiz_' + document.title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/gi, '_').toLowerCase();
+let currentQuestion = 0;
+let userAnswers = [];
+
+function initQuiz() {
+  const totalQ = questions.length;
+  document.getElementById('qtd-btn').textContent = totalQ;
+  document.getElementById('qtd-btn-bottom').textContent = totalQ;
+  
+  const notaCorte = Math.ceil(totalQ * 0.8);
+  document.getElementById('regras-prova').innerHTML = `${totalQ} questões rigorosas. Acerte <strong>80% (${notaCorte}/${totalQ})</strong> para provar seu domínio. O seu progresso é salvo automaticamente neste navegador.`;
+
+  let savedAnswers = localStorage.getItem(storageKey);
+  if (savedAnswers) {
+    try {
+      let parsed = JSON.parse(savedAnswers);
+      // Validar tamanho do array p/ evitar bug de atualização
+      if (Array.isArray(parsed) && parsed.length === totalQ) {
+        userAnswers = parsed;
+      } else {
+        userAnswers = new Array(totalQ).fill(null);
+        localStorage.removeItem(storageKey);
+      }
+    } catch(e) {
+      userAnswers = new Array(totalQ).fill(null);
+      localStorage.removeItem(storageKey);
+    }
+  } else {
+    userAnswers = new Array(totalQ).fill(null);
+  }
+}
+
+function setMode(mode) {
+  const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+  views.forEach(v => document.getElementById(v).style.display = 'none');
+  document.getElementById('quizFooter').style.display = 'none';
+
+  if(mode === 'explanation') {
+    document.getElementById('viewExplanation').style.display = 'flex';
+    document.getElementById('btnExp').classList.add('active');
+    document.getElementById('btnPrac').classList.remove('active');
+  } else if (mode === 'practice') {
+    document.getElementById('viewPractice').style.display = 'block';
+    document.getElementById('quizFooter').style.display = 'flex';
+    document.getElementById('btnExp').classList.remove('active');
+    document.getElementById('btnPrac').classList.add('active');
+    renderQuestion();
+    renderMap();
+  } else if (mode === 'result') {
+    document.getElementById('viewResult').style.display = 'block';
+    document.getElementById('quizFooter').style.display = 'none';
+    window.scrollTo(0,0);
+  }
+}
+
+function renderQuestion() {
+  if(questions.length === 0) return;
+  const q = questions[currentQuestion];
+  const container = document.getElementById('quizContainer');
+  const letters = ['A', 'B', 'C', 'D'];
+  const ans = userAnswers[currentQuestion];
+  let badgeClass = '';
+
+  if(q.level === 'Fácil') badgeClass = 'dif-facil';
+  else if(q.level === 'Médio') badgeClass = 'dif-medio';
+  else badgeClass = 'dif-dificil';
+
+  let htmlStr = `
+    <div class="card-content" style="border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); padding: 15px; border-radius: 12px; background: white;">
+      <span class="difficulty-badge ${badgeClass}">${q.level}</span>
+      
+      <div style="margin-bottom: 20px;">
+        <span style="font-size: 0.8rem; font-weight: 800; color: var(--theme-dark);">QUESTÃO ${currentQuestion + 1} DE ${questions.length}</span>
+        <h2 style="font-size: 1.15rem; margin-top: 5px; color: var(--text-color); font-weight: 900;">${q.text}</h2>
+        ${q.illustration ? `<div style="display:flex; justify-content:center; align-items:center; background:#F8FAFC; border: 2px dashed #818CF8; border-radius: 8px; padding: 10px; margin-top: 15px;">${q.illustration}</div>` : ''}
+      </div>
+      
+      <div class="options-list">
+  `;
+
+  q.options.forEach((opt, i) => {
+    let cls = '';
+    if (ans !== null) {
+      if (i === q.correct) cls = 'correct';
+      else if (i === ans) cls = 'wrong';
+      else cls = 'disabled';
+    }
+    let dis = ans !== null ? 'disabled' : '';
+    htmlStr += `<button class="option-btn ${cls}" onclick="handleAnswer(${i})" ${dis}>
+      <div class="opt-circle">${letters[i]}</div>
+      <div>${opt}</div>
+    </button>`;
+  });
+
+  htmlStr += `</div>`;
+  
+  if (ans !== null) {
+    let feedbackTitleColor = ans === q.correct ? 'var(--correct-border)' : 'var(--wrong-border)';
+    let feedbackTitleText = ans === q.correct ? '☑ Raciocínio Aprovado!' : '✖ Ops! Falha Detectada:';
+    
+    htmlStr += `
+      <div class="feedback-box">
+        <div class="feedback-title" style="color:${feedbackTitleColor}">
+           ${feedbackTitleText}
+        </div>
+        <div class="feedback-item correct-opt"><strong>A Verdade Direta e Certa:</strong> ${q.options[q.correct]}</div>
+        
+        <div style="margin-top: 10px; font-size:0.95rem; color:var(--text-color); margin-bottom:15px; font-weight:600;">
+          ${q.explanation.correct}
+        </div>
+        
+        <div style="margin-top:15px; border-top:1px dashed var(--theme-light); padding-top:10px;">
+          <small style="color:var(--theme-dark);"><strong>Diagnóstico das Rasteiras e Distratores:</strong></small>
+    `;
+
+    q.explanation.options.forEach((exp, i) => {
+      if (i !== q.correct) {
+        htmlStr += `<div class="feedback-item wrong-opt" style="margin-top:8px;"><strong>${letters[i]})</strong> ${exp}</div>`;
+      }
+    });
+
+    htmlStr += `</div></div>`;
+  }
+
+  htmlStr += `</div>`;
+  container.innerHTML = htmlStr;
+  updateNav();
+}
+
+function handleAnswer(idx) {
+  if (userAnswers[currentQuestion] !== null) return;
+  userAnswers[currentQuestion] = idx;
+  localStorage.setItem(storageKey, JSON.stringify(userAnswers));
+  
+  if (idx === questions[currentQuestion].correct) {
+    if (typeof confetti !== 'undefined') {
+      const duration = 1500;
+      const end = Date.now() + duration;
+      (function frame() {
+        confetti({ particleCount: 5, angle: 60, spread: 55, origin: {x: 0, y: 0.6 }, colors: ['#10B981', '#059669', '#34D399', '#047857'] });
+        confetti({ particleCount: 5, angle: 120, spread: 55, origin: {x: 1, y: 0.6 }, colors: ['#10B981', '#059669', '#34D399', '#047857'] });
+        if (Date.now() < end) { requestAnimationFrame(frame); }
+      }());
+    }
+  } else {
+    const quizContainer = document.getElementById('quizContainer');
+    quizContainer.classList.remove('shake-effect');
+    void quizContainer.offsetWidth;
+    quizContainer.classList.add('shake-effect');
+    setTimeout(() => quizContainer.classList.remove('shake-effect'), 500);
+  }
+  
+  renderQuestion();
+  renderMap();
+  
+  setTimeout(() => {
+    const feedback = document.querySelector('.feedback-box');
+    if(feedback) {
+      feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, 150);
+}
+
+function renderMap() {
+  if(questions.length === 0) return;
+  const map = document.getElementById('qMap');
+  
+  let mapHtml = '';
+  questions.forEach((q, i) => {
+    let cls = 'map-dot';
+    if (i === currentQuestion) cls += ' active';
+    if (userAnswers[i] !== null) {
+      cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+    }
+    mapHtml += `<div class="${cls}" onclick="goTo(${i})">${i+1}</div>`;
+  });
+  
+  map.innerHTML = mapHtml;
+  
+  setTimeout(() => {
+    const activeDot = map.querySelector('.map-dot.active');
+    if (activeDot) {
+      activeDot.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }, 50);
+}
+
+function goTo(i) {
+  if (typeof confetti !== 'undefined') confetti.reset();
+  currentQuestion = i;
+  renderQuestion();
+  renderMap();
+}
+
+function changeQuestion(d) {
+  let n = currentQuestion + d;
+  if (n >= 0 && n < questions.length) goTo(n);
+}
+
+function updateNav() {
+  document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+  const next = document.getElementById('btnNext');
+  
+  if (currentQuestion === questions.length - 1) {
+    next.textContent = "Finalizar Diagnóstico";
+    next.onclick = finish;
+  } else {
+    next.textContent = "Avançar";
+    next.onclick = () => changeQuestion(1);
+  }
+}
+
+function finish() {
+  let correct = userAnswers.filter((a, i) => a !== null && a === questions[i].correct).length;
+  let percent = Math.round((correct/questions.length) * 100);
+  
+  if (typeof confetti !== 'undefined') confetti.reset();
+  
+  document.getElementById('finalPercent').textContent = percent + "%";
+  document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${questions.length} questões.`;
+  document.getElementById('finalStars').textContent = percent >= 80 ? "⭐⭐⭐" : percent >= 60 ? "⭐⭐" : "⭐";
+  
+  let summary = '<div style="text-align:left; margin-top:20px;">';
+  
+  if (percent < 80) {
+    summary += `<div style="background:var(--wrong-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--wrong-border); color:var(--wrong-border);">
+    <strong>⚠️ Domínio Insuficiente!</strong> O seu desempenho não atingiu a nota de corte (80%). Atingir a pontuação mínima é obrigatório nesta prova. Revise a teoria com rigor antes de tentar novamente.
+    </div>`;
+    document.getElementById('action-buttons').innerHTML = `<button class="btn-action" onclick="resetQuiz()"> Limpar Histórico e Refazer Prova</button>`;
+  } else {
+    summary += `<div style="background:var(--correct-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--correct-border); color:var(--correct-border);">
+    <strong>🏆 Excelente Desempenho!</strong> Você demonstrou uma base sólida, clínica e exata sobre os conceitos avaliados. A sua aprovação técnica está garantida neste módulo.
+    </div>`;
+    document.getElementById('action-buttons').innerHTML = `<button class="btn-action" onclick="resetQuiz()"> Refazer Prova (Zerar Histórico)</button>`;
+  }
+  
+  if (correct < questions.length) {
+    summary += `<h4 style="margin-bottom:10px; color:var(--text-color);">Relatório de Falhas e Correções:</h4>`;
+    questions.forEach((q, i) => {
+      if(userAnswers[i] !== q.correct) {
+        let userChoiceText = userAnswers[i] === null ? "Não respondida (Em branco)" : q.options[userAnswers[i]];
+        summary += `<div style="margin-bottom:10px; padding:15px; background:var(--white); border-radius:8px; border:2px dashed var(--theme-dark);">
+        <strong style="color:var(--theme-dark);">Q${i+1}:</strong> ${q.text}<br>
+        <span style="color:var(--wrong-border); font-size:0.9rem; font-weight:600; display:block; margin-top:5px;">Seu Erro/Status: ${userChoiceText}</span>
+        <span style="color:var(--correct-border); font-size:0.9rem; font-weight:600; display:block; margin-top:2px;">A Verdade: ${q.options[q.correct]}</span>
+        </div>`;
+      }
+    });
+  }
+  
+  summary += '</div>';
+  document.getElementById('review-container').innerHTML = summary;
+  setMode('result');
+}
+
+function resetQuiz() {
+  localStorage.removeItem(storageKey);
+  userAnswers = new Array(questions.length).fill(null);
+  currentQuestion = 0;
+  setMode('practice');
+}
+
+initQuiz();
+let hasStarted = userAnswers.some(ans => ans !== null);
+
+if (hasStarted) {
+  let firstUnanswered = userAnswers.indexOf(null);
+  currentQuestion = firstUnanswered !== -1 ? firstUnanswered : 0;
+  setMode('practice');
+} else {
+  setMode('explanation');
+}
+</script>
+</body>
+</html>

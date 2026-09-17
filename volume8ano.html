@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medidas de Volume 8 Ano - Promover</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+:root {
+  /* Cores adaptadas ao tema da disciplina Matemática/Geometria */
+  --bg-color: #F0F9FF; /* Azul bem claro */
+  --text-color: #0F172A; /* Slate escuro */
+  --border-color: #0369A1; /* Azul escuro da borda */
+  --white: #FFFFFF;
+  --theme-light: #E0F2FE; 
+  --theme-medium: #7DD3FC;
+  --theme-dark: #0284C7; /* Cor principal de destaque */
+  --theme-contrast: #38BDF8;
+  --theme-accent: #0C4A6E;
+  --theme-text-active: #FFFFFF;
+
+  /* NÃO ALTERAR AS CORES ABAIXO */
+  --correct-bg: #D1FAE5;
+  --correct-border: #059669;
+  --wrong-bg: #FFE4E6;
+  --wrong-border: #BE123C;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Poppins', sans-serif; 
+  background-color: var(--bg-color); 
+  color: var(--text-color);
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  min-height: 100vh; 
+  padding: 20px; 
+  padding-bottom: 100px;
+  background-image: linear-gradient(var(--theme-light) 1px, transparent 1px), linear-gradient(90deg, var(--theme-light) 1px, transparent 1px);
+  background-size: 20px 20px; 
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-6px); }
+  100% { transform: translateX(0); }
+}
+.shake-effect { animation: shake 0.4s ease-in-out; }
+@keyframes fadeIn { from {opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from {transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; }}
+.pulse-effect { animation: pulse 1s infinite; display: inline-block; }
+@keyframes pulse {
+  0% { transform: scale(1); }
+  15% { transform: scale(1.15); color: var(--theme-contrast); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.15); color: var(--theme-contrast); }
+  100% { transform: scale(1); }
+}
+
+.logo-header { width: 100%; max-width: 600px; display: flex; justify-content: center; flex-direction: column; align-items: center; padding: 20px 0 10px 0; }
+.css-logo { font-size: 1.6rem; font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 20px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); text-align: center; margin-bottom: 15px; }
+h1 { font-size: 1.8rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); text-align: center; }
+.subtitle { font-size: 0.95rem; color: var(--theme-dark); font-weight: 600; text-align: center; }
+
+.container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+.toggle-container { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 50px; padding: 4px; display: flex; margin-bottom: 10px; box-shadow: 3px 3px 0px var(--border-color); }
+.toggle-btn { flex: 1; border: none; background: none; padding: 12px 0; border-radius: 40px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; color: var(--theme-dark); cursor: pointer; transition: all 0.3s ease; }
+.toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); box-shadow: 0px 2px 5px rgba(0,0,0,0.2); }
+.view-section { display: none; animation: fadeIn 0.4s ease; flex-direction: column; gap: 20px; }
+
+.search-container {position: relative; width: 100%; }
+.search-input { width: 100%; padding: 15px 20px 15px 50px; border: 2px solid var(--border-color); border-radius: 50px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+.search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+.search-icon {position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; opacity: 0.7; }
+#no-results { text-align: center; color: var(--theme-dark); font-weight: 600; display: none; }
+
+.content-group { display: flex; flex-direction: column; gap: 12px; }
+.section-badge { display: inline-block; padding: 8px 16px; background-color: var(--theme-dark); color: var(--white); font-size: 0.9rem; font-weight: 700; border-radius: 8px; border: 2px solid var(--border-color); box-shadow: 3px 3px 0px rgba(0,0,0,0.2); text-transform: uppercase; align-self: flex-start; margin-bottom: 5px; }
+
+.theory-box { display: flex; flex-direction: column; padding: 20px; border-radius: 16px; background-color: var(--white); border: 2px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); font-weight: 500; font-size: 0.95rem; line-height: 1.6; position: relative; overflow: hidden; gap: 15px; }
+.theory-box::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background-color: var(--theme-contrast); border-right: 2px solid var(--border-color); }
+.theory-box h3 {font-size: 1.2rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; display: flex; align-items: center; gap: 8px;}
+.theory-box p { margin-bottom: 10px; color: #1E293B; }
+.theory-box ul { padding-left: 20px; margin-bottom: 10px; }
+.theory-box li { margin-bottom: 6px; }
+
+.illustration-container { display: flex; justify-content: center; align-items: center; padding: 20px; background: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 8px; margin: 15px 0; overflow: hidden; width: 100%;}
+.illustration-container svg {max-width: 100%; height: auto; display: block; margin: 0 auto; }
+.highlight-box { background-color: #E0F2FE; border-left: 4px solid var(--theme-contrast); padding: 15px; border-radius: 6px; font-size: 0.9rem; color: #075985; font-weight: 600; }
+
+.difficulty-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+.dif-facil {background: #D1FAE5; color: #065F46; }
+.dif-medio { background: #FEF08A; color: #713F12; }
+.dif-dificil { background: #FECACA; color: #7F1D1D; }
+
+.question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+.question-map::-webkit-scrollbar { display: none; }
+.map-dot {min-width: 35px; height: 35px; border: 2px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+.map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 2px 2px 0px var(--theme-contrast); transform: scale(1.1); }
+.map-dot.answered-correct { background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+.map-dot.answered-wrong {background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+
+.option-btn { display: flex; align-items: center; width: 100%; padding: 16px; background-color: var(--white); border: 2px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 600; text-align: left; color: var(--text-color); }
+.option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+.opt-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+.option-btn.correct {background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 2px 2px 0px var(--correct-border); }
+.option-btn.correct .opt-circle {background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+.option-btn.wrong {background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+.option-btn.wrong .opt-circle {background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+.option-btn.disabled {pointer-events: none; opacity: 0.7; }
+
+.feedback-box { display: block; margin-top: 20px; background-color: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 12px; padding: 20px; animation: slideUp 0.3s ease-out; }
+.feedback-title { font-weight: 900; text-transform: uppercase; font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items:center; gap:8px; color: var(--theme-dark); }
+.feedback-item { margin-bottom: 8px; font-size: 0.85rem; padding-left: 10px; border-left: 3px solid #CBD5E1; line-height: 1.5; color: #0F172A; }
+.feedback-item.correct-opt {border-left-color: var(--correct-border); font-weight: 700; color: var(--correct-border); background: var(--correct-bg); padding: 10px; border-radius: 0 6px 6px 0; }
+.feedback-item.wrong-opt { border-left-color: var(--wrong-border); color: #7F1D1D; }
+
+.result-card {background: white; border: 3px solid var(--border-color); border-radius: 20px; padding: 30px; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+.stars-container { font-size: 3.5rem; margin: 10px 0; letter-spacing: 5px; }
+.percentage-big {font-size: 4.5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 10px 0; text-shadow: 3px 3px 0px var(--theme-contrast); }
+
+.btn-action { width: 100%; padding: 18px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; box-shadow: 4px 4px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 20px; }
+.btn-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+
+.quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-color); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100; }
+.nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 800; border: 2px solid var(--border-color); cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase;}
+.btn-next { background-color: var(--theme-dark); color: white; }
+.btn-prev { background-color: white; color: var(--text-color); }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header class="logo-header">
+    <div class="css-logo"><span class="pulse-effect">♦</span> PROMOVER</div>
+    <h1>MATEMÁTICA / 8º ANO</h1>
+    <p class="subtitle">Relação entre Volume e Capacidade</p>
+  </header>
+
+  <div class="toggle-container">
+    <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">Teoria</button>
+    <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">Prática (<span id="qtd-btn">0</span>)</button>
+  </div>
+
+  <div id="viewExplanation" class="view-section" style="display: flex;">
+    <div class="search-container">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar conceito...">
+    </div>
+    <div id="no-results"><p>Termo não encontrado.</p></div>
+
+    <div class="content-group">
+      <span class="section-badge">1. Conceitos Base</span>
+      <div class="theory-box">
+        <h3>Volume vs. Capacidade</h3>
+        <p>É muito provável que você já tenha se confundido entre essas duas palavras. Elas estão ligadas, mas não significam exatamente a mesma coisa:</p>
+        <ul>
+          <li><strong>Volume:</strong> É a medida do espaço que um corpo ocupa no ambiente.</li>
+          <li><strong>Capacidade:</strong> É a quantidade, normalmente de líquido, que um recipiente consegue armazenar em seu interior.</li>
+        </ul>
+        <div class="highlight-box">
+          💡 <strong>Dica de Ouro:</strong> Todo recipiente tem volume (porque ocupa lugar no espaço), mas nem todo objeto com volume tem capacidade (um bloco maciço de concreto não armazena líquido).
+        </div>
+      </div>
+    </div>
+
+    <div class="content-group">
+      <span class="section-badge">2. O Pequeno: cm³ e mL</span>
+      <div class="theory-box">
+        <h3>O Centímetro Cúbico (cm³)</h3>
+        <p>Imagine um pequeno dado ou um cubinho muito pequeno onde a medida do comprimento da aresta é exatamente 1 centímetro (1 cm). O espaço dentro desse cubinho é chamado de <strong>1 centímetro cúbico (1 cm³)</strong>.</p>
+        <p>A regra de ouro: Um recipiente com essa medida de volume interno tem medida de capacidade para exatamente <strong>1 mililitro (1 mL)</strong> de líquido.</p>
+        
+        <div class="illustration-container">
+          <svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+             <g transform="translate(60, 120)">
+               <path d="M 0,-40 L 30,-55 L 60,-40 L 30,-25 Z" fill="#7DD3FC" stroke="#0284C7" stroke-width="2"/>
+               <path d="M 0,-40 L 0,0 L 30,15 L 30,-25 Z" fill="#38BDF8" stroke="#0284C7" stroke-width="2"/>
+               <path d="M 30,-25 L 30,15 L 60,0 L 60,-40 Z" fill="#0284C7" stroke="#0284C7" stroke-width="2"/>
+               <text x="-15" y="-10" font-family="Poppins" font-size="12" fill="#0C4A6E" font-weight="bold">1 cm</text>
+               <text x="35" y="30" font-family="Poppins" font-size="12" fill="#0C4A6E" font-weight="bold">1 cm</text>
+             </g>
+             <text x="140" y="100" font-family="Poppins" font-size="20" fill="#0C4A6E" font-weight="bold">1 cm³ = 1 mL</text>
+             <g transform="translate(290, 80)">
+               <path d="M 15,0 C 15,0 -5,35 -5,50 C -5,65 5,75 15,75 C 25,75 35,65 35,50 C 35,35 15,0 15,0 Z" fill="#38BDF8" stroke="#0284C7" stroke-width="2"/>
+               <text x="-10" y="95" font-family="Poppins" font-size="12" fill="#0C4A6E" font-weight="bold">1 Mililitro (mL)</text>
+             </g>
+          </svg>
+        </div>
+
+        <div class="highlight-box">
+          ATENÇÃO: Na prática, 1 mL de líquido corresponde a aproximadamente <strong>1/5 (um quinto)</strong> da medida de capacidade de uma colher de chá. Assim, uma colher de chá cheia possui medida de capacidade de aproximadamente <strong>5 mL</strong>.
+        </div>
+      </div>
+    </div>
+
+    <div class="content-group">
+      <span class="section-badge">3. O Médio: dm³ e o Litro</span>
+      <div class="theory-box">
+        <h3>O Decímetro Cúbico (dm³)</h3>
+        <p>Um recipiente cujo volume interno mede <strong>um decímetro cúbico (1 dm³)</strong> tem medida de capacidade para exatamente 1000 cubinhos de 1 cm³ de medida de volume.</p>
+        <p>Isso equivale a dizer que esse recipiente (com 1 dm de aresta) comporta exatamente <strong>1000 mL ou 1 Litro (1 L)</strong> de líquido.</p>
+        
+        <div class="illustration-container">
+          <svg viewBox="0 0 450 220" xmlns="http://www.w3.org/2000/svg">
+             <g transform="translate(60, 140)">
+               <path d="M 0,-70 L 50,-95 L 100,-70 L 50,-45 Z" fill="#7DD3FC" stroke="#0284C7" stroke-width="2"/>
+               <path d="M 25,-82.5 L 75,-57.5 M 75,-82.5 L 25,-57.5 M 50,-95 L 50,-45 M 0,-70 L 100,-70" stroke="#0284C7" stroke-width="0.5" opacity="0.5"/>
+               <path d="M 0,-70 L 0,0 L 50,25 L 50,-45 Z" fill="#38BDF8" stroke="#0284C7" stroke-width="2"/>
+               <path d="M 25,-22.5 L 25,-92.5 M 0,-35 L 50,-10 M 0,-17.5 L 50,7.5" stroke="#0284C7" stroke-width="0.5" opacity="0.5"/>
+               <path d="M 50,-45 L 50,25 L 100,0 L 100,-70 Z" fill="#0284C7" stroke="#0284C7" stroke-width="2"/>
+               <text x="-25" y="-15" font-family="Poppins" font-size="14" fill="#0C4A6E" font-weight="bold">1 dm</text>
+               <text x="60" y="45" font-family="Poppins" font-size="14" fill="#0C4A6E" font-weight="bold">1 dm</text>
+             </g>
+             <text x="180" y="110" font-family="Poppins" font-size="16" fill="#0C4A6E" font-weight="bold">1 dm³ = 1000 cm³ = 1 L</text>
+             <g transform="translate(350, 60)">
+               <rect x="0" y="30" width="60" height="90" rx="10" fill="#E0F2FE" stroke="#0284C7" stroke-width="3"/>
+               <path d="M 15,30 C 15,10 20,5 20,5 L 40,5 C 40,5 45,10 45,30 Z" fill="#E0F2FE" stroke="#0284C7" stroke-width="3"/>
+               <rect x="17" y="0" width="26" height="10" rx="2" fill="#0284C7"/>
+               <rect x="0" y="60" width="60" height="30" fill="#38BDF8" opacity="0.8"/>
+               <text x="30" y="75" font-family="Poppins" font-size="10" fill="#0C4A6E" font-weight="bold" text-anchor="middle">ÁGUA</text>
+               <text x="30" y="86" font-family="Poppins" font-size="10" fill="#0C4A6E" font-weight="bold" text-anchor="middle">1 L</text>
+             </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-group">
+      <span class="section-badge">4. O Gigante: m³ e as Caixas d'água</span>
+      <div class="theory-box">
+        <h3>O Metro Cúbico (m³)</h3>
+        <p>Um recipiente cujo volume interno mede <strong>um metro cúbico (1 m³)</strong> tem medida de capacidade para exatamente 1000 cubinhos com 1 dm³ de medida de volume.</p>
+        <p>Como cada dm³ é um litro, essa estrutura gigante equivale a impressionantes <strong>1000 Litros de líquido</strong>.</p>
+        
+        <div class="highlight-box">
+          🏠 <strong>Conversão Principal:</strong> 1 m³ = 1000 dm³ = 1000 L.<br>
+          <em>Curiosidade:</em> Em uma residência com quatro pessoas, recomenda-se uma caixa-d'água de pelo menos <strong>1000 L</strong> (ou seja, 1 m³).
+        </div>
+      </div>
+    </div>
+
+    <div class="content-group">
+      <span class="section-badge">5. Como Calcular o Volume?</span>
+      <div class="theory-box">
+        <h3>Volume de Formas Retangulares</h3>
+        <p>Para descobrir o volume interno de caixas, piscinas e blocos retangulares (paralelepípedos), a regra é simples. Basta multiplicar suas três dimensões essenciais:</p>
+        
+        <p style="text-align: center; font-size: 1.1rem; font-weight: 900; color: var(--theme-dark); margin: 10px 0; background: var(--theme-light); padding: 10px; border-radius: 8px;">Volume = Comprimento × Largura × Altura</p>
+        
+        <div class="illustration-container" style="background:transparent; border:none; padding:0; margin:10px 0;">
+          <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 50,80 L 150,30 L 250,80 L 150,130 Z" fill="#7DD3FC" stroke="#0284C7" stroke-width="2"/>
+            <path d="M 50,80 L 50,100 L 150,150 L 150,130 Z" fill="#38BDF8" stroke="#0284C7" stroke-width="2"/>
+            <path d="M 150,150 L 250,100 L 250,80 L 150,130 Z" fill="#0284C7" stroke="#0284C7" stroke-width="2"/>
+            <text x="135" y="165" font-family="Poppins" font-size="13" fill="#0C4A6E" font-weight="bold">Comp.</text>
+            <text x="210" y="130" font-family="Poppins" font-size="13" fill="#0C4A6E" font-weight="bold">Largura</text>
+            <text x="260" y="90" font-family="Poppins" font-size="13" fill="#0C4A6E" font-weight="bold">Altura</text>
+          </svg>
+        </div>
+
+        <ul>
+          <li>Se as medidas estiverem em <strong>metros (m)</strong>, o volume será em <strong>m³</strong> (lembre-se: m³ x 1000 = Litros).</li>
+          <li>Se as medidas estiverem em <strong>centímetros (cm)</strong>, o volume será em <strong>cm³</strong> (lembre-se: 1 cm³ = 1 mL).</li>
+        </ul>
+      </div>
+    </div>
+
+    <button class="btn-action" onclick="setMode('practice')">
+      Iniciar Diagnóstico (<span id="qtd-btn-bottom">0</span> Q) →
+    </button>
+  </div>
+
+  <div id="viewPractice" class="view-section">
+    <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+      <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo</h2>
+      <p id="regras-prova" style="color: #0F172A; font-size: 0.95rem; font-weight:600;">
+        Carregando regras da prova...
+      </p>
+    </div>
+    <div class="question-map" id="qMap"></div>
+    <div id="quizContainer" style="margin-bottom: 100px;"></div>
+  </div>
+
+  <div id="viewResult" class="view-section">
+    <div class="result-card">
+      <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+      <div class="stars-container" id="finalStars">★</div>
+      <div class="percentage-big" id="finalPercent">0%</div>
+      <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+      <div id="review-container"></div>
+    </div>
+    <div id="action-buttons"></div>
+  </div>
+
+</div>
+
+<footer class="quiz-footer" id="quizFooter">
+  <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+  <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+</footer>
+
+<script>
+const searchInput = document.getElementById('searchInput');
+const contentGroups = document.querySelectorAll('.content-group');
+const noResultsMsg = document.getElementById('no-results');
+
+searchInput.addEventListener('input', function(e) {
+  const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  let totalVisible = 0;
+
+  contentGroups.forEach(group => {
+    const textContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (textContent.includes(term)) {
+      group.style.display = 'flex';
+      totalVisible++;
+    } else {
+      group.style.display = 'none';
+    }
+  });
+
+  noResultsMsg.style.display = totalVisible === 0 ? 'block' : 'none';
+});
+
+const questions = [
+  // ================= QUESTÕES FÁCEIS (1 a 10) =================
+  {
+    id: 1, level: "Fácil",
+    text: "De acordo com o que estudamos, qual é a principal diferença entre volume e capacidade?",
+    options: [
+      "Volume é o peso da água, capacidade é a altura do recipiente.",
+      "Volume é a medida do espaço ocupado por um corpo, e capacidade é a quantidade que um recipiente pode armazenar.",
+      "Ambas são exatamente a mesma coisa e servem apenas para medir sólidos de concreto.",
+      "Capacidade mede o tamanho do objeto por fora, e volume mede apenas líquidos."
+    ],
+    correct: 1,
+    explanation: {
+      correct: "Exatamente! Volume foca no espaço ocupado pelo corpo, enquanto a capacidade foca no armazenamento, geralmente líquido.",
+      options: ["Peso e altura não definem o conceito de volume.", "Correta!", "São conceitos ligados, mas não são a mesma coisa.", "Inverso! Capacidade é o que cabe dentro."]
+    }
+  },
+  {
+    id: 2, level: "Fácil",
+    text: "Um cubinho minúsculo tem exatamente 1 centímetro (1 cm) de aresta, o que lhe dá um volume de 1 cm³. Qual é a capacidade interna desse cubinho?",
+    options: ["1 Litro (L)", "10 Mililitros (mL)", "1 Mililitro (mL)", "100 Mililitros (mL)"],
+    correct: 2,
+    explanation: {
+      correct: "Perfeito! A regra de ouro básica é: 1 centímetro cúbico (cm³) equivale a exatamente 1 mililitro (mL).",
+      options: ["1 Litro precisaria de 1 dm³ (1000 cm³).", "Para 10 mL, precisaríamos de 10 cubinhos desses.", "Correta! 1 cm³ = 1 mL.", "100 mL equivalem a 100 cm³."]
+    }
+  },
+  {
+    id: 3, level: "Fácil",
+    text: "Um recipiente maior possui o formato de um cubo com 1 decímetro (1 dm) de aresta. Seu volume interno é 1 dm³. Quantos litros de água ele pode armazenar?",
+    options: ["1 Litro", "10 Litros", "100 Litros", "1000 Litros"],
+    correct: 0,
+    explanation: {
+      correct: "Isso mesmo! O cubo com 10cm de aresta (1 dm³) é a base para a medida de 1 Litro.",
+      options: ["Correta! 1 dm³ = 1 L.", "10 litros exigiriam 10 decímetros cúbicos.", "100 litros exigiriam 100 dm³.", "1000 litros exigiriam um gigante de 1 metro cúbico (1 m³)."]
+    }
+  },
+  {
+    id: 4, level: "Fácil",
+    text: "Um metro cúbico (1 m³) é uma medida de volume gigante! Sabendo disso, qual é a capacidade de armazenamento de água de uma caixa com 1 m³?",
+    options: ["1 Litro", "10 Litros", "100 Litros", "1000 Litros"],
+    correct: 3,
+    explanation: {
+      correct: "Exatamente! Como ensinado, a conversão principal para construções e caixas d'água é: 1 m³ = 1000 Litros.",
+      options: ["1 Litro é apenas 1 dm³. 1 m³ é mil vezes maior.", "10 Litros seriam 10 dm³.", "100 Litros seriam 0,1 m³.", "Correta! 1 metro cúbico abriga 1000 litros."]
+    }
+  },
+  {
+    id: 5, level: "Fácil",
+    text: "Lemos que 1 mL de líquido corresponde a aproximadamente 1/5 da capacidade de uma colher de chá. Sendo assim, qual a capacidade de uma colher de chá cheia?",
+    options: ["1 mL", "5 mL", "10 mL", "50 mL"],
+    correct: 1,
+    explanation: {
+      correct: "Lógica perfeita! Se 1/5 da colher é 1 mL, então a colher inteira (5 partes) tem 5 mL.",
+      options: ["Isso é apenas a quinta parte (uma gota grande).", "Correta! 5 vezes 1 mL = 5 mL.", "10 mL seriam duas colheres cheias.", "50 mL equivalem a um copinho de café inteiro."]
+    }
+  },
+  {
+    id: 6, level: "Fácil",
+    text: "Se uma colher de chá cheia tem 5 mL de capacidade, qual será o seu volume interno correspondente em centímetros cúbicos (cm³)?",
+    options: ["1 cm³", "5 cm³", "50 cm³", "500 cm³"],
+    correct: 1,
+    explanation: {
+      correct: "Certo! Como a relação é de 1 para 1 (1 mL = 1 cm³), então 5 mL ocupam o espaço de 5 cm³.",
+      options: ["1 cm³ abriga apenas 1 mL.", "Correta! A equivalência é direta: 5 mL = 5 cm³.", "50 cm³ abrigariam 50 mL.", "500 cm³ abrigariam meio litro!"]
+    }
+  },
+  {
+    id: 7, level: "Fácil",
+    text: "Qual é a fórmula matemática correta para se descobrir o volume de uma caixa com formato retangular (paralelepípedo)?",
+    options: [
+      "Volume = Comprimento + Largura + Altura",
+      "Volume = Comprimento × Largura × Altura",
+      "Volume = Base × Altura ÷ 2",
+      "Volume = (Comprimento × Largura) - Altura"
+    ],
+    correct: 1,
+    explanation: {
+      correct: "Isso aí! Para caixas retangulares, basta multiplicar as 3 dimensões (3D) para achar o volume.",
+      options: ["Somar as arestas não nos dá a medida do espaço interno.", "Correta! Multiplicamos as 3 dimensões.", "Essa é a fórmula da área de um triângulo, não de volume.", "Subtrair a altura não faz sentido geométrico."]
+    }
+  },
+  {
+    id: 8, level: "Fácil",
+    text: "Temos um pequeno bloco maciço com 2 cm de comprimento, 2 cm de largura e 2 cm de altura. Qual é o volume desse bloco?",
+    illustration: `<svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg" style="max-height:120px; width:100%;">
+      <g transform="translate(70, 80)">
+        <path d="M 0,-40 L 30,-55 L 60,-40 L 30,-25 Z" fill="#7DD3FC" stroke="#0284C7" stroke-width="1.5"/>
+        <path d="M 0,-40 L 0,0 L 30,15 L 30,-25 Z" fill="#38BDF8" stroke="#0284C7" stroke-width="1.5"/>
+        <path d="M 30,-25 L 30,15 L 60,0 L 60,-40 Z" fill="#0284C7" stroke="#0284C7" stroke-width="1.5"/>
+        <text x="35" y="15" font-family="Poppins" font-size="10" fill="#0C4A6E" font-weight="bold">2 cm</text>
+        <text x="-15" y="10" font-family="Poppins" font-size="10" fill="#0C4A6E" font-weight="bold">2 cm</text>
+        <text x="65" y="-15" font-family="Poppins" font-size="10" fill="#0C4A6E" font-weight="bold">2 cm</text>
+      </g>
+    </svg>`,
+    options: ["6 cm³", "4 cm³", "8 cm³", "12 cm³"],
+    correct: 2,
+    explanation: {
+      correct: "Perfeito! Aplicando a fórmula: 2 × 2 × 2 = 8 cm³.",
+      options: ["Você somou as arestas (2+2+2=6). Lembre-se, o correto é multiplicar!", "Você multiplicou apenas a base (2x2=4). Faltou a altura.", "Correta! 2 × 2 × 2 = 8.", "O cálculo foi feito com números errados."]
+    }
+  },
+  {
+    id: 9, level: "Fácil",
+    text: "Se você tem uma jarra com volume interno igual a 3 dm³, qual a capacidade dessa jarra em litros?",
+    options: ["30 Litros", "3 Litros", "0,3 Litros", "300 Litros"],
+    correct: 1,
+    explanation: {
+      correct: "Exato! Sabemos que 1 dm³ = 1 L. Portanto, basta manter o número: 3 dm³ = 3 Litros.",
+      options: ["30 Litros exigiriam 30 dm³.", "Correta! A conversão é 1 para 1. Logo, 3 dm³ = 3 L.", "Você dividiu por 10. A relação é 1 para 1.", "300 litros seriam quase um terço de uma caixa d'água."]
+    }
+  },
+  {
+    id: 10, level: "Fácil",
+    text: "Um caminhão-pipa transporta água em um tanque enorme com volume de 5 m³. Quantos litros de água ele está levando?",
+    options: ["50 Litros", "500 Litros", "5.000 Litros", "50.000 Litros"],
+    correct: 2,
+    explanation: {
+      correct: "Brilhante! Como 1 metro cúbico (m³) armazena 1000 Litros, basta multiplicar: 5 × 1000 = 5.000 Litros.",
+      options: ["50 litros cabem em um pequeno tambor.", "500 litros seriam apenas meio metro cúbico (0,5 m³).", "Correta! 5 m³ × 1000 = 5.000 L.", "Cuidado com os zeros! São três zeros, não quatro."]
+    }
+  },
+
+  // ================= QUESTÕES MÉDIAS (11 a 20) =================
+  {
+    id: 11, level: "Médio",
+    text: "Uma caixinha de suco tem 5 cm de comprimento, 4 cm de largura e 10 cm de altura. Qual é a capacidade dessa caixinha em mililitros (mL)?",
+    illustration: `<svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" style="max-height:140px; width:100%;">
+      <g transform="translate(70, 110)">
+        <path d="M 0,-80 L 25,-95 L 60,-80 L 35,-65 Z" fill="#7DD3FC" stroke="#0284C7" stroke-width="1.5"/>
+        <path d="M 0,-80 L 0,0 L 35,15 L 35,-65 Z" fill="#38BDF8" stroke="#0284C7" stroke-width="1.5"/>
+        <path d="M 35,-65 L 35,15 L 60,0 L 60,-80 Z" fill="#0284C7" stroke="#0284C7" stroke-width="1.5"/>
+        <text x="5" y="25" font-family="Poppins" font-size="10" fill="#0C4A6E" font-weight="bold">5 cm</text>
+        <text x="50" y="15" font-family="Poppins" font-size="10" fill="#0C4A6E" font-weight="bold">4 cm</text>
+        <text x="-25" y="-30" font-family="Poppins" font-size="10" fill="#0C4A6E" font-weight="bold">10 cm</text>
+      </g>
+    </svg>`,
+    options: ["200 mL", "19 mL", "100 mL", "400 mL"],
+    correct: 0,
+    explanation: {
+      correct: "Mandou bem! Volume = 5 × 4 × 10 = 200 cm³. Como 1 cm³ = 1 mL, então cabem 200 mL.",
+      options: ["Correta! O cálculo do volume dá 200 cm³, que é igual a 200 mL.", "Você somou (5+4+10). O correto é multiplicar.", "Você multiplicou apenas 10x10. Erro de tabuada.", "O dobro da resposta certa. Refaça a multiplicação: 5x4=20, 20x10=200."]
+    }
+  },
+  {
+    id: 12, level: "Médio",
+    text: "Um aquário pequeno, em formato cúbico, possui 10 cm de comprimento, 10 cm de largura e 10 cm de altura. Quantos litros de água cabem nesse aquário?",
+    options: ["10 Litros", "100 Litros", "1 Litro", "1000 Litros"],
+    correct: 2,
+    explanation: {
+      correct: "Ótimo raciocínio! O volume é 10x10x10 = 1000 cm³. E como vimos, 1000 cm³ formam 1 dm³, que equivale a 1 Litro.",
+      options: ["Você confundiu a unidade. 1000 cm³ é 1 Litro, não 10 Litros.", "100 litros seria um aquário gigante.", "Correta! 1000 cm³ = 1000 mL = 1 Litro.", "1000 Litros precisariam de 1 m³!"]
+    }
+  },
+  {
+    id: 13, level: "Médio",
+    text: "Uma piscina infantil tem formato retangular com as seguintes medidas: 2 m de comprimento, 2 m de largura e 1 m de altura. Qual é a sua capacidade total de água?",
+    illustration: `<svg viewBox="0 0 250 120" xmlns="http://www.w3.org/2000/svg" style="max-height:120px; width:100%;">
+      <g transform="translate(60, 90)">
+        <path d="M 0,-20 L 50,-45 L 130,-20 L 80,5 Z" fill="#BAE6FD" stroke="#0284C7" stroke-width="1.5"/>
+        <path d="M 0,-20 L 0,0 L 80,25 L 80,5 Z" fill="#38BDF8" stroke="#0284C7" stroke-width="1.5"/>
+        <path d="M 80,5 L 80,25 L 130,0 L 130,-20 Z" fill="#0284C7" stroke="#0284C7" stroke-width="1.5"/>
+        <text x="25" y="25" font-family="Poppins" font-size="10" fill="#0C4A6E" font-weight="bold">2 m</text>
+        <text x="110" y="25" font-family="Poppins" font-size="10" fill="#0C4A6E" font-weight="bold">2 m</text>
+        <text x="-20" y="-5" font-family="Poppins" font-size="10" fill="#0C4A6E" font-weight="bold">1 m</text>
+      </g>
+    </svg>`,
+    options: ["5.000 Litros", "4.000 Litros", "400 Litros", "40 Litros"],
+    correct: 1,
+    explanation: {
+      correct: "Acertou! Volume = 2 × 2 × 1 = 4 m³. Como 1 m³ tem 1000 L, basta multiplicar: 4 × 1000 = 4.000 Litros.",
+      options: ["Você somou as arestas (2+2+1=5) antes de converter. A regra é multiplicar.", "Correta! O volume é 4 m³, equivalendo a 4000 L.", "Você esqueceu um zero na conversão de m³ para litros.", "Essa quantidade não enche nem a metade da piscina!"]
+    }
+  },
+  {
+    id: 14, level: "Médio",
+    text: "A recomendação do nosso material para uma casa de 4 pessoas é uma caixa-d'água de pelo menos 1 m³ (1000 L). Se uma família grande precisasse de 2500 Litros, qual seria o volume dessa caixa em metros cúbicos?",
+    options: ["25 m³", "2,5 m³", "0,25 m³", "250 m³"],
+    correct: 1,
+    explanation: {
+      correct: "Perfeito! A operação inversa é dividir os Litros por 1000. 2500 ÷ 1000 = 2,5 m³.",
+      options: ["25 m³ abrigariam 25.000 litros! É caixa de prédio.", "Correta! 2500 Litros = 2,5 m³.", "0,25 m³ seriam apenas 250 litros.", "250 m³ é quase o tamanho de uma piscina olímpica."]
+    }
+  },
+  {
+    id: 15, level: "Médio",
+    text: "Um frasco de perfume tem 50 cm³ de volume interno. Sabendo que cada colher de chá tem 5 mL de capacidade, quantas colheres de chá seriam necessárias para encher esse frasco?",
+    options: ["10 colheres", "5 colheres", "50 colheres", "100 colheres"],
+    correct: 0,
+    explanation: {
+      correct: "Excelente lógica! 50 cm³ = 50 mL. Como cada colher tem 5 mL, fazemos a divisão: 50 ÷ 5 = 10 colheres.",
+      options: ["Correta! 50 mL divididos por 5 mL = 10.", "5 colheres dariam apenas 25 mL.", "50 colheres dariam 250 mL (um copo cheio).", "Erro de conversão. Você ignorou a capacidade da colher."]
+    }
+  },
+  {
+    id: 16, level: "Médio",
+    text: "Se você comprar meia caixa-d'água padrão, ou seja, um recipiente com volume de 0,5 m³, quantos litros ele suportará?",
+    options: ["50 Litros", "5 Litros", "500 Litros", "5.000 Litros"],
+    correct: 2,
+    explanation: {
+      correct: "Na mosca! 1 m³ = 1000 L. Logo, metade disso (0,5 m³) será a metade de 1000, que é 500 Litros.",
+      options: ["Você dividiu por 20. 0,5 de 1000 é 500.", "5 litros cabem em um garrafão pequeno.", "Correta! 0,5 m³ × 1000 = 500 Litros.", "Isso seria o equivalente a 5 m³."]
+    }
+  },
+  {
+    id: 17, level: "Médio",
+    text: "Um bloco retangular transparente de acrílico possui 10 cm de base, 20 cm de altura e 30 cm de profundidade. Qual é o seu volume em litros?",
+    illustration: `<svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" style="max-height:140px; width:100%;">
+      <g transform="translate(60, 110)">
+        <path d="M 0,-80 L 30,-95 L 70,-80 L 40,-65 Z" fill="#E0F2FE" stroke="#0284C7" stroke-width="1.5"/>
+        <path d="M 0,-80 L 0,0 L 40,15 L 40,-65 Z" fill="#BAE6FD" stroke="#0284C7" stroke-width="1.5" opacity="0.8"/>
+        <path d="M 40,-65 L 40,15 L 70,0 L 70,-80 Z" fill="#7DD3FC" stroke="#0284C7" stroke-width="1.5" opacity="0.6"/>
+        <text x="10" y="25" font-family="Poppins" font-size="10" fill="#0C4A6E" font-weight="bold">10cm</text>
+        <text x="55" y="15" font-family="Poppins" font-size="10" fill="#0C4A6E" font-weight="bold">30cm</text>
+        <text x="-30" y="-30" font-family="Poppins" font-size="10" fill="#0C4A6E" font-weight="bold">20cm</text>
+      </g>
+    </svg>`,
+    options: ["60 Litros", "6 Litros", "0,6 Litros", "600 Litros"],
+    correct: 1,
+    explanation: {
+      correct: "Ótima abstração! Volume = 10x20x30 = 6000 cm³. Como 1000 cm³ = 1 L, então 6000 cm³ = 6 Litros.",
+      options: ["Erro na casa decimal. 6000 cm³ são 6 Litros.", "Correta! O volume em cm³ foi convertido para Litros dividindo por 1000.", "Isso seriam apenas 600 cm³.", "600 Litros necessitariam de 600.000 cm³."]
+    }
+  },
+  {
+    id: 18, level: "Médio",
+    text: "Se um recipiente tem capacidade de 2.000 mililitros (2.000 mL), quantos cubinhos de 1 cm³ cabem dentro dele?",
+    options: ["200 cubinhos", "20 cubinhos", "2.000 cubinhos", "2 cubinhos"],
+    correct: 2,
+    explanation: {
+      correct: "Simples e direto! Como 1 cm³ abriga 1 mL, então para 2.000 mL precisaremos de exatos 2.000 cubinhos.",
+      options: ["Faltou um zero na contagem.", "A proporção é de 1 para 1, você não precisa cortar zeros aqui.", "Correta! 2000 mL = 2000 cm³.", "2 cubinhos fariam apenas 2 mL."]
+    }
+  },
+  {
+    id: 19, level: "Médio",
+    text: "O porta-malas de um carro foi medido e tem um volume interno de 500 dm³. Se fôssemos enchê-lo de água (apenas hipoteticamente!), quantos litros caberiam?",
+    options: ["50 Litros", "5 Litros", "5.000 Litros", "500 Litros"],
+    correct: 3,
+    explanation: {
+      correct: "Rápido no gatilho! A regra do 'médio' diz que 1 dm³ = 1 L. Portanto, 500 dm³ são exatamente 500 Litros.",
+      options: ["Faltou um zero, 1 dm³ = 1 L, não 0,1 L.", "Você dividiu por 100.", "Você multiplicou por 10. Lembre-se, 1 dm³ já é o litro.", "Correta! 500 dm³ equivalem diretamente a 500 L."]
+    }
+  },
+  {
+    id: 20, level: "Médio",
+    text: "João quer encher um balde de 10 Litros usando um recipiente que tem a medida exata de 1 dm³ de volume. Quantas vezes ele precisará usar esse recipiente?",
+    options: ["1 vez", "10 vezes", "100 vezes", "1000 vezes"],
+    correct: 1,
+    explanation: {
+      correct: "Perfeito! O recipiente de 1 dm³ tem capacidade para exatamente 1 Litro. Para encher 10 L, ele o usará 10 vezes.",
+      options: ["Com 1 vez ele transfere apenas 1 Litro.", "Correta! Cada dm³ é 1 L, logo, são precisas 10 viagens.", "100 vezes dariam 100 Litros.", "Ele estaria enchendo uma caixa d'água inteira!"]
+    }
+  },
+
+  // ================= QUESTÕES DIFÍCEIS (21 a 30) =================
+  {
+    id: 21, level: "Difícil",
+    text: "Desafio da Engenharia: Uma piscina comunitária tem 10 m de comprimento, 5 m de largura e 2 m de profundidade. Quantos litros de água ela comporta quando está totalmente cheia?",
+    options: ["100 Litros", "1.000 Litros", "10.000 Litros", "100.000 Litros"],
+    correct: 3,
+    explanation: {
+      correct: "Cálculo impecável! Volume = 10 × 5 × 2 = 100 m³. Como cada 1 m³ tem 1000 L, multiplicamos: 100 × 1000 = 100.000 Litros.",
+      options: ["Esse é apenas o volume em m³ (100). Faltou converter para litros.", "Isso equivaleria a apenas 1 m³.", "Faltou um zero! 100 x 1000 = 100.000.", "Correta! O volume de 100 m³ suporta 100.000 L."]
+    }
+  },
+  {
+    id: 22, level: "Difícil",
+    text: "Você tem um bloco oco retangular que mede 50 cm de comprimento, 20 cm de largura e 10 cm de altura. Convertendo esse volume final para capacidade, o que obtemos?",
+    options: ["1.000 Litros", "100 Litros", "10 Litros", "1 Litro"],
+    correct: 2,
+    explanation: {
+      correct: "Atenção máxima aqui! Volume = 50x20x10 = 10.000 cm³. Sabendo que cada 1000 cm³ é 1 Litro, então 10.000 ÷ 1000 = 10 Litros.",
+      options: ["Isso seria o volume do bloco se as medidas fossem em metros (1m³).", "Você errou a casa decimal na divisão de 10.000 cm³.", "Correta! 10.000 cm³ = 10.000 mL, que equivalem a 10 Litros.", "1 Litro seria apenas 1.000 cm³."]
+    }
+  },
+  {
+    id: 23, level: "Difícil",
+    text: "Se afirmarmos que uma caixa d'água grande abriga 3.000 dm³ de água. Podemos afirmar com certeza matemática que o volume dessa caixa também é:",
+    options: ["3 m³", "30 m³", "300 m³", "0,3 m³"],
+    correct: 0,
+    explanation: {
+      correct: "Muito bem! 1 m³ equivale a 1.000 dm³. Logo, se temos 3.000 dm³, temos o equivalente a 3 metros cúbicos (3 m³).",
+      options: ["Correta! A cada 1000 dm³, forma-se 1 m³.", "30 m³ abrigariam 30.000 dm³.", "300 m³ são gigantescos (300.000 L).", "0,3 m³ seria equivalente a 300 dm³ apenas."]
+    }
+  },
+  {
+    id: 24, level: "Difícil",
+    text: "Um aquário foi construído com as seguintes dimensões internas: 5 dm de comprimento, 4 dm de largura e 3 dm de altura. Quantos litros esse aquário suporta?",
+    options: ["60 Litros", "600 Litros", "120 Litros", "12 Litros"],
+    correct: 0,
+    explanation: {
+      correct: "Fórmula e conversão perfeitas! Volume = 5x4x3 = 60 dm³. E como aprendemos, a medida de 1 dm³ é exatamente 1 Litro. Logo, 60 Litros.",
+      options: ["Correta! 60 dm³ = 60 Litros.", "Você multiplicou o resultado por 10 sem necessidade.", "Isso seria se a conta fosse (5+4+3) x 10, o que é um erro na fórmula.", "Erro de multiplicação básica."]
+    }
+  },
+  {
+    id: 25, level: "Difícil",
+    text: "Uma ampola de vacina armazena exatamente 3 mL. Qual deve ser o volume interno exato da ampola em milímetros cúbicos ou centímetros cúbicos?",
+    options: ["3 m³", "3 dm³", "3 cm³", "30 cm³"],
+    correct: 2,
+    explanation: {
+      correct: "Clínico! A regra base do 'pequeno' é que 1 mL ocupa sempre o espaço de 1 cm³. Logo, 3 mL = 3 cm³.",
+      options: ["3 m³ abrigam 3 mil litros! O paciente explodiria.", "3 dm³ abrigam 3 litros.", "Correta! 1 mL = 1 cm³.", "30 cm³ dariam 30 mL."]
+    }
+  },
+  {
+    id: 26, level: "Difícil",
+    text: "Um reservatório retangular tem área da base igual a 2 m² e altura igual a 3 m. (Dica: Volume = Área da Base × Altura). Qual é a sua capacidade em litros?",
+    illustration: `<svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" style="max-height:140px; width:100%;">
+      <g transform="translate(60, 110)">
+        <path d="M 0,-80 L 40,-100 L 80,-80 L 40,-60 Z" fill="#7DD3FC" stroke="#0284C7" stroke-width="1.5"/>
+        <path d="M 0,-80 L 0,0 L 40,20 L 40,-60 Z" fill="#38BDF8" stroke="#0284C7" stroke-width="1.5"/>
+        <path d="M 40,-60 L 40,20 L 80,0 L 80,-80 Z" fill="#0284C7" stroke="#0284C7" stroke-width="1.5"/>
+        <text x="10" y="-15" font-family="Poppins" font-size="11" fill="#FFFFFF" font-weight="bold">Área: 2 m²</text>
+        <text x="-25" y="-30" font-family="Poppins" font-size="11" fill="#0C4A6E" font-weight="bold">H = 3 m</text>
+      </g>
+    </svg>`,
+    options: ["6 Litros", "60 Litros", "600 Litros", "6.000 Litros"],
+    correct: 3,
+    explanation: {
+      correct: "Ótima visão matemática! Se a base já está multiplicada (2), fazemos 2 × 3 = 6 m³. Convertendo para litros: 6 × 1000 = 6.000 Litros.",
+      options: ["6 é apenas o volume em metros cúbicos. Faltou converter.", "Faltaram zeros. 1 m³ = 1000 L.", "Isso seriam apenas 0,6 m³.", "Correta! 6 m³ = 6.000 L."]
+    }
+  },
+  {
+    id: 27, level: "Difícil",
+    text: "O consumo de água de uma família foi de 15 m³ no mês. A conta de água vem cobrando o consumo a cada 1000 Litros. Quantos milhares de litros a família gastou?",
+    options: ["1.500 Litros (1,5 milhares)", "15.000 Litros (15 milhares)", "150.000 Litros (150 milhares)", "150 Litros (0,15 milhares)"],
+    correct: 1,
+    explanation: {
+      correct: "Correto! Se 1 m³ = 1000 Litros, então 15 m³ = 15.000 Litros. Portanto, foram gastos 15 blocos de 1.000 litros (15 milhares).",
+      options: ["Isso equivaleria a apenas 1,5 m³.", "Correta! 15 x 1000 = 15.000 L.", "Cuidado, você adicionou um zero a mais no final.", "Esse consumo seria de 0,15 m³, quase nada para um mês."]
+    }
+  },
+  {
+    id: 28, level: "Difícil",
+    text: "Desafio Cúbico: Um cubo grande tem arestas medindo 2 metros. Lembre-se, um cubo tem todas as arestas iguais. Qual é a sua capacidade total?",
+    options: ["6.000 Litros", "8.000 Litros", "4.000 Litros", "2.000 Litros"],
+    correct: 1,
+    explanation: {
+      correct: "Gênio! As 3 arestas do cubo são iguais: 2x2x2 = 8 m³. E como 1 m³ tem 1000 L, o cubo armazena 8.000 Litros.",
+      options: ["Você somou as arestas (2+2+2). A fórmula exige multiplicação.", "Correta! Volume = 2x2x2 = 8 m³ = 8000 L.", "Você multiplicou apenas a base (2x2). Faltou a altura.", "Você não calculou o volume, apenas repetiu a aresta em litros."]
+    }
+  },
+  {
+    id: 29, level: "Difícil",
+    text: "Um caminhão tem um baú de transporte no formato retangular com medidas: 4 m de comprimento, 2 m de largura e 2 m de altura. Se ele fosse um enorme tanque de água, qual o volume de água em Litros?",
+    illustration: `<svg viewBox="0 0 250 140" xmlns="http://www.w3.org/2000/svg" style="max-height:130px; width:100%;">
+      <g transform="translate(50, 100)">
+        <path d="M 0,-40 L 40,-60 L 140,-40 L 100,-20 Z" fill="#7DD3FC" stroke="#0284C7" stroke-width="1.5"/>
+        <path d="M 0,-40 L 0,0 L 100,20 L 100,-20 Z" fill="#38BDF8" stroke="#0284C7" stroke-width="1.5"/>
+        <path d="M 100,-20 L 100,20 L 140,0 L 140,-40 Z" fill="#0284C7" stroke="#0284C7" stroke-width="1.5"/>
+        <text x="40" y="25" font-family="Poppins" font-size="11" fill="#0C4A6E" font-weight="bold">4 m</text>
+        <text x="125" y="20" font-family="Poppins" font-size="11" fill="#0C4A6E" font-weight="bold">2 m</text>
+        <text x="-20" y="-10" font-family="Poppins" font-size="11" fill="#0C4A6E" font-weight="bold">2 m</text>
+      </g>
+    </svg>`,
+    options: ["16 Litros", "1.600 Litros", "16.000 Litros", "160.000 Litros"],
+    correct: 2,
+    explanation: {
+      correct: "Belo cálculo! Volume = 4 × 2 × 2 = 16 m³. Convertendo para capacidade usando o 'gigante': 16 × 1.000 = 16.000 Litros.",
+      options: ["Isso é apenas o volume em metros (16 m³).", "Faltou um zero na multiplicação por 1.000.", "Correta! 16 m³ = 16.000 L.", "Você adicionou um zero a mais. São 16 x 1000."]
+    }
+  },
+  {
+    id: 30, level: "Difícil",
+    text: "Para encerrar: Qual alternativa resume todas as conversões verdadeiras e diretas ensinadas sobre Volume e Capacidade?",
+    options: [
+      "1 m³ = 1 L; 1 dm³ = 1 mL; 1 cm³ = 1000 L",
+      "1 cm³ = 1 L; 1 m³ = 1000 mL",
+      "1 cm³ = 1 mL; 1 dm³ = 1 L; 1 m³ = 1.000 L",
+      "1 cm³ = 10 L; 1 dm³ = 100 L; 1 m³ = 1.000 L"
+    ],
+    correct: 2,
+    explanation: {
+      correct: "Parabéns! Essa é a trindade de ouro das medidas: o minúsculo (mL), o médio (Litro) e o gigante (Mil litros).",
+      options: ["Tudo invertido! O gigante não pode suportar só 1 L.", "1 cm³ suporta apenas uma gotinha (1 mL).", "Correta! É a regra perfeita de equivalência ensinada na teoria.", "Valores distorcidos no cm³ e dm³. A única conversão com 1000 é a do m³."]
+    }
+  }
+];
+
+const storageKey = 'promover_quiz_' + document.title.replace(/\s+/g,'_').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+let currentQuestion = 0;
+let userAnswers = [];
+
+function initQuiz() {
+  const totalQ = questions.length;
+  // Correção Bug 3: Textos estáticos agora refletem a real quantidade de questões
+  document.getElementById('qtd-btn').textContent = totalQ;
+  document.getElementById('qtd-btn-bottom').textContent = totalQ;
+  
+  const notaCorte = Math.ceil(totalQ * 0.8);
+  document.getElementById('regras-prova').innerHTML = `${totalQ} questões rigorosas. Acerte <strong>80% (${notaCorte}/${totalQ})</strong> para provar seu domínio. Leia a correção de cada erro!`;
+
+  // Correção Bug 1: Validação de cache corrompido ou desatualizado
+  let savedAnswers = localStorage.getItem(storageKey);
+  if (savedAnswers) {
+    let parsed = JSON.parse(savedAnswers);
+    if (parsed.length !== totalQ) {
+      // Se o tamanho salvo no navegador não bate com as questões atuais, reseta o progresso para evitar quebras.
+      userAnswers = new Array(totalQ).fill(null);
+      localStorage.removeItem(storageKey);
+    } else {
+      userAnswers = parsed;
+    }
+  } else {
+    userAnswers = new Array(totalQ).fill(null);
+  }
+}
+initQuiz();
+
+function setMode(mode) {
+  const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+  views.forEach(v => document.getElementById(v).style.display = 'none');
+  document.getElementById('quizFooter').style.display = 'none';
+
+  if(mode === 'explanation') {
+    document.getElementById('viewExplanation').style.display = 'flex';
+    document.getElementById('btnExp').classList.add('active');
+    document.getElementById('btnPrac').classList.remove('active');
+  } else if (mode === 'practice') {
+    document.getElementById('viewPractice').style.display = 'block';
+    document.getElementById('quizFooter').style.display = 'flex';
+    document.getElementById('btnExp').classList.remove('active');
+    document.getElementById('btnPrac').classList.add('active');
+    renderQuestion();
+    renderMap();
+  } else if (mode === 'result') {
+    document.getElementById('viewResult').style.display = 'block';
+    document.getElementById('quizFooter').style.display = 'none';
+    window.scrollTo(0,0);
+  }
+}
+
+function renderQuestion() {
+  if(questions.length === 0) return;
+  const q = questions[currentQuestion];
+  const container = document.getElementById('quizContainer');
+  const letters = ['A', 'B', 'C', 'D'];
+  const ans = userAnswers[currentQuestion];
+  let badgeClass = '';
+
+  if(q.level === 'Fácil') badgeClass = 'dif-facil';
+  else if(q.level === 'Médio') badgeClass = 'dif-medio';
+  else badgeClass = 'dif-dificil';
+
+  container.innerHTML = `
+    <div class="card-content" style="border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); padding: 15px; border-radius: 12px; background: white;">
+      <span class="difficulty-badge ${badgeClass}">${q.level}</span>
+      
+      <div style="margin-bottom: 20px;">
+        <span style="font-size: 0.8rem; font-weight: 800; color: var(--theme-dark);">QUESTÃO ${currentQuestion + 1} DE ${questions.length}</span>
+        <h2 style="font-size: 1.15rem; margin-top: 5px; color: var(--text-color); font-weight: 900;">${q.text}</h2>
+        ${q.illustration ? `<div style="display:flex; justify-content:center; align-items:center; background:#F8FAFC; border: 2px dashed #BAE6FD; border-radius: 8px; padding: 10px; margin-top: 15px;">${q.illustration}</div>` : ''}
+      </div>
+      
+      <div class="options-list">
+        ${q.options.map((opt, i) => {
+          let cls = '';
+          if (ans !== null) {
+            if (i === q.correct) cls = 'correct';
+            else if (i === ans) cls = 'wrong';
+            else cls = 'disabled';
+          }
+          return `<button class="option-btn ${cls}" onclick="handleAnswer(${i})" ${ans !== null ? 'disabled' : ''}>
+            <div class="opt-circle">${letters[i]}</div>
+            <div>${opt}</div>
+          </button>`
+        }).join('')}
+      </div>
+      
+      ${ans !== null ? `
+      <div class="feedback-box">
+        <div class="feedback-title" style="color:${ans === q.correct ? 'var(--correct-border)' : 'var(--wrong-border)'}">
+           ${ans === q.correct ? '☑ Raciocínio Aprovado!' : '✖ Ops! Falha Detectada:'}
+        </div>
+        <div class="feedback-item correct-opt"><strong>A Verdade Direta e Certa:</strong> ${q.options[q.correct]}</div>
+        
+        <div style="margin-top: 10px; font-size:0.95rem; color:var(--text-color); margin-bottom:15px; font-weight:600;">
+          ${q.explanation.correct}
+        </div>
+        
+        <div style="margin-top:15px; border-top:1px dashed var(--theme-light); padding-top:10px;">
+          <small style="color:var(--theme-dark);"><strong>Diagnóstico das Rasteiras e Distratores:</strong></small>
+          ${q.explanation.options.map((exp, i) => i !== q.correct ? `<div class="feedback-item wrong-opt" style="margin-top:8px;"><strong>${letters[i]})</strong> ${exp}</div>` : '').join('')}
+        </div>
+      </div>
+      ` : ''}
+    </div>
+  `;
+  updateNav();
+}
+
+function handleAnswer(idx) {
+  if (userAnswers[currentQuestion] !== null) return;
+  userAnswers[currentQuestion] = idx;
+  localStorage.setItem(storageKey, JSON.stringify(userAnswers));
+  
+  if (idx === questions[currentQuestion].correct) {
+    const duration = 1500;
+    const end = Date.now() + duration;
+    (function frame() {
+      confetti({ particleCount: 5, angle: 60, spread: 55, origin: {x: 0, y: 0.6 }, colors: ['#10B981', '#059669', '#34D399', '#047857'] });
+      confetti({ particleCount: 5, angle: 120, spread: 55, origin: {x: 1, y: 0.6 }, colors: ['#10B981', '#059669', '#34D399', '#047857'] });
+      if (Date.now() < end) { requestAnimationFrame(frame); }
+    }());
+  } else {
+    const quizContainer = document.getElementById('quizContainer');
+    quizContainer.classList.remove('shake-effect');
+    void quizContainer.offsetWidth;
+    quizContainer.classList.add('shake-effect');
+    setTimeout(() => quizContainer.classList.remove('shake-effect'), 500);
+  }
+  
+  renderQuestion();
+  renderMap();
+}
+
+function renderMap() {
+  if(questions.length === 0) return;
+  const map = document.getElementById('qMap');
+  
+  map.innerHTML = questions.map((q, i) => {
+    let cls = 'map-dot';
+    if (i === currentQuestion) cls += ' active';
+    if (userAnswers[i] !== null) {
+      cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+    }
+    return `<div class="${cls}" onclick="goTo(${i})">${i+1}</div>`;
+  }).join('');
+  
+  setTimeout(() => {
+    const activeDot = map.querySelector('.map-dot.active');
+    if (activeDot) {
+      activeDot.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }, 50);
+}
+
+function goTo(i) {
+  if (window.confetti) confetti.reset();
+  currentQuestion = i;
+  renderQuestion();
+  renderMap();
+}
+
+function changeQuestion(d) {
+  let n = currentQuestion + d;
+  if (n >= 0 && n < questions.length) goTo(n);
+}
+
+function updateNav() {
+  document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+  const next = document.getElementById('btnNext');
+  
+  if (currentQuestion === questions.length - 1) {
+    next.textContent = "Finalizar Diagnóstico";
+    next.onclick = finish;
+  } else {
+    next.textContent = "Avançar";
+    next.onclick = () => changeQuestion(1);
+  }
+}
+
+function finish() {
+  let correct = userAnswers.filter((a, i) => a === questions[i].correct).length;
+  let percent = Math.round((correct/questions.length) * 100);
+  
+  if (window.confetti) confetti.reset();
+  
+  document.getElementById('finalPercent').textContent = percent + "%";
+  document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${questions.length} questões.`;
+  document.getElementById('finalStars').textContent = percent >= 80 ? "⭐⭐⭐" : percent >= 60 ? "⭐⭐" : "⭐";
+  
+  let summary = '<div style="text-align:left; margin-top:20px;">';
+  
+  if (percent < 80) {
+    summary += `<div style="background:var(--wrong-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--wrong-border); color:var(--wrong-border);">
+    <strong>⚠️ Domínio Insuficiente!</strong> O seu desempenho não atingiu a nota de corte (80%). Atingir a pontuação mínima é obrigatório nesta prova. Revise a teoria com rigor antes de tentar novamente.
+    </div>`;
+    document.getElementById('action-buttons').innerHTML = `<button class="btn-action" onclick="reset()"> Limpar Histórico e Refazer Prova</button>`;
+  } else {
+    summary += `<div style="background:var(--correct-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--correct-border); color:var(--correct-border);">
+    <strong>🏆 Excelente Desempenho!</strong> Você demonstrou uma base sólida, clínica e exata sobre os conceitos avaliados. A sua aprovação técnica está garantida neste módulo.
+    </div>`;
+    document.getElementById('action-buttons').innerHTML = `<button class="btn-action" onclick="reset()"> Refazer Prova (Zerar Histórico)</button>`;
+  }
+  
+  if (correct < questions.length) {
+    summary += `<h4 style="margin-bottom:10px; color:var(--text-color);">Relatório de Falhas e Correções:</h4>`;
+    questions.forEach((q, i) => {
+      // Correção Bug 2: Avalia também questões que o aluno deixou em branco (null)
+      if(userAnswers[i] !== q.correct) {
+        let userChoiceText = userAnswers[i] === null ? "Não respondida (Em branco)" : q.options[userAnswers[i]];
+        summary += `<div style="margin-bottom:10px; padding:15px; background:var(--white); border-radius:8px; border:2px dashed var(--theme-dark);">
+        <strong style="color:var(--theme-dark);">Q${i+1}:</strong> ${q.text}<br>
+        <span style="color:var(--wrong-border); font-size:0.9rem; font-weight:600; display:block; margin-top:5px;">Seu Erro/Status: ${userChoiceText}</span>
+        <span style="color:var(--correct-border); font-size:0.9rem; font-weight:600; display:block; margin-top:2px;">A Verdade: ${q.options[q.correct]}</span>
+        </div>`;
+      }
+    });
+  }
+  
+  summary += '</div>';
+  document.getElementById('review-container').innerHTML = summary;
+  setMode('result');
+}
+
+function reset() {
+  localStorage.removeItem(storageKey);
+  userAnswers = new Array(questions.length).fill(null);
+  currentQuestion = 0;
+  setMode('practice');
+}
+
+setMode(userAnswers.some(ans => ans !== null) ? 'practice' : 'explanation');
+</script>
+</body>
+</html>
