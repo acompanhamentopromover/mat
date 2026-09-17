@@ -285,7 +285,7 @@
             </div>
             <div class="topic-item item-menus" data-id="menu-angulos-circunferencia-9ano">
                 <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div>
-                <a href="angulos na circuferencia9ano.html" class="topic-link"><span class="topic-title">Ângulos na Circunferência 9º Ano</span><span class="arrow">➜</span></a>
+                <a href="angulosnacircuferencia9ano.html" class="topic-link"><span class="topic-title">Ângulos na Circunferência 9º Ano</span><span class="arrow">➜</span></a>
             </div>
             <div class="topic-item item-menus" data-id="menu-quadrado-inscrito-circunscrito">
                 <div class="topic-cb-wrapper"><input type="checkbox" class="topic-cb"></div>
@@ -519,12 +519,21 @@
         const STORAGE_KEY = 'matematica_promover_progresso_2026';
 
         function getProgress() {
-            const data = localStorage.getItem(STORAGE_KEY);
-            return data ? JSON.parse(data) : [];
+            try {
+                const data = localStorage.getItem(STORAGE_KEY);
+                const progress = data ? JSON.parse(data) : [];
+                return Array.isArray(progress) ? progress : [];
+            } catch (error) {
+                return [];
+            }
         }
 
         function saveProgress(progressArray) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(progressArray));
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(progressArray));
+            } catch (error) {
+                // O índice continua navegável mesmo sem armazenamento local disponível.
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -580,7 +589,7 @@
         const contentGroups = document.querySelectorAll('.content-group');
         const noResultsMsg = document.getElementById('no-results');
 
-        searchInput.addEventListener('keyup', function(e) {
+        searchInput.addEventListener('input', function(e) {
             const term = e.target.value.toLowerCase();
             const termNormalized = term.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             let totalVisibleGroups = 0;
